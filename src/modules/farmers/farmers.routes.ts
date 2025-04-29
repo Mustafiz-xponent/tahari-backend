@@ -1,5 +1,9 @@
+// src/modules/farmers/farmers.routes.ts
+
 import { Router } from "express";
-import * as FarmerController from "./farmers.controller";
+import FarmerController from "./farmers.controller";
+
+
 
 const router = Router();
 

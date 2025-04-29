@@ -1,74 +1,85 @@
+// src/modules/farmers/farmers.controller.ts
+
 import { Request, Response } from "express";
-import * as FarmerService from "./farmer.service";
+import * as FarmerService from "./farmers.service";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 // Create a new farmer
-export const createFarmer = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+const createFarmer = async (req: Request, res: Response): Promise<void> => {
   try {
     const farmer = await FarmerService.createFarmer(req.body);
-    return res.status(201).json(farmer);
+    res.status(201).json(farmer); // No return
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: getErrorMessage(error) }); // No return
   }
 };
 
 // Get all farmers
-export const getAllFarmers = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+const getAllFarmers = async (req: Request, res: Response): Promise<void> => {
   try {
     const farmers = await FarmerService.getAllFarmers();
-    return res.status(200).json(farmers);
+    res.status(200).json(farmers); // No return
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: getErrorMessage(error) }); // No return
   }
 };
 
 // Get a farmer by ID
-export const getFarmerById = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+const getFarmerById = async (req: Request, res: Response): Promise<void> => {
   try {
-    const farmerId = BigInt(req.params.id); // Assuming ID is passed as a string, convert to BigInt
+    const { id } = req.params;
+    if (!/^\d+$/.test(id)) {
+      res.status(400).json({ message: "Invalid farmer ID" }); // No return
+      return;
+    }
+    const farmerId = BigInt(id);
     const farmer = await FarmerService.getFarmerById(farmerId);
     if (farmer) {
-      return res.status(200).json(farmer);
+      res.status(200).json(farmer); // No return
     } else {
-      return res.status(404).json({ message: "Farmer not found." });
+      res.status(404).json({ message: "Farmer not found." }); // No return
     }
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: getErrorMessage(error) }); // No return
   }
 };
 
 // Update a farmer's details
-export const updateFarmer = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+const updateFarmer = async (req: Request, res: Response): Promise<void> => {
   try {
-    const farmerId = BigInt(req.params.id); // Assuming ID is passed as a string, convert to BigInt
+    const { id } = req.params;
+    if (!/^\d+$/.test(id)) {
+      res.status(400).json({ message: "Invalid farmer ID" }); // No return
+      return;
+    }
+    const farmerId = BigInt(id);
     const updatedFarmer = await FarmerService.updateFarmer(farmerId, req.body);
-    return res.status(200).json(updatedFarmer);
+    res.status(200).json(updatedFarmer); // No return
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: getErrorMessage(error) }); // No return
   }
 };
 
 // Delete a farmer
-export const deleteFarmer = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+const deleteFarmer = async (req: Request, res: Response): Promise<void> => {
   try {
-    const farmerId = BigInt(req.params.id); // Assuming ID is passed as a string, convert to BigInt
+    const { id } = req.params;
+    if (!/^\d+$/.test(id)) {
+      res.status(400).json({ message: "Invalid farmer ID" }); // No return
+      return;
+    }
+    const farmerId = BigInt(id);
     const deletedFarmer = await FarmerService.deleteFarmer(farmerId);
-    return res.status(200).json(deletedFarmer);
+    res.status(200).json(deletedFarmer); // No return
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: getErrorMessage(error) }); // No return
   }
+};
+
+export default {
+  createFarmer,
+  getAllFarmers,
+  getFarmerById,
+  updateFarmer,
+  deleteFarmer,
 };

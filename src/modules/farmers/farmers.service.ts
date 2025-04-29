@@ -1,3 +1,6 @@
+// src/modules/farmers/farmers.service.ts
+
+import { getErrorMessage } from "@/utils/errorHandler";
 import prisma from "../../prisma-client/prismaClient";
 import { Farmer } from "@prisma/client"; // Import the Farmer type from Prisma Client
 
@@ -13,7 +16,7 @@ export const createFarmer = async (data: {
       data,
     });
   } catch (error) {
-    throw new Error(`Error creating farmer: ${error.message}`);
+    throw new Error(`Error creating farmer: ${getErrorMessage(error)}`);
   }
 };
 
@@ -22,7 +25,7 @@ export const getAllFarmers = async (): Promise<Farmer[]> => {
   try {
     return await prisma.farmer.findMany();
   } catch (error) {
-    throw new Error(`Error fetching farmers: ${error.message}`);
+    throw new Error(`Error fetching farmers: ${getErrorMessage(error)}`);
   }
 };
 
@@ -35,7 +38,7 @@ export const getFarmerById = async (
       where: { farmerId: Number(farmerId) }, // Convert BigInt to Number for Prisma compatibility
     });
   } catch (error) {
-    throw new Error(`Error fetching farmer by ID: ${error.message}`);
+    throw new Error(`Error fetching farmer by ID: ${getErrorMessage(error)}`);
   }
 };
 
@@ -55,7 +58,7 @@ export const updateFarmer = async (
       data,
     });
   } catch (error) {
-    throw new Error(`Error updating farmer: ${error.message}`);
+    throw new Error(`Error updating farmer: ${getErrorMessage(error)}`);
   }
 };
 
@@ -66,6 +69,6 @@ export const deleteFarmer = async (farmerId: BigInt): Promise<Farmer> => {
       where: { farmerId: Number(farmerId) }, // Convert BigInt to Number for Prisma compatibility
     });
   } catch (error) {
-    throw new Error(`Error deleting farmer: ${error.message}`);
+    throw new Error(`Error deleting farmer: ${getErrorMessage(error)}`);
   }
 };
