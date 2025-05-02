@@ -4,25 +4,36 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "ts-node src/index.ts",
-    "dev": "ts-node-dev src/index.ts"
+    "dev": "ts-node-dev src/index.ts",
+    "test": "jest",
+    "test:unit": "jest --testPathPattern=tests/unit",
+    "test:e2e": "jest --testPathPattern=tests/e2e",
+    "test:load": "artillery run tests/load/admins.load.yml"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.1",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.15.3",
-    "prisma": "^6.6.0",
+    "@types/supertest": "^6.0.3",
+    "dotenv": "^16.5.0",
+    "jest": "^29.7.0",
+    "prisma": "^6.7.0",
+    "supertest": "^7.1.0",
+    "ts-jest": "^29.3.2",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   },
   "dependencies": {
     "@prisma/client": "^6.6.0",
-    "dotenv": "^16.5.0",
+    "@types/express-serve-static-core": "^5.0.6",
+    "bcrypt": "^5.1.1",
     "express": "^5.1.0",
     "zod": "^3.24.3"
   }

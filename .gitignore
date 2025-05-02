@@ -10,6 +10,7 @@ build/
 
 # Environment variables
 .env
+ 
 
 # Logs
 logs/
@@ -20,6 +21,7 @@ yarn-error.log*
 
 # Prisma generated files
 prisma/migrations/
+/generated/
 
 # OS files
 .DS_Store

@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ES2020", // ✅ Enables BigInt support
     "module": "commonjs",
+    "lib": ["ES2020"], // ✅ Includes BigInt in the standard library
     "outDir": "./dist",
     "rootDir": "./src",
     "esModuleInterop": true,
@@ -9,9 +10,10 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
 
-    "baseUrl": "./src", // <<== move it here inside compilerOptions
+    "baseUrl": ".", // <<== move it here inside compilerOptions
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["src/*"],
+       "@/generated/*": ["generated/*"]   
     }
   },
   "include": ["src/**/*.ts"],

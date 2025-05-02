@@ -1,19 +1,20 @@
 import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
+import dotenv from "dotenv";
 
 // import routes
-
+import adminRoutes from "../src/modules/admins/admins.routes"
 
 // 
 
-
+dotenv.config();
 // Initialize the app
 const app = express();
 
 // Core Middleware
 app.use(bodyParser.json());
 
-
+app.use("/api/admins",adminRoutes)
 
 
 // Basic Error Handler

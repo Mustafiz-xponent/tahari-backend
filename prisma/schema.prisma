@@ -1,14 +1,29 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// Enum for Admin user type 
+
+enum AdminRole {
+  SuperAdmin
+  Admin 
+  Support
+}
+
+// Enums for status and type fields
+enum AdminStatus {
+  Active
+  Fired
+  InActive
+}
+
 
 // Enums for status and type fields
 enum OrderStatus {
@@ -42,6 +57,23 @@ enum InventoryPurchaseStatus {
   COMPLETED
   CANCELLED
 }
+
+// Admin table for user data
+model Admin {
+  adminId    BigInt         @id @default(autoincrement())
+  name          String
+  email         String         @unique
+  phone         String?
+  address       String
+  role          AdminRole 
+  status        AdminStatus
+  passwordHash  String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([adminId])
+}
+
 
 // Farmers table to store farm/garden profiles (managed by admin)
 model Farmer {

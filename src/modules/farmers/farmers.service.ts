@@ -2,7 +2,7 @@
 
 import { getErrorMessage } from "@/utils/errorHandler";
 import prisma from "../../prisma-client/prismaClient";
-import { Farmer } from "@prisma/client"; // Import the Farmer type from Prisma Client
+import { Farmer } from "@/generated/prisma/client";
 
 // Create a new farmer
 export const createFarmer = async (data: {

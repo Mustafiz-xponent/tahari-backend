@@ -1,0 +1,16 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+scenarios:
+  - flow:
+      - post:
+          url: "/api/admins"
+          json:
+            name: "Load User"
+            email: "load@example.com"
+            password: "123456"
+            address: "Test City"
+            role: "Admin"
+            status: "Active"
