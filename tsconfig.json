@@ -9,8 +9,7 @@
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-
-    "baseUrl": ".", // <<== move it here inside compilerOptions
+    "baseUrl": "./",  
     "paths": {
       "@/*": ["src/*"],
        "@/generated/*": ["generated/*"]   

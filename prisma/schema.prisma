@@ -42,8 +42,9 @@ enum PaymentStatus {
 }
 
 enum TransactionType {
-  ADDITION
-  DEDUCTION
+  IN
+  OUT
+  ADJUSTMENT
 }
 
 enum SubscriptionStatus {

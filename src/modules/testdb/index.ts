@@ -1,11 +1,11 @@
-import prisma from "../../prisma-client/prismaClient";
+import prisma from "@/prisma-client/prismaClient";
 
 console.log("test");
 
 async function main() {
   const user = await prisma.category.create({
     data: {
-      name: "abul kashem",
+      name: "abul dir",
     },
   });
   console.log(user);
@@ -20,3 +20,6 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+//npx ts-node src/modules/testdb/index.ts
+
+// https://medium.com/@VincentSchoener/say-bye-to-relative-paths-in-typescript-7242b6e6f252

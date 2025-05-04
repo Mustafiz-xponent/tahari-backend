@@ -1,85 +1,106 @@
 // src/modules/farmers/farmers.controller.ts
-
 import { Request, Response } from "express";
-import * as FarmerService from "./farmers.service";
-import { getErrorMessage } from "@/utils/errorHandler";
+import * as farmerService from "./farmers.service";
+import { zCreateFarmerDto, zUpdateFarmerDto } from "./farmer.dto";
+import { ZodError, z } from "zod";
 
-// Create a new farmer
-const createFarmer = async (req: Request, res: Response): Promise<void> => {
+const farmerIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
+  message: "Farmer ID must be a positive integer",
+});
+
+/**
+ * Create a new farmer
+ */
+export const createFarmer = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const farmer = await FarmerService.createFarmer(req.body);
-    res.status(201).json(farmer); // No return
+    const data = zCreateFarmerDto.parse(req.body);
+    const farmer = await farmerService.createFarmer(data);
+    res.status(201).json({ message: "Farmer created successfully", farmer });
   } catch (error) {
-    res.status(500).json({ message: getErrorMessage(error) }); // No return
-  }
-};
-
-// Get all farmers
-const getAllFarmers = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const farmers = await FarmerService.getAllFarmers();
-    res.status(200).json(farmers); // No return
-  } catch (error) {
-    res.status(500).json({ message: getErrorMessage(error) }); // No return
-  }
-};
-
-// Get a farmer by ID
-const getFarmerById = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { id } = req.params;
-    if (!/^\d+$/.test(id)) {
-      res.status(400).json({ message: "Invalid farmer ID" }); // No return
+    if (error instanceof ZodError) {
+      res.status(400).json({ errors: error.flatten() });
       return;
     }
-    const farmerId = BigInt(id);
-    const farmer = await FarmerService.getFarmerById(farmerId);
-    if (farmer) {
-      res.status(200).json(farmer); // No return
-    } else {
-      res.status(404).json({ message: "Farmer not found." }); // No return
-    }
-  } catch (error) {
-    res.status(500).json({ message: getErrorMessage(error) }); // No return
+    console.error("Error creating farmer:", error);
+    res.status(500).json({ message: "Failed to create farmer" });
   }
 };
 
-// Update a farmer's details
-const updateFarmer = async (req: Request, res: Response): Promise<void> => {
+/**
+ * Get all farmers
+ */
+export const getAllFarmers = async (
+  _req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const { id } = req.params;
-    if (!/^\d+$/.test(id)) {
-      res.status(400).json({ message: "Invalid farmer ID" }); // No return
+    const farmers = await farmerService.getAllFarmers();
+    res.json(farmers);
+  } catch (error) {
+    console.error("Error fetching farmers:", error);
+    res.status(500).json({ message: "Failed to fetch farmers" });
+  }
+};
+
+/**
+ * Get a single farmer by ID
+ */
+export const getFarmerById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const farmerId = BigInt(req.params.id);
+    const farmer = await farmerService.getFarmerById(farmerId);
+    if (!farmer) {
+      res.status(404).json({ message: "Farmer not found" });
       return;
     }
-    const farmerId = BigInt(id);
-    const updatedFarmer = await FarmerService.updateFarmer(farmerId, req.body);
-    res.status(200).json(updatedFarmer); // No return
+    res.json(farmer);
   } catch (error) {
-    res.status(500).json({ message: getErrorMessage(error) }); // No return
+    console.error("Error fetching farmer:", error);
+    res.status(500).json({ message: "Failed to fetch farmer" });
   }
 };
 
-// Delete a farmer
-const deleteFarmer = async (req: Request, res: Response): Promise<void> => {
+/**
+ * Update a farmer by ID
+ */
+export const updateFarmer = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const { id } = req.params;
-    if (!/^\d+$/.test(id)) {
-      res.status(400).json({ message: "Invalid farmer ID" }); // No return
+    const farmerId = farmerIdSchema.parse(req.params.id);
+    const data = zUpdateFarmerDto.parse(req.body);
+    const updated = await farmerService.updateFarmer(farmerId, data);
+    res.json({ message: "Farmer updated successfully", farmer: updated });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      res.status(400).json({ errors: error.flatten() });
       return;
     }
-    const farmerId = BigInt(id);
-    const deletedFarmer = await FarmerService.deleteFarmer(farmerId);
-    res.status(200).json(deletedFarmer); // No return
-  } catch (error) {
-    res.status(500).json({ message: getErrorMessage(error) }); // No return
+    console.error("Error updating farmer:", error);
+    res.status(500).json({ message: "Failed to update farmer" });
   }
 };
 
-export default {
-  createFarmer,
-  getAllFarmers,
-  getFarmerById,
-  updateFarmer,
-  deleteFarmer,
+/**
+ * Delete a farmer by ID
+ */
+export const deleteFarmer = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const farmerId = farmerIdSchema.parse(req.params.id);
+    await farmerService.deleteFarmer(farmerId);
+    res.json({ message: "Farmer deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting farmer:", error);
+    res.status(500).json({ message: "Failed to delete farmer" });
+  }
 };

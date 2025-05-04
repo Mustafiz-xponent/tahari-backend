@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import * as adminService from "./admins.service";
 import { CreateAdminDto, UpdateAdminDto } from "./admins.dto";
 import { getErrorMessage } from "../../utils/errorHandler";
-import safeBigIntJsonStringify from "../../utils/safeBigIntJsonStringify";
 
 export const createAdmin = async (
   req: Request,
@@ -20,7 +19,7 @@ export const createAdmin = async (
       adminId: admin.adminId.toString(), // convert BigInt to string
     };
 
-    console.log("adminSafe", adminSafe)
+  
 
     res.status(201).json({
       message: "Admin created successfully",

@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "ts-node src/index.ts",
     "dev": "ts-node-dev src/index.ts",
-    "test": "jest",
+    "test": "vitest",
     "test:unit": "jest --testPathPattern=tests/unit",
     "test:e2e": "jest --testPathPattern=tests/e2e",
     "test:load": "artillery run tests/load/admins.load.yml"
@@ -28,7 +28,10 @@
     "ts-jest": "^29.3.2",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.8.3"
+    "tsc-alias": "^1.8.15",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.2"
   },
   "dependencies": {
     "@prisma/client": "^6.6.0",

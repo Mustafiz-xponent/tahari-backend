@@ -3,14 +3,10 @@
 import { getErrorMessage } from "@/utils/errorHandler";
 import prisma from "../../prisma-client/prismaClient";
 import { Farmer } from "@/generated/prisma/client";
+import { CreateFarmerDto, UpdateFarmerDto } from "./farmer.dto";
 
 // Create a new farmer
-export const createFarmer = async (data: {
-  name: string;
-  farmName: string;
-  address: string;
-  contactInfo?: string;
-}): Promise<Farmer> => {
+export const createFarmer = async (data: CreateFarmerDto): Promise<Farmer> => {
   try {
     return await prisma.farmer.create({
       data,
@@ -44,13 +40,8 @@ export const getFarmerById = async (
 
 // Update a farmer's details
 export const updateFarmer = async (
-  farmerId: BigInt,
-  data: {
-    name?: string;
-    farmName?: string;
-    address?: string;
-    contactInfo?: string;
-  }
+  farmerId: bigint,
+  data: UpdateFarmerDto
 ): Promise<Farmer> => {
   try {
     return await prisma.farmer.update({

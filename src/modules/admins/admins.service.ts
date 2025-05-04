@@ -6,9 +6,8 @@ import { CreateAdminDto, UpdateAdminDto } from "./admins.dto";
 import { Admin } from "../../../generated/prisma/client";
 import { getErrorMessage } from "../../utils/errorHandler";
 import bcrypt from "bcrypt";
-// import { PrismaClientKnownRequestError } from "../../../generated/prisma/client/runtime/library";
 
-console.log(process.env.DATABASE_URL);
+
 
 export const createAdmin = async (data: CreateAdminDto): Promise<Admin> =>  {
   const saltRounds = 10;
@@ -37,13 +36,7 @@ export const createAdmin = async (data: CreateAdminDto): Promise<Admin> =>  {
    
   } catch (err: any) {
     console.log(err)
-    // Handle known Prisma errors
-    // if (err instanceof PrismaClientKnownRequestError) {
-    //   if (err.code === "P2002") {
-    //     throw new Error(`Unique constraint failed on: ${err.meta?.target}`);
-    //   }
-    // }
-
+ 
     console.error("Error creating admin:", err);
     throw new Error("Failed to create admin");
   }

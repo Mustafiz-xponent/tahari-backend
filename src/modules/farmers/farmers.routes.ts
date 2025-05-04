@@ -1,7 +1,7 @@
 // src/modules/farmers/farmers.routes.ts
 
 import { Router } from "express";
-import FarmerController from "./farmers.controller";
+import * as FarmerController from "./farmers.controller";
 
 
 
