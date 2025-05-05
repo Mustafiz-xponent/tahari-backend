@@ -32,7 +32,10 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+  CONFIRMED
 }
+
+
 
 enum PaymentStatus {
   PENDING
@@ -51,8 +54,11 @@ enum SubscriptionStatus {
   ACTIVE
   PAUSED
   CANCELLED
+  EXPIRED
+  PENDING
 }
 
+ 
 enum InventoryPurchaseStatus {
   PENDING
   COMPLETED
@@ -64,6 +70,10 @@ enum WalletTransactionType {
   WITHDRAWAL
   PURCHASE
   REFUND
+}
+enum NotificationStatus {
+  READ
+  UNREAD
 }
 
 // Admin table for user data
