@@ -11,6 +11,8 @@ build/
 # Environment variables
 .env
  
+ # firebase keys 
+ src/config/serviceAccountKey.json
 
 # Logs
 logs/

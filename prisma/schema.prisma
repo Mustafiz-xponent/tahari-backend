@@ -59,9 +59,17 @@ enum InventoryPurchaseStatus {
   CANCELLED
 }
 
+enum WalletTransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  PURCHASE
+  REFUND
+}
+
 // Admin table for user data
 model Admin {
   adminId    BigInt         @id @default(autoincrement())
+  firebaseUid  String         @unique
   name          String
   email         String         @unique
   phone         String?
@@ -230,6 +238,7 @@ model SubscriptionPlan {
 // Customers table for user data
 model Customer {
   customerId    BigInt         @id @default(autoincrement())
+  firebaseUid  String         @unique
   name          String
   email         String         @unique
   phone         String?
@@ -243,6 +252,7 @@ model Customer {
   messages      Message[]
 
   @@index([customerId])
+  @@index([firebaseUid]) // Index for faster lookups
 }
 
 // Customer wallets for balance management
@@ -262,7 +272,7 @@ model Wallet {
 model WalletTransaction {
   transactionId     BigInt          @id @default(autoincrement())
   amount            Decimal
-  transactionType   TransactionType
+  transactionType   WalletTransactionType
   transactionStatus PaymentStatus
   description       String?
   createdAt         DateTime        @default(now())
