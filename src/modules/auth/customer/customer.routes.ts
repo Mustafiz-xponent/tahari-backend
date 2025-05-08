@@ -1,0 +1,23 @@
+/**
+ * Routes for Customer authentication operations.
+ * Defines API endpoints for customer authentication.
+ */
+
+import { Router } from "express";
+import * as CustomerController from "./customer.controller";
+
+const router = Router();
+
+// Route to register a customer
+router.post("/register", CustomerController.registerCustomer);
+
+// Route to login a customer with email/password
+router.post("/login", CustomerController.loginCustomer);
+
+// Route to initiate OTP login for customer
+router.post("/otp-login", CustomerController.otpLoginCustomer);
+
+// Route to verify OTP for customer
+router.post("/verify-otp", CustomerController.verifyCustomerOtp);
+
+export default router;

@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma/client"
@@ -9,11 +8,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enum for  User Role 
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
 // Enum for Admin user type 
 
 enum AdminRole {
   SuperAdmin
-  Admin 
+  Admin
   Support
 }
 
@@ -24,7 +35,6 @@ enum AdminStatus {
   InActive
 }
 
-
 // Enums for status and type fields
 enum OrderStatus {
   PENDING
@@ -34,8 +44,6 @@ enum OrderStatus {
   CANCELLED
   CONFIRMED
 }
-
-
 
 enum PaymentStatus {
   PENDING
@@ -58,7 +66,6 @@ enum SubscriptionStatus {
   PENDING
 }
 
- 
 enum InventoryPurchaseStatus {
   PENDING
   COMPLETED
@@ -71,28 +78,64 @@ enum WalletTransactionType {
   PURCHASE
   REFUND
 }
+
 enum NotificationStatus {
   READ
   UNREAD
 }
 
 // Admin table for user data
-model Admin {
-  adminId    BigInt         @id @default(autoincrement())
-  firebaseUid  String         @unique
-  name          String
-  email         String         @unique
-  phone         String?
-  address       String
-  role          AdminRole 
-  status        AdminStatus
-  passwordHash  String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
 
-  @@index([adminId])
+model User {
+  userId       BigInt     @id @default(autoincrement())
+  email        String     @unique
+  name         String
+  phone        String? // Optional for SMS auth, e.g., +8801712345678
+  address      String? // Optional
+  passwordHash String // Hashed with bcrypt
+  role         UserRole
+  status       UserStatus
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  admin        Admin?
+  customer     Customer?
+  otps         Otp[]
+
+  @@index([userId])
+  @@index([email])
 }
 
+model Admin {
+  adminId BigInt @id @default(autoincrement())
+  userId  BigInt @unique
+  user    User   @relation(fields: [userId], references: [userId])
+
+  @@index([userId])
+}
+
+model Customer {
+  customerId    BigInt         @id @default(autoincrement())
+  userId        BigInt         @unique
+  user          User           @relation(fields: [userId], references: [userId])
+  wallet        Wallet?
+  orders        Order[]
+  subscriptions Subscription[]
+  messages      Message[]
+
+  @@index([userId])
+}
+
+model Otp {
+  otpId     BigInt   @id @default(autoincrement())
+  email     String
+  otpHash   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [email], references: [email])
+
+  @@index([otpId])
+  @@index([email])
+}
 
 // Farmers table to store farm/garden profiles (managed by admin)
 model Farmer {
@@ -245,26 +288,6 @@ model SubscriptionPlan {
   @@index([planId])
 }
 
-// Customers table for user data
-model Customer {
-  customerId    BigInt         @id @default(autoincrement())
-  firebaseUid  String         @unique
-  name          String
-  email         String         @unique
-  phone         String?
-  address       String
-  passwordHash  String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  wallet        Wallet?
-  orders        Order[]
-  subscriptions Subscription[]
-  messages      Message[]
-
-  @@index([customerId])
-  @@index([firebaseUid]) // Index for faster lookups
-}
-
 // Customer wallets for balance management
 model Wallet {
   walletId           BigInt              @id @default(autoincrement())
@@ -280,16 +303,16 @@ model Wallet {
 
 // Wallet transactions to track fund additions, deductions, and refunds
 model WalletTransaction {
-  transactionId     BigInt          @id @default(autoincrement())
+  transactionId     BigInt                @id @default(autoincrement())
   amount            Decimal
   transactionType   WalletTransactionType
   transactionStatus PaymentStatus
   description       String?
-  createdAt         DateTime        @default(now())
+  createdAt         DateTime              @default(now())
   walletId          BigInt
-  wallet            Wallet          @relation(fields: [walletId], references: [walletId])
+  wallet            Wallet                @relation(fields: [walletId], references: [walletId])
   orderId           BigInt?
-  order             Order?          @relation(fields: [orderId], references: [orderId])
+  order             Order?                @relation(fields: [orderId], references: [orderId])
   Payment           Payment[]
 
   @@index([walletId])
