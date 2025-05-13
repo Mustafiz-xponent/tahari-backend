@@ -23,11 +23,9 @@ export const registerCustomer = async (
   try {
     const data = zCustomerRegisterDto.parse(req.body);
     await customerService.registerCustomer(data);
-    res
-      .status(201)
-      .json({
-        message: "Customer registration initiated. OTP sent if phone provided.",
-      });
+    res.status(201).json({
+      message: "Customer registration initiated. OTP sent if phone provided.",
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       res.status(400).json({ errors: error.flatten() });

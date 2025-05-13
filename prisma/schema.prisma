@@ -11,6 +11,7 @@ datasource db {
 // Enum for  User Role 
 enum UserRole {
   ADMIN
+  SUPER_ADMIN
   CUSTOMER
 }
 
@@ -21,7 +22,6 @@ enum UserStatus {
 }
 
 // Enum for Admin user type 
-
 enum AdminRole {
   SuperAdmin
   Admin

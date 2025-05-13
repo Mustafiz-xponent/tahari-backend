@@ -8,6 +8,15 @@ interface JwtPayload {
   role: "CUSTOMER" | "ADMIN" | "SUPER_ADMIN";
 }
 
+// Extend the Express Request interface to include the user property
+declare global {
+  namespace Express {
+    interface Request {
+      user?: JwtPayload;
+    }
+  }
+}
+
 export const authMiddleware = (
   role: "CUSTOMER" | "ADMIN" | "SUPER_ADMIN"
 ): RequestHandler => {

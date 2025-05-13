@@ -1,18 +1,46 @@
 //src/modules/admins/admins.service.ts
 
-
 import prisma from "../../prisma-client/prismaClient";
 import { CreateAdminDto, UpdateAdminDto } from "./admins.dto";
 import { Admin } from "../../../generated/prisma/client";
 import { getErrorMessage } from "../../utils/errorHandler";
 import bcrypt from "bcrypt";
 
+// export const createAdmin = async (data: CreateAdminDto): Promise<Admin> =>  {
+//   const saltRounds = 10;
 
+//   try {
+//     if (!data.password || data.password.length < 6) {
+//       throw new Error("Password must be at least 6 characters long");
+//     }
 
-export const createAdmin = async (data: CreateAdminDto): Promise<Admin> =>  {
+//     const passwordHash = await bcrypt.hash(data.password, saltRounds);
+
+//    const admin = await prisma.admin.create({
+//       data: {
+//         name: data.name,
+//         email: data.email,
+//         phone: data.phone,
+//         address: data.address,
+//         role: data.role,
+//         status: data.status,
+//         passwordHash,
+//       },
+//     });
+//     console.log("admin created successfull")
+//     return admin;
+
+//   } catch (err: any) {
+//     console.log(err)
+
+//     console.error("Error creating admin:", err);
+//     throw new Error("Failed to create admin");
+//   }
+// };
+
+export const createAdmin = async (data: CreateAdminDto): Promise<Admin> => {
   const saltRounds = 10;
-   
-  
+
   try {
     if (!data.password || data.password.length < 6) {
       throw new Error("Password must be at least 6 characters long");
@@ -20,33 +48,44 @@ export const createAdmin = async (data: CreateAdminDto): Promise<Admin> =>  {
 
     const passwordHash = await bcrypt.hash(data.password, saltRounds);
 
-   const admin = await prisma.admin.create({
+    // First create the User
+    const user = await prisma.user.create({
       data: {
-        name: data.name,
         email: data.email,
+        name: data.name,
         phone: data.phone,
         address: data.address,
-        role: data.role,
-        status: data.status,
         passwordHash,
+        role: data.role || "ADMIN", // Default to ADMIN if not provided
+        status: data.status || "ACTIVE", // Default to ACTIVE if not provided
       },
     });
-    console.log("admin created successfull")
+
+    // Then create the Admin linked to that User
+    const admin = await prisma.admin.create({
+      data: {
+        user: {
+          connect: { userId: user.userId },
+        },
+      },
+      // include: {
+      //   user: true,
+      // },
+    });
+
+    console.log("Admin created successfully");
     return admin;
-   
   } catch (err: any) {
-    console.log(err)
- 
     console.error("Error creating admin:", err);
-    throw new Error("Failed to create admin");
+    throw new Error("Failed to create admin: " + err.message);
   }
 };
 
-export const getAllAdmins = async () : Promise<Admin[]> => {
+export const getAllAdmins = async (): Promise<Admin[]> => {
   return prisma.admin.findMany();
 };
 
-export const getAdminById = async (adminId: bigint): Promise<Admin|null> => {
+export const getAdminById = async (adminId: bigint): Promise<Admin | null> => {
   try {
     return await prisma.admin.findUnique({
       where: { adminId: Number(adminId) }, // Convert BigInt to Number for Prisma compatibility
@@ -56,7 +95,10 @@ export const getAdminById = async (adminId: bigint): Promise<Admin|null> => {
   }
 };
 
-export const updateAdmin = async (adminId: bigint, data: UpdateAdminDto): Promise<Admin> => {
+export const updateAdmin = async (
+  adminId: bigint,
+  data: UpdateAdminDto
+): Promise<Admin> => {
   const updateData: any = { ...data };
 
   if (data.password) {
@@ -70,8 +112,6 @@ export const updateAdmin = async (adminId: bigint, data: UpdateAdminDto): Promis
     data: updateData,
   });
 };
-
- 
 
 export const deleteAdmin = async (farmerId: BigInt): Promise<Admin> => {
   try {

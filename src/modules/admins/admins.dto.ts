@@ -1,5 +1,6 @@
 // src/modules/admins/admins.dto.ts
 
+import { UserRole, UserStatus } from "@/generated/prisma/client";
 
 export enum AdminRole {
   SuperAdmin = "SuperAdmin",
@@ -18,10 +19,11 @@ export interface CreateAdminDto {
   email: string;
   phone?: string;
   address: string;
-  role: AdminRole;
-  status: AdminStatus;
+  // role: AdminRole;
+  // status: AdminStatus;
+  role: UserRole;
+  status: UserStatus;
   password: string;
- 
 }
 
 export interface UpdateAdminDto {

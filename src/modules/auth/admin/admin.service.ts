@@ -6,7 +6,8 @@
 import prisma from "../../../prisma-client/prismaClient";
 import { User } from "../../../../generated/prisma/client";
 import { CreateAdminDto, AdminLoginDto } from "./admin.dto";
-import { getErrorMessage } from "@/utils/errorHandler";
+// import { getErrorMessage } from "@/utils/errorHandler";
+import { getErrorMessage } from "../../../utils/errorHandler";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -53,7 +54,8 @@ export async function loginAdmin(
     const user = await prisma.user.findUnique({
       where: { email: data.email },
     });
-    if (!user || user.role !== "ADMIN") {
+
+    if (!user || (user.role !== "ADMIN" && user.role !== "SUPER_ADMIN")) {
       throw new Error("Admin not found");
     }
 
