@@ -1,6 +1,6 @@
 // src/modules/farmers/farmers.service.ts
 
-import { getErrorMessage } from "@/utils/errorHandler";
+import { getErrorMessage } from "../../utils/errorHandler";
 import prisma from "../../prisma-client/prismaClient";
 import { Farmer } from "@/generated/prisma/client";
 import { CreateFarmerDto, UpdateFarmerDto } from "./farmer.dto";
