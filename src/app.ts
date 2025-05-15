@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 // import adminRoutes from "../src/modules/admins/admins.routes";
 import customerUserRoutes from "../src/modules/auth/customer/customer.routes";
 import adminUserRoutes from "../src/modules/auth/admin/admin.routes";
-// import farmerRoutes from "../src/modules/farmers/farmers.routes";
+import farmerRoutes from "../src/modules/farmers/farmers.routes";
 
 //
 
@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 // app.use("/api/admins", adminRoutes);
 app.use("/api/auth/customer", customerUserRoutes);
 app.use("/api/auth/admin", adminUserRoutes);
-// app.use("/api/farmers", farmerRoutes);
+app.use("/api/farmers", farmerRoutes);
 
 // Basic Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

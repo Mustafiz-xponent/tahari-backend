@@ -18,7 +18,7 @@ declare global {
 }
 
 export const authMiddleware = (
-  role: "CUSTOMER" | "ADMIN" | "SUPER_ADMIN"
+  role: "CUSTOMER" | "ADMIN" | "SUPER_ADMIN" | "SUPPORT"
 ): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction): void => {
     const token = req.headers.authorization?.split(" ")[1];

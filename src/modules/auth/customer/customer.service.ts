@@ -91,13 +91,16 @@ export async function loginCustomer(
 export async function otpLoginCustomer(
   data: CustomerOtpLoginDto
 ): Promise<void> {
-  const user = await prisma.user.findUnique({
+  await prisma.user.upsert({
     where: { phone: data.phone },
+    update: {}, // No updates needed if user exists
+    create: {
+      phone: data.phone,
+      role: "CUSTOMER",
+      status: "PENDING",
+      customer: { create: {} },
+    },
   });
-
-  if (!user || user.role !== "CUSTOMER") {
-    throw new Error("Customer not found");
-  }
 
   await sendOtp(data.phone);
 }
@@ -131,7 +134,7 @@ export async function verifyCustomerOtp(
     throw new Error("Customer not found");
   }
 
-  await prisma.user.update({
+  const updatedUser = await prisma.user.update({
     where: { phone: data.phone },
     data: { status: "ACTIVE" },
   });
@@ -140,5 +143,5 @@ export async function verifyCustomerOtp(
     where: { phone: data.phone },
   });
 
-  return generateAuthToken(user);
+  return generateAuthToken(updatedUser);
 }

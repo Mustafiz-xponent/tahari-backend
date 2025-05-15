@@ -1,4 +1,3 @@
-
 // src/farmers/farmer.dto.ts
 
 /**
@@ -7,7 +6,6 @@
  * You can also use these types with validation libraries like Zod or Joi if needed.
  */
 
- 
 import { z } from "zod";
 
 /**
