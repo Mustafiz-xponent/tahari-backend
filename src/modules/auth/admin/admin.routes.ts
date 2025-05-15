@@ -4,9 +4,8 @@
  */
 
 import { Router } from "express";
-import * as AdminController from "./admin.controller";
-// import { authMiddleware } from "@/middlewares/auth";
 import { authMiddleware } from "../../../middlewares/auth";
+import * as AdminController from "./admin.controller";
 
 const router = Router();
 
@@ -17,7 +16,7 @@ router.post(
   AdminController.createAdmin
 );
 
-// Route to login an admin with email/password
+// Route to login an admin with phone/email and password
 router.post("/login", AdminController.loginAdmin);
 
 export default router;

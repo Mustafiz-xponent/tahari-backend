@@ -2,99 +2,82 @@
  * Controller layer for Customer authentication operations.
  * Handles HTTP requests and responses for customer authentication endpoints.
  */
-
 import { Request, Response } from "express";
-import * as customerService from "./customer.service";
+import { handleErrorResponse } from "../../../utils/errorResponseHandler";
 import {
-  zCustomerRegisterDto,
   zCustomerLoginDto,
   zCustomerOtpLoginDto,
+  zCustomerRegisterDto,
   zCustomerVerifyOtpDto,
 } from "./customer.dto";
-import { ZodError } from "zod";
+import * as customerService from "./customer.service";
 
 /**
  * Register a customer
  */
-export const registerCustomer = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const registerCustomer = async (req: Request, res: Response) => {
   try {
     const data = zCustomerRegisterDto.parse(req.body);
     await customerService.registerCustomer(data);
     res.status(201).json({
-      message: "Customer registration initiated. OTP sent if phone provided.",
+      success: true,
+      message: "Registration successful. OTP sent to your phone.",
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error registering customer:", error);
-    res.status(500).json({ message: "Failed to register customer" });
+    handleErrorResponse(error, res, "register customer");
   }
 };
 
 /**
- * Login a customer with email/password
+ * Login customer with email/phone and password
  */
-export const loginCustomer = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const loginCustomer = async (req: Request, res: Response) => {
   try {
     const data = zCustomerLoginDto.parse(req.body);
     const { token, user } = await customerService.loginCustomer(data);
-    res.json({ message: "Customer logged in successfully", token, user });
+    res.json({
+      success: true,
+      message: "Login successful",
+      data: { token, user },
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error logging in customer:", error);
-    res.status(500).json({ message: "Failed to login customer" });
+    handleErrorResponse(error, res, "login customer");
   }
 };
 
 /**
- * Initiate OTP login for customer
+ * OTP login customer
  */
-export const otpLoginCustomer = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const otpLoginCustomer = async (req: Request, res: Response) => {
   try {
     const data = zCustomerOtpLoginDto.parse(req.body);
     await customerService.otpLoginCustomer(data);
-    res.json({ message: "Customer OTP login initiated. OTP sent." });
+    res.json({
+      success: true,
+      message: "OTP sent successfully",
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error initiating customer OTP login:", error);
-    res.status(500).json({ message: "Failed to initiate customer OTP login" });
+    handleErrorResponse(error, res, "OTP login");
   }
 };
 
 /**
- * Verify OTP for customer
+ * Verify customer OTP
  */
-export const verifyCustomerOtp = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const verifyCustomerOtp = async (req: Request, res: Response) => {
   try {
     const data = zCustomerVerifyOtpDto.parse(req.body);
     const { token, user } = await customerService.verifyCustomerOtp(data);
-    res.json({ message: "Customer verified successfully", token, user });
+
+    // Exclude passwordHash from the user object manually
+    const { passwordHash, ...sanitizedUser } = user;
+
+    res.json({
+      success: true,
+      message: "OTP verified successfully",
+      data: { token, user: sanitizedUser },
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error verifying customer OTP:", error);
-    res.status(500).json({ message: "Failed to verify customer OTP" });
+    handleErrorResponse(error, res, "verify OTP");
   }
 };

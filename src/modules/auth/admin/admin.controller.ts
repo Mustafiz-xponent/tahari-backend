@@ -2,50 +2,41 @@
  * Controller layer for Admin authentication operations.
  * Handles HTTP requests and responses for admin authentication endpoints.
  */
-
 import { Request, Response } from "express";
+import { handleErrorResponse } from "../../../utils/errorResponseHandler";
+import { zAdminLoginDto, zCreateAdminDto } from "./admin.dto";
 import * as adminService from "./admin.service";
-import { zCreateAdminDto, zAdminLoginDto } from "./admin.dto";
-import { ZodError } from "zod";
 
 /**
- * Create a new admin (super admin only)
+ * Create admin by super admin only
  */
-export const createAdmin = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const createAdmin = async (req: Request, res: Response) => {
   try {
     const data = zCreateAdminDto.parse(req.body);
-    await adminService.createAdmin(data);
-    res.status(201).json({ message: "Admin created successfully" });
+    const { user } = await adminService.createAdmin(data);
+    res.status(201).json({
+      success: true,
+      message: "Admin created successfully",
+      data: { user },
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error creating admin:", error);
-    res.status(500).json({ message: "Failed to create admin" });
+    handleErrorResponse(error, res, "create admin");
   }
 };
 
 /**
- * Login an admin with email/password
+ * login admin/superadmin through email/phone with password.
  */
-export const loginAdmin = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const loginAdmin = async (req: Request, res: Response) => {
   try {
     const data = zAdminLoginDto.parse(req.body);
     const { token, user } = await adminService.loginAdmin(data);
-    res.json({ message: "Admin logged in successfully", token, user });
+    res.json({
+      success: true,
+      message: "Admin logged in successfully",
+      data: { token, user },
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error logging in admin:", error);
-    res.status(500).json({ message: "Failed to login admin" });
+    handleErrorResponse(error, res, "login admin");
   }
 };

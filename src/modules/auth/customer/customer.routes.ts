@@ -11,7 +11,7 @@ const router = Router();
 // Route to register a customer
 router.post("/register", CustomerController.registerCustomer);
 
-// Route to login a customer with email/password
+// Route to login a customer with email/phone and password
 router.post("/login", CustomerController.loginCustomer);
 
 // Route to initiate OTP login for customer

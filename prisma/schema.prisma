@@ -13,6 +13,7 @@ enum UserRole {
   ADMIN
   SUPER_ADMIN
   CUSTOMER
+  SUPPORT
 }
 
 enum UserStatus {
@@ -84,15 +85,13 @@ enum NotificationStatus {
   UNREAD
 }
 
-// Admin table for user data
-
 model User {
   userId       BigInt     @id @default(autoincrement())
-  email        String     @unique
-  name         String
-  phone        String? // Optional for SMS auth, e.g., +8801712345678
+  email        String?    @unique
+  name         String? // Optional
+  phone        String     @unique
   address      String? // Optional
-  passwordHash String // Hashed with bcrypt
+  passwordHash String? // Hashed with bcrypt
   role         UserRole
   status       UserStatus
   createdAt    DateTime   @default(now())
@@ -102,7 +101,7 @@ model User {
   otps         Otp[]
 
   @@index([userId])
-  @@index([email])
+  @@index([phone])
 }
 
 model Admin {
@@ -127,14 +126,14 @@ model Customer {
 
 model Otp {
   otpId     BigInt   @id @default(autoincrement())
-  email     String
+  phone     String
   otpHash   String
   expiresAt DateTime
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [email], references: [email])
+  user      User     @relation(fields: [phone], references: [phone])
 
   @@index([otpId])
-  @@index([email])
+  @@index([phone])
 }
 
 // Farmers table to store farm/garden profiles (managed by admin)

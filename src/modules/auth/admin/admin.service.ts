@@ -2,35 +2,43 @@
  * Service layer for Admin authentication operations.
  * Handles admin creation by super admins and login.
  */
-
-import prisma from "../../../prisma-client/prismaClient";
-import { User } from "../../../../generated/prisma/client";
-import { CreateAdminDto, AdminLoginDto } from "./admin.dto";
-// import { getErrorMessage } from "@/utils/errorHandler";
-import { getErrorMessage } from "../../../utils/errorHandler";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { User } from "../../../../generated/prisma/client";
+import prisma from "../../../prisma-client/prismaClient";
+import { generateAuthToken } from "../../../utils/authToken";
+import { getErrorMessage } from "../../../utils/errorHandler";
+import { AdminLoginDto, CreateAdminDto } from "./admin.dto";
 
-const JWT_EXPIRY = "1h";
 const SALT_ROUNDS = 10;
 
 /**
- * Create a new admin (super admin only)
+ * Create admin by super admin only
  */
-export async function createAdmin(data: CreateAdminDto): Promise<void> {
+export async function createAdmin(
+  data: CreateAdminDto
+): Promise<{ user: Omit<User, "passwordHash"> }> {
   try {
-    const existingUser = await prisma.user.findUnique({
-      where: { email: data.email },
+    // Check if email or phone already exists
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ email: data.email }, { phone: data.phone }],
+      },
     });
+
     if (existingUser) {
-      throw new Error("Email already registered");
+      throw new Error(
+        existingUser.email === data.email
+          ? "Email already registered"
+          : "Phone number already registered"
+      );
     }
 
     const passwordHash = await bcrypt.hash(data.password, SALT_ROUNDS);
 
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         email: data.email,
+        phone: data.phone,
         name: data.name,
         address: data.address,
         passwordHash,
@@ -39,38 +47,51 @@ export async function createAdmin(data: CreateAdminDto): Promise<void> {
         admin: { create: {} },
       },
     });
+
+    const { passwordHash: _, ...userData } = user;
+    return { user: userData };
   } catch (error) {
     throw new Error(`Failed to create admin: ${getErrorMessage(error)}`);
   }
 }
 
 /**
- * Login admin with email and password
+ * login admin/superadmin through email/phone with password.
  */
 export async function loginAdmin(
   data: AdminLoginDto
 ): Promise<{ token: string; user: User }> {
   try {
+    // Validate input
+    if (!data.password) throw new Error("Password is required");
+    if (!data.email && !data.phone) {
+      throw new Error("Email or phone is required");
+    }
+
+    // Determine identifier
+    const identifier = data.email
+      ? { email: data.email }
+      : { phone: data.phone! };
+
+    // Find user
     const user = await prisma.user.findUnique({
-      where: { email: data.email },
+      where: identifier,
+      include: { admin: true },
     });
 
-    if (!user || (user.role !== "ADMIN" && user.role !== "SUPER_ADMIN")) {
-      throw new Error("Admin not found");
+    // Validate user
+    if (!user) throw new Error("Invalid credentials");
+    if (!user.passwordHash) throw new Error("Password not set yet");
+    if (user.role !== "ADMIN" && user.role !== "SUPER_ADMIN") {
+      throw new Error("Invalid credentials");
     }
 
+    // Verify password
     const isValid = await bcrypt.compare(data.password, user.passwordHash);
-    if (!isValid) {
-      throw new Error("Invalid password");
-    }
+    if (!isValid) throw new Error("Invalid credentials");
 
-    const token = jwt.sign(
-      { userId: user.userId, email: user.email, role: user.role },
-      process.env.JWT_SECRET!,
-      { expiresIn: JWT_EXPIRY }
-    );
-
-    return { token, user };
+    // Generate token
+    return generateAuthToken(user);
   } catch (error) {
     throw new Error(`Failed to login admin: ${getErrorMessage(error)}`);
   }

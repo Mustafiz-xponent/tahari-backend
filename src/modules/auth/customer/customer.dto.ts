@@ -5,65 +5,39 @@
 
 import { z } from "zod";
 
-const phoneNumberRegex = /^\+8801[3-9]\d{8}$/;
+const bangladeshPhoneValidator = z.string().regex(/^\+8801[3-9]\d{8}$/, {
+  message: "Must be a valid Bangladesh phone number (+8801XXXXXXXXX)",
+});
 
-/**
- * Zod schema for customer registration.
- */
+// Customer Registration DTO
 export const zCustomerRegisterDto = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  name: z.string().min(1, "Name is required"),
-  phone: z
-    .string()
-    .regex(phoneNumberRegex, "Invalid Bangladesh phone number")
-    .optional(),
+  phone: bangladeshPhoneValidator,
+  name: z.string().min(3, "Name must be at least 3 characters").optional(),
   address: z.string().optional(),
 });
-
-/**
- * TypeScript type inferred from register schema.
- */
 export type CustomerRegisterDto = z.infer<typeof zCustomerRegisterDto>;
 
-/**
- * Zod schema for customer email/password login.
- */
-export const zCustomerLoginDto = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
-});
-
-/**
- * TypeScript type inferred from login schema.
- */
+// For /login endpoint (email/phone + password)
+export const zCustomerLoginDto = z
+  .object({
+    email: z.string().email().optional(),
+    phone: bangladeshPhoneValidator.optional(),
+    password: z.string().min(1, "Password is required"),
+  })
+  .refine((data) => data.email || data.phone, {
+    message: "Either email or phone must be provided",
+  });
 export type CustomerLoginDto = z.infer<typeof zCustomerLoginDto>;
 
-/**
- * Zod schema for customer OTP login.
- */
+// For /otp-login endpoint (phone only)
 export const zCustomerOtpLoginDto = z.object({
-  email: z.string().email("Invalid email address"),
-  phone: z.string().regex(phoneNumberRegex, "Invalid Bangladesh phone number"),
+  phone: bangladeshPhoneValidator,
 });
-
-/**
- * TypeScript type inferred from OTP login schema.
- */
 export type CustomerOtpLoginDto = z.infer<typeof zCustomerOtpLoginDto>;
 
-/**
- * Zod schema for customer OTP verification.
- */
+// For /verify-otp endpoint
 export const zCustomerVerifyOtpDto = z.object({
-  email: z.string().email("Invalid email address"),
-  otp: z
-    .string()
-    .length(6, "OTP must be 6 digits")
-    .regex(/^\d{6}$/, "OTP must be numeric"),
+  phone: bangladeshPhoneValidator,
+  otp: z.string().length(6, "OTP must be 6 digits"),
 });
-
-/**
- * TypeScript type inferred from verify OTP schema.
- */
 export type CustomerVerifyOtpDto = z.infer<typeof zCustomerVerifyOtpDto>;

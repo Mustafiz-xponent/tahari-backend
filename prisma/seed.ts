@@ -143,15 +143,9 @@
 //     await prisma.$disconnect();
 //   });
 
-//  ========= 2nd edition ==============
+//  ================= 2nd edition =====================
 
-// prisma/seed.ts
-import {
-  PrismaClient,
-  UserRole,
-  UserStatus,
-  AdminRole,
-} from "../generated/prisma/client";
+import { PrismaClient, UserRole, UserStatus } from "../generated/prisma/client";
 import * as bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
@@ -161,6 +155,7 @@ async function seed() {
   // Create SuperAdmin
   const superAdminEmail =
     process.env.SUPERADMIN_EMAIL || "superadmin@example.com";
+  const superAdminPhone = process.env.SUPERADMIN_PHONE || "+8801700000000";
   const superAdminPassword =
     process.env.SUPERADMIN_PASSWORD || "securePassword123";
 
@@ -169,11 +164,11 @@ async function seed() {
 
   // Create User for SuperAdmin
   const superAdminUser = await prisma.user.upsert({
-    where: { email: superAdminEmail },
+    where: { phone: superAdminPhone },
     update: {
       email: superAdminEmail,
       name: "Super Admin",
-      phone: "123-456-7890",
+      phone: superAdminPhone,
       address: "Admin Office",
       passwordHash: passwordHash,
       role: UserRole.SUPER_ADMIN,
@@ -182,7 +177,7 @@ async function seed() {
     create: {
       email: superAdminEmail,
       name: "Super Admin",
-      phone: "123-456-7890",
+      phone: superAdminPhone,
       address: "Admin Office",
       passwordHash: passwordHash,
       role: UserRole.SUPER_ADMIN,
@@ -201,15 +196,16 @@ async function seed() {
 
   // Seed a regular Admin
   const adminEmail = "admin@example.com";
+  const adminPhone = "+8801800000000";
   const adminPassword = "adminPassword123";
   const adminPasswordHash = await bcrypt.hash(adminPassword, SALT_ROUNDS);
 
   const adminUser = await prisma.user.upsert({
-    where: { email: adminEmail },
+    where: { phone: adminPhone },
     update: {
       email: adminEmail,
       name: "Admin User",
-      phone: "987-654-3210",
+      phone: adminPhone,
       address: "Admin Office",
       passwordHash: adminPasswordHash,
       role: UserRole.ADMIN,
@@ -218,7 +214,7 @@ async function seed() {
     create: {
       email: adminEmail,
       name: "Admin User",
-      phone: "987-654-3210",
+      phone: adminPhone,
       address: "Admin Office",
       passwordHash: adminPasswordHash,
       role: UserRole.ADMIN,
@@ -236,15 +232,16 @@ async function seed() {
 
   // Seed a Customer with a Wallet
   const customerEmail = "customer@example.com";
+  const customerPhone = "+8801600000000";
   const customerPassword = "customerPassword123";
   const customerPasswordHash = await bcrypt.hash(customerPassword, SALT_ROUNDS);
 
   const customerUser = await prisma.user.upsert({
-    where: { email: customerEmail },
+    where: { phone: customerPhone },
     update: {
       email: customerEmail,
       name: "Customer User",
-      phone: "555-555-5555",
+      phone: customerPhone,
       address: "Customer Address",
       passwordHash: customerPasswordHash,
       role: UserRole.CUSTOMER,
@@ -253,7 +250,7 @@ async function seed() {
     create: {
       email: customerEmail,
       name: "Customer User",
-      phone: "555-555-5555",
+      phone: customerPhone,
       address: "Customer Address",
       passwordHash: customerPasswordHash,
       role: UserRole.CUSTOMER,
