@@ -13,6 +13,7 @@ import {
   CustomerLoginDto,
   CustomerOtpLoginDto,
   CustomerRegisterDto,
+  CustomerUpdateProfileDto,
   CustomerVerifyOtpDto,
 } from "./customer.dto";
 
@@ -31,12 +32,19 @@ export async function registerCustomer(
       throw new Error("Phone number already registered");
     }
 
-    // Create user record without password
+    // Hash the password before storing
+    const saltRounds = 10;
+    const passwordHash = data.password
+      ? await bcrypt.hash(data.password, saltRounds)
+      : null;
+
+    // Create user record with hashed password
     const user = await prisma.user.create({
       data: {
         phone: data.phone,
         name: data.name,
         address: data.address,
+        passwordHash: passwordHash,
         role: "CUSTOMER",
         status: "PENDING",
         customer: { create: {} },
@@ -47,7 +55,7 @@ export async function registerCustomer(
     await sendOtp(data.phone);
 
     // Return user data without sensitive fields
-    const { passwordHash, ...userData } = user;
+    const { passwordHash: _, ...userData } = user;
     return { user: userData };
   } catch (error) {
     throw new Error(`Failed to register customer: ${getErrorMessage(error)}`);
@@ -144,4 +152,48 @@ export async function verifyCustomerOtp(
   });
 
   return generateAuthToken(updatedUser);
+}
+
+/**
+ * Update customer profile
+ */
+export async function updateCustomerProfile(
+  userId: bigint,
+  data: CustomerUpdateProfileDto
+): Promise<User> {
+  const updateData: {
+    name?: string;
+    email?: string;
+    address?: string;
+    passwordHash?: string;
+    updatedAt?: Date;
+  } = {
+    updatedAt: new Date(), // Always update the updatedAt field
+  };
+
+  if (data.name) updateData.name = data.name;
+  if (data.email) updateData.email = data.email;
+  if (data.address) updateData.address = data.address;
+
+  // Handle password update with hashing
+  if (data.password) {
+    const saltRounds = 10;
+    updateData.passwordHash = await bcrypt.hash(data.password, saltRounds);
+  }
+
+  // Check if any fields were actually provided (beyond updatedAt)
+  const hasUpdates = Object.keys(updateData).some(
+    (key) =>
+      key !== "updatedAt" &&
+      updateData[key as keyof typeof updateData] !== undefined
+  );
+
+  if (!hasUpdates) {
+    throw new Error("No valid fields provided for update");
+  }
+
+  return await prisma.user.update({
+    where: { userId },
+    data: updateData,
+  });
 }

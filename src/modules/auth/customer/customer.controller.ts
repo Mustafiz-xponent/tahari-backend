@@ -8,6 +8,7 @@ import {
   zCustomerLoginDto,
   zCustomerOtpLoginDto,
   zCustomerRegisterDto,
+  zCustomerUpdateProfileDto,
   zCustomerVerifyOtpDto,
 } from "./customer.dto";
 import * as customerService from "./customer.service";
@@ -79,5 +80,39 @@ export const verifyCustomerOtp = async (req: Request, res: Response) => {
     });
   } catch (error) {
     handleErrorResponse(error, res, "verify OTP");
+  }
+};
+
+/**
+ * Update customer profile by ID
+ */
+export const updateCustomerProfile = async (req: Request, res: Response) => {
+  try {
+    const requestingUserId = req.user?.userId;
+    if (!requestingUserId) {
+      throw new Error("Unauthorized");
+    }
+
+    const customerId = BigInt(req.params.id);
+    if (customerId !== BigInt(requestingUserId)) {
+      throw new Error("Invalid request!");
+    }
+
+    const data = zCustomerUpdateProfileDto.parse(req.body);
+    const updatedUser = await customerService.updateCustomerProfile(
+      customerId,
+      data
+    );
+
+    // Exclude sensitive fields from the response
+    const { passwordHash, ...sanitizedUser } = updatedUser;
+
+    res.json({
+      success: true,
+      message: "Profile updated successfully",
+      data: sanitizedUser,
+    });
+  } catch (error) {
+    handleErrorResponse(error, res, "update profile");
   }
 };

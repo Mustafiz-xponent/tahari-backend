@@ -14,6 +14,10 @@ export const zCustomerRegisterDto = z.object({
   phone: bangladeshPhoneValidator,
   name: z.string().min(3, "Name must be at least 3 characters").optional(),
   address: z.string().optional(),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .optional(),
 });
 export type CustomerRegisterDto = z.infer<typeof zCustomerRegisterDto>;
 
@@ -22,7 +26,7 @@ export const zCustomerLoginDto = z
   .object({
     email: z.string().email().optional(),
     phone: bangladeshPhoneValidator.optional(),
-    password: z.string().min(1, "Password is required"),
+    password: z.string().min(6, "Password is required"),
   })
   .refine((data) => data.email || data.phone, {
     message: "Either email or phone must be provided",
@@ -41,3 +45,17 @@ export const zCustomerVerifyOtpDto = z.object({
   otp: z.string().length(6, "OTP must be 6 digits"),
 });
 export type CustomerVerifyOtpDto = z.infer<typeof zCustomerVerifyOtpDto>;
+
+// For PUT /:id endpoint
+export const zCustomerUpdateProfileDto = z.object({
+  name: z.string().min(3, "Name is required").optional(),
+  email: z.string().email("Invalid email").optional(),
+  address: z.string().min(3, "Address is required").optional(),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .optional(),
+});
+export type CustomerUpdateProfileDto = z.infer<
+  typeof zCustomerUpdateProfileDto
+>;
