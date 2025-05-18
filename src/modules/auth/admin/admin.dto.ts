@@ -24,7 +24,7 @@ export const zCreateAdminDto = z.object({
     .regex(/[a-z]/, "Must contain at least one lowercase letter")
     .regex(/[0-9]/, "Must contain at least one number"),
   name: z.string().min(2, "Name must be at least 2 characters"),
-  address: z.string().optional(),
+  address: z.string().array().optional(),
 });
 
 /**

@@ -90,7 +90,7 @@ model User {
   email        String?    @unique
   name         String? // Optional
   phone        String     @unique
-  address      String? // Optional
+  address      String[] // Optional
   passwordHash String? // Hashed with bcrypt
   role         UserRole
   status       UserStatus

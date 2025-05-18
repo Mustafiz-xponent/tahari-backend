@@ -3,102 +3,71 @@
  * Contains business logic and database interactions for categories.
  */
 
-import { CreateCategoryDto, UpdateCategoryDto } from "./category.dto";
+import { getErrorMessage } from "../../utils/errorHandler";
 import prisma from "../../prisma-client/prismaClient";
-import { Category } from "../../../generated/prisma/client";
-import { getErrorMessage } from "@/utils/errorHandler";
+import { Category } from "@/generated/prisma/client";
+import { CreateCategoryDto, UpdateCategoryDto } from "./category.dto";
 
-/**
- * Create a new category
- * @param data - Data required to create a category
- * @returns The created category
- * @throws Error if the category cannot be created (e.g., duplicate name)
- */
-export async function createCategory(
+// Create a new category
+export const createCategory = async (
   data: CreateCategoryDto
-): Promise<Category> {
+): Promise<Category> => {
   try {
-    const category = await prisma.category.create({
-      data: {
-        name: data.name,
-        description: data.description,
-      },
+    return await prisma.category.create({
+      data,
     });
-    return category;
   } catch (error) {
-    throw new Error(`Failed to create category: ${getErrorMessage(error)}`);
+    throw new Error(`Error creating category: ${getErrorMessage(error)}`);
   }
-}
+};
 
-/**
- * Retrieve all categories
- * @returns An array of all categories
- * @throws Error if the query fails
- */
-export async function getAllCategories(): Promise<Category[]> {
+// Get all categories
+export const getAllCategories = async (): Promise<Category[]> => {
   try {
-    const categories = await prisma.category.findMany();
-    return categories;
+    return await prisma.category.findMany();
   } catch (error) {
-    throw new Error(`Failed to fetch categories: ${getErrorMessage(error)}`);
+    throw new Error(`Error fetching categories: ${getErrorMessage(error)}`);
   }
-}
+};
 
-/**
- * Retrieve a category by its ID
- * @param categoryId - The ID of the category
- * @returns The category if found, or null if not found
- * @throws Error if the query fails
- */
-export async function getCategoryById(
+// Get a category by ID
+export const getCategoryById = async (
   categoryId: BigInt
-): Promise<Category | null> {
+): Promise<Category | null> => {
   try {
-    const category = await prisma.category.findUnique({
+    return await prisma.category.findUnique({
       where: { categoryId: Number(categoryId) },
-    });
-    return category;
-  } catch (error) {
-    throw new Error(`Failed to fetch category: ${getErrorMessage(error)}`);
-  }
-}
-
-/**
- * Update a category by its ID
- * @param categoryId - The ID of the category to update
- * @param data - Data to update the category
- * @returns The updated category
- * @throws Error if the category is not found or update fails
- */
-export async function updateCategory(
-  categoryId: BigInt,
-  data: UpdateCategoryDto
-): Promise<Category> {
-  try {
-    const category = await prisma.category.update({
-      where: { categoryId: Number(categoryId) },
-      data: {
-        name: data.name,
-        description: data.description,
+      include: {
+        products: true, // Include related products if needed
       },
     });
-    return category;
   } catch (error) {
-    throw new Error(`Failed to update category: ${getErrorMessage(error)}`);
+    throw new Error(`Error fetching category by ID: ${getErrorMessage(error)}`);
   }
-}
+};
 
-/**
- * Delete a category by its ID
- * @param categoryId - The ID of the category to delete
- * @throws Error if the category is not found or deletion fails
- */
-export async function deleteCategory(categoryId: BigInt): Promise<void> {
+// Update a category's details
+export const updateCategory = async (
+  categoryId: bigint,
+  data: UpdateCategoryDto
+): Promise<Category> => {
   try {
-    await prisma.category.delete({
+    return await prisma.category.update({
+      where: { categoryId: Number(categoryId) },
+      data,
+    });
+  } catch (error) {
+    throw new Error(`Error updating category: ${getErrorMessage(error)}`);
+  }
+};
+
+// Delete a category
+export const deleteCategory = async (categoryId: BigInt): Promise<Category> => {
+  try {
+    return await prisma.category.delete({
       where: { categoryId: Number(categoryId) },
     });
   } catch (error) {
-    throw new Error(`Failed to delete category: ${getErrorMessage(error)}`);
+    throw new Error(`Error deleting category: ${getErrorMessage(error)}`);
   }
-}
+};

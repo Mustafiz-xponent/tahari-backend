@@ -5,6 +5,7 @@
 import { Request, Response } from "express";
 import { handleErrorResponse } from "../../../utils/errorResponseHandler";
 import {
+  zCustomerIdParam,
   zCustomerLoginDto,
   zCustomerOtpLoginDto,
   zCustomerRegisterDto,
@@ -12,6 +13,7 @@ import {
   zCustomerVerifyOtpDto,
 } from "./customer.dto";
 import * as customerService from "./customer.service";
+import { z } from "zod";
 
 /**
  * Register a customer
@@ -114,5 +116,32 @@ export const updateCustomerProfile = async (req: Request, res: Response) => {
     });
   } catch (error) {
     handleErrorResponse(error, res, "update profile");
+  }
+};
+
+/**
+ * Get customer by ID
+ */
+export const getCustomerById = async (req: Request, res: Response) => {
+  try {
+    const customerId = zCustomerIdParam.parse(req.params.id);
+    const requestingUserId = req.user?.userId;
+
+    if (!requestingUserId) {
+      throw new Error("Authentication required");
+    }
+    if (BigInt(requestingUserId) !== customerId) {
+      throw new Error("Can only access your own profile");
+    }
+
+    const customer = await customerService.getCustomerById(customerId);
+
+    res.json({
+      success: true,
+      message: "Customer retrieved successfully",
+      data: customer,
+    });
+  } catch (error) {
+    handleErrorResponse(error, res, "get customer by ID");
   }
 };

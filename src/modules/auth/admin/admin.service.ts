@@ -40,7 +40,7 @@ export async function createAdmin(
         email: data.email,
         phone: data.phone,
         name: data.name,
-        address: data.address,
+        address: data.address || [],
         passwordHash,
         role: "ADMIN",
         status: "ACTIVE",
@@ -96,3 +96,51 @@ export async function loginAdmin(
     throw new Error(`Failed to login admin: ${getErrorMessage(error)}`);
   }
 }
+
+/**
+ * Delete an admin by ID
+ * @param adminId The ID of the admin to delete
+ * @param requestingUserId The ID of the superadmin making the request
+ * @throws Error if admin not found or if trying to delete self
+ */
+export const deleteAdmin = async (
+  adminId: bigint,
+  requestingUserId?: string
+): Promise<User> => {
+  try {
+    // Prevent self-deletion
+    if (requestingUserId && BigInt(requestingUserId) === adminId) {
+      throw new Error("Superadmin cannot delete themselves");
+    }
+
+    return await prisma.$transaction(async (prisma) => {
+      // Verify admin exists and is not a superadmin
+      const adminToDelete = await prisma.user.findUnique({
+        where: { userId: Number(adminId) },
+        include: { admin: true },
+      });
+
+      if (!adminToDelete) {
+        throw new Error("Admin not found");
+      }
+
+      if (adminToDelete.role === "SUPER_ADMIN") {
+        throw new Error("Cannot delete a superadmin");
+      }
+
+      // Delete the admin record first if it exists
+      if (adminToDelete.admin) {
+        await prisma.admin.delete({
+          where: { userId: Number(adminId) },
+        });
+      }
+
+      // Then delete the user
+      return await prisma.user.delete({
+        where: { userId: Number(adminId) },
+      });
+    });
+  } catch (error) {
+    throw new Error(`Error deleting admin: ${getErrorMessage(error)}`);
+  }
+};

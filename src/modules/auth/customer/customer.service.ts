@@ -43,7 +43,7 @@ export async function registerCustomer(
       data: {
         phone: data.phone,
         name: data.name,
-        address: data.address,
+        address: data.address || [],
         passwordHash: passwordHash,
         role: "CUSTOMER",
         status: "PENDING",
@@ -164,7 +164,7 @@ export async function updateCustomerProfile(
   const updateData: {
     name?: string;
     email?: string;
-    address?: string;
+    address?: string[];
     passwordHash?: string;
     updatedAt?: Date;
   } = {
@@ -196,4 +196,27 @@ export async function updateCustomerProfile(
     where: { userId },
     data: updateData,
   });
+}
+
+/**
+ * Get customer by ID
+ * @throws Error if customer not found or unauthorized
+ */
+export async function getCustomerById(
+  userId: bigint
+): Promise<Omit<User, "passwordHash">> {
+  const user = await prisma.user.findUnique({
+    where: { userId },
+    include: { customer: true },
+  });
+
+  if (!user) {
+    throw new Error("Customer not found");
+  }
+  if (user.role !== "CUSTOMER") {
+    throw new Error("User is not a customer");
+  }
+
+  const { passwordHash, ...customerData } = user;
+  return customerData;
 }

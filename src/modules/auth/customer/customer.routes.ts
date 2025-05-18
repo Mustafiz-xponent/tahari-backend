@@ -28,4 +28,11 @@ router.put(
   CustomerController.updateCustomerProfile
 );
 
+// Route to get customer by ID
+router.get(
+  "/:id",
+  authMiddleware("CUSTOMER"),
+  CustomerController.getCustomerById
+);
+
 export default router;

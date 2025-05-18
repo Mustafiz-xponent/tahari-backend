@@ -19,4 +19,11 @@ router.post(
 // Route to login an admin with phone/email and password
 router.post("/login", AdminController.loginAdmin);
 
+// Route to delete an admin by superadmin
+router.delete(
+  "/:id",
+  authMiddleware("SUPER_ADMIN"),
+  AdminController.deleteAdmin
+);
+
 export default router;

@@ -13,7 +13,7 @@ const bangladeshPhoneValidator = z.string().regex(/^\+8801[3-9]\d{8}$/, {
 export const zCustomerRegisterDto = z.object({
   phone: bangladeshPhoneValidator,
   name: z.string().min(3, "Name must be at least 3 characters").optional(),
-  address: z.string().optional(),
+  address: z.string().array().optional(),
   password: z
     .string()
     .min(6, "Password must be at least 6 characters")
@@ -50,7 +50,7 @@ export type CustomerVerifyOtpDto = z.infer<typeof zCustomerVerifyOtpDto>;
 export const zCustomerUpdateProfileDto = z.object({
   name: z.string().min(3, "Name is required").optional(),
   email: z.string().email("Invalid email").optional(),
-  address: z.string().min(3, "Address is required").optional(),
+  address: z.string().array().optional(),
   password: z
     .string()
     .min(6, "Password must be at least 6 characters")
@@ -59,3 +59,9 @@ export const zCustomerUpdateProfileDto = z.object({
 export type CustomerUpdateProfileDto = z.infer<
   typeof zCustomerUpdateProfileDto
 >;
+
+// For GET /:id
+// ID Param Validation (direct value)
+export const zCustomerIdParam = z.coerce.bigint().refine((val) => val > 0n, {
+  message: "ID must be a positive integer",
+});
