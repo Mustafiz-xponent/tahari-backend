@@ -6,7 +6,8 @@
 import { Request, Response } from "express";
 import * as productService from "./product.service";
 import { zCreateProductDto, zUpdateProductDto } from "./product.dto";
-import { ZodError, z } from "zod";
+import { z } from "zod";
+import { handleErrorResponse } from "../../utils/errorResponseHandler";
 
 const productIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Product ID must be a positive integer",
@@ -22,14 +23,13 @@ export const createProduct = async (
   try {
     const data = zCreateProductDto.parse(req.body);
     const product = await productService.createProduct(data);
-    res.status(201).json({ message: "Product created successfully", product });
+    res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      data: product,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error creating product:", error);
-    res.status(500).json({ message: "Failed to create product" });
+    handleErrorResponse(error, res, "create product");
   }
 };
 
@@ -42,10 +42,13 @@ export const getAllProducts = async (
 ): Promise<void> => {
   try {
     const products = await productService.getAllProducts();
-    res.json(products);
+    res.json({
+      success: true,
+      message: "Products retrieved successfully",
+      data: products,
+    });
   } catch (error) {
-    console.error("Error fetching products:", error);
-    res.status(500).json({ message: "Failed to fetch products" });
+    handleErrorResponse(error, res, "fetch products");
   }
 };
 
@@ -60,17 +63,19 @@ export const getProductById = async (
     const productId = productIdSchema.parse(req.params.id);
     const product = await productService.getProductById(productId);
     if (!product) {
-      res.status(404).json({ message: "Product not found" });
+      res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
       return;
     }
-    res.json(product);
+    res.json({
+      success: true,
+      message: "Product retrieved successfully",
+      data: product,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error fetching product:", error);
-    res.status(500).json({ message: "Failed to fetch product" });
+    handleErrorResponse(error, res, "fetch product");
   }
 };
 
@@ -85,14 +90,13 @@ export const updateProduct = async (
     const productId = productIdSchema.parse(req.params.id);
     const data = zUpdateProductDto.parse(req.body);
     const updated = await productService.updateProduct(productId, data);
-    res.json({ message: "Product updated successfully", product: updated });
+    res.json({
+      success: true,
+      message: "Product updated successfully",
+      data: updated,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error updating product:", error);
-    res.status(500).json({ message: "Failed to update product" });
+    handleErrorResponse(error, res, "update product");
   }
 };
 
@@ -106,13 +110,11 @@ export const deleteProduct = async (
   try {
     const productId = productIdSchema.parse(req.params.id);
     await productService.deleteProduct(productId);
-    res.json({ message: "Product deleted successfully" });
+    res.json({
+      success: true,
+      message: "Product deleted successfully",
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting product:", error);
-    res.status(500).json({ message: "Failed to delete product" });
+    handleErrorResponse(error, res, "delete product");
   }
 };

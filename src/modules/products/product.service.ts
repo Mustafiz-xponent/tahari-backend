@@ -8,7 +8,7 @@
 import prisma from "../../prisma-client/prismaClient";
 import { Product } from "../../../generated/prisma/client";
 import { CreateProductDto, UpdateProductDto } from "./product.dto";
-import { getErrorMessage } from "@/utils/errorHandler";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 /**
  * Create a new product

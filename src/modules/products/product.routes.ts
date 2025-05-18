@@ -5,11 +5,12 @@
 
 import { Router } from "express";
 import * as ProductController from "./product.controller";
+import { authMiddleware } from "../../middlewares/auth";
 
 const router = Router();
 
 // Route to create a new product
-router.post("/", ProductController.createProduct);
+router.post("/", authMiddleware("ADMIN"), ProductController.createProduct);
 
 // Route to get all products
 router.get("/", ProductController.getAllProducts);
@@ -18,9 +19,9 @@ router.get("/", ProductController.getAllProducts);
 router.get("/:id", ProductController.getProductById);
 
 // Route to update a product's details
-router.put("/:id", ProductController.updateProduct);
+router.put("/:id", authMiddleware("ADMIN"), ProductController.updateProduct);
 
 // Route to delete a product
-router.delete("/:id", ProductController.deleteProduct);
+router.delete("/:id", authMiddleware("ADMIN"), ProductController.deleteProduct);
 
 export default router;
