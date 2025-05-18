@@ -23,9 +23,11 @@ export const createCategory = async (
   try {
     const data = zCreateCategoryDto.parse(req.body);
     const category = await categoryService.createCategory(data);
-    res
-      .status(201)
-      .json({ message: "Category created successfully", category });
+    res.status(201).json({
+      success: true,
+      message: "Category created successfully",
+      data: category,
+    });
   } catch (error) {
     handleErrorResponse(error, res, "create category");
   }
@@ -40,7 +42,11 @@ export const getAllCategories = async (
 ): Promise<void> => {
   try {
     const categories = await categoryService.getAllCategories();
-    res.json(categories);
+    res.json({
+      success: true,
+      message: "Categories retrieved successfully",
+      data: categories,
+    });
   } catch (error) {
     handleErrorResponse(error, res, "fetch categories");
   }
@@ -57,10 +63,13 @@ export const getCategoryById = async (
     const categoryId = BigInt(req.params.id);
     const category = await categoryService.getCategoryById(categoryId);
     if (!category) {
-      res.status(404).json({ message: "Category not found" });
-      return;
+      throw new Error("Category not found.");
     }
-    res.json(category);
+    res.json({
+      success: true,
+      message: "Category retrieved successfully",
+      data: category,
+    });
   } catch (error) {
     handleErrorResponse(error, res, "fetch category");
   }
@@ -77,7 +86,11 @@ export const updateCategory = async (
     const categoryId = categoryIdSchema.parse(req.params.id);
     const data = zUpdateCategoryDto.parse(req.body);
     const updated = await categoryService.updateCategory(categoryId, data);
-    res.json({ message: "Category updated successfully", category: updated });
+    res.json({
+      success: true,
+      message: "Category updated successfully",
+      data: updated,
+    });
   } catch (error) {
     handleErrorResponse(error, res, "update category");
   }
@@ -93,7 +106,7 @@ export const deleteCategory = async (
   try {
     const categoryId = categoryIdSchema.parse(req.params.id);
     await categoryService.deleteCategory(categoryId);
-    res.json({ message: "Category deleted successfully" });
+    res.json({ success: true, message: "Category deleted successfully" });
   } catch (error) {
     handleErrorResponse(error, res, "delete category");
   }
