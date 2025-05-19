@@ -9,7 +9,8 @@ import {
   zCreateInventoryPurchaseDto,
   zUpdateInventoryPurchaseDto,
 } from "./inventory-purchase.dto";
-import { ZodError, z } from "zod";
+import { z } from "zod";
+import { handleErrorResponse } from "../../utils/errorResponseHandler";
 
 const purchaseIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Purchase ID must be a positive integer",
@@ -27,16 +28,13 @@ export const createInventoryPurchase = async (
     const purchase = await inventoryPurchaseService.createInventoryPurchase(
       data
     );
-    res
-      .status(201)
-      .json({ message: "Inventory purchase created successfully", purchase });
+    res.status(201).json({
+      success: true,
+      message: "Inventory purchase created successfully",
+      data: purchase,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error creating inventory purchase:", error);
-    res.status(500).json({ message: "Failed to create inventory purchase" });
+    handleErrorResponse(error, res, "create inventory purchase");
   }
 };
 
@@ -49,10 +47,13 @@ export const getAllInventoryPurchases = async (
 ): Promise<void> => {
   try {
     const purchases = await inventoryPurchaseService.getAllInventoryPurchases();
-    res.json(purchases);
+    res.json({
+      success: true,
+      message: "Inventory purchases retrieved successfully",
+      data: purchases,
+    });
   } catch (error) {
-    console.error("Error fetching inventory purchases:", error);
-    res.status(500).json({ message: "Failed to fetch inventory purchases" });
+    handleErrorResponse(error, res, "fetch inventory purchases");
   }
 };
 
@@ -69,17 +70,15 @@ export const getInventoryPurchaseById = async (
       purchaseId
     );
     if (!purchase) {
-      res.status(404).json({ message: "Inventory purchase not found" });
-      return;
+      throw new Error("Inventory purchase not found");
     }
-    res.json(purchase);
+    res.json({
+      success: true,
+      message: "Inventory purchase retrieved successfully",
+      data: purchase,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error fetching inventory purchase:", error);
-    res.status(500).json({ message: "Failed to fetch inventory purchase" });
+    handleErrorResponse(error, res, "fetch inventory purchase");
   }
 };
 
@@ -98,16 +97,12 @@ export const updateInventoryPurchase = async (
       data
     );
     res.json({
+      success: true,
       message: "Inventory purchase updated successfully",
-      purchase: updated,
+      data: updated,
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error updating inventory purchase:", error);
-    res.status(500).json({ message: "Failed to update inventory purchase" });
+    handleErrorResponse(error, res, "update inventory purchase");
   }
 };
 
@@ -121,13 +116,11 @@ export const deleteInventoryPurchase = async (
   try {
     const purchaseId = purchaseIdSchema.parse(req.params.id);
     await inventoryPurchaseService.deleteInventoryPurchase(purchaseId);
-    res.json({ message: "Inventory purchase deleted successfully" });
+    res.json({
+      success: true,
+      message: "Inventory purchase deleted successfully",
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting inventory purchase:", error);
-    res.status(500).json({ message: "Failed to delete inventory purchase" });
+    handleErrorResponse(error, res, "delete inventory purchase");
   }
 };

@@ -9,6 +9,7 @@ import adminUserRoutes from "../src/modules/auth/admin/admin.routes";
 import farmerRoutes from "../src/modules/farmers/farmers.routes";
 import categoryRoutes from "../src/modules/categories/category.routes";
 import productRoutes from "../src/modules/products/product.routes";
+import inventoryPurchaseRoutes from "../src/modules/inventory_purchases/inventory_purchase.routes";
 
 //
 
@@ -30,6 +31,7 @@ app.use("/api/auth/admin", adminUserRoutes);
 app.use("/api/farmers", farmerRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/inventory-purchases", inventoryPurchaseRoutes);
 
 // Basic Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

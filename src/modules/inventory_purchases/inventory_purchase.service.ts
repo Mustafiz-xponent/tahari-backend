@@ -1,6 +1,5 @@
 // src/modules/inventory_purchases/inventory_purchase.service.ts
 
-
 /**
  * Service layer for InventoryPurchase entity operations.
  * Contains business logic and database interactions for inventory purchases.
@@ -8,8 +7,11 @@
 
 import prisma from "../../prisma-client/prismaClient";
 import { InventoryPurchase } from "../../../generated/prisma/client";
-import { CreateInventoryPurchaseDto, UpdateInventoryPurchaseDto } from "./inventory-purchase.dto";
-import { getErrorMessage } from "@/utils/errorHandler";
+import {
+  CreateInventoryPurchaseDto,
+  UpdateInventoryPurchaseDto,
+} from "./inventory-purchase.dto";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 /**
  * Create a new inventory purchase
@@ -17,7 +19,9 @@ import { getErrorMessage } from "@/utils/errorHandler";
  * @returns The created inventory purchase
  * @throws Error if the inventory purchase cannot be created (e.g., invalid foreign keys)
  */
-export async function createInventoryPurchase(data: CreateInventoryPurchaseDto): Promise<InventoryPurchase> {
+export async function createInventoryPurchase(
+  data: CreateInventoryPurchaseDto
+): Promise<InventoryPurchase> {
   try {
     const inventoryPurchase = await prisma.inventoryPurchase.create({
       data: {
@@ -33,7 +37,9 @@ export async function createInventoryPurchase(data: CreateInventoryPurchaseDto):
     });
     return inventoryPurchase;
   } catch (error) {
-    throw new Error(`Failed to create inventory purchase: ${getErrorMessage(error)}`);
+    throw new Error(
+      `Failed to create inventory purchase: ${getErrorMessage(error)}`
+    );
   }
 }
 
@@ -47,7 +53,9 @@ export async function getAllInventoryPurchases(): Promise<InventoryPurchase[]> {
     const inventoryPurchases = await prisma.inventoryPurchase.findMany();
     return inventoryPurchases;
   } catch (error) {
-    throw new Error(`Failed to fetch inventory purchases: ${getErrorMessage(error)}`);
+    throw new Error(
+      `Failed to fetch inventory purchases: ${getErrorMessage(error)}`
+    );
   }
 }
 
@@ -57,14 +65,18 @@ export async function getAllInventoryPurchases(): Promise<InventoryPurchase[]> {
  * @returns The inventory purchase if found, or null if not found
  * @throws Error if the query fails
  */
-export async function getInventoryPurchaseById(purchaseId: BigInt): Promise<InventoryPurchase | null> {
+export async function getInventoryPurchaseById(
+  purchaseId: BigInt
+): Promise<InventoryPurchase | null> {
   try {
     const inventoryPurchase = await prisma.inventoryPurchase.findUnique({
       where: { purchaseId: Number(purchaseId) },
     });
     return inventoryPurchase;
   } catch (error) {
-    throw new Error(`Failed to fetch inventory purchase: ${getErrorMessage(error)}`);
+    throw new Error(
+      `Failed to fetch inventory purchase: ${getErrorMessage(error)}`
+    );
   }
 }
 
@@ -75,7 +87,10 @@ export async function getInventoryPurchaseById(purchaseId: BigInt): Promise<Inve
  * @returns The updated inventory purchase
  * @throws Error if the inventory purchase is not found or update fails
  */
-export async function updateInventoryPurchase(purchaseId: BigInt, data: UpdateInventoryPurchaseDto): Promise<InventoryPurchase> {
+export async function updateInventoryPurchase(
+  purchaseId: BigInt,
+  data: UpdateInventoryPurchaseDto
+): Promise<InventoryPurchase> {
   try {
     const inventoryPurchase = await prisma.inventoryPurchase.update({
       where: { purchaseId: Number(purchaseId) },
@@ -92,7 +107,9 @@ export async function updateInventoryPurchase(purchaseId: BigInt, data: UpdateIn
     });
     return inventoryPurchase;
   } catch (error) {
-    throw new Error(`Failed to update inventory purchase: ${getErrorMessage(error)}`);
+    throw new Error(
+      `Failed to update inventory purchase: ${getErrorMessage(error)}`
+    );
   }
 }
 
@@ -101,12 +118,16 @@ export async function updateInventoryPurchase(purchaseId: BigInt, data: UpdateIn
  * @param purchaseId - The ID of the inventory purchase to delete
  * @throws Error if the inventory purchase is not found or deletion fails
  */
-export async function deleteInventoryPurchase(purchaseId: BigInt): Promise<void> {
+export async function deleteInventoryPurchase(
+  purchaseId: BigInt
+): Promise<void> {
   try {
     await prisma.inventoryPurchase.delete({
       where: { purchaseId: Number(purchaseId) },
     });
   } catch (error) {
-    throw new Error(`Failed to delete inventory purchase: ${getErrorMessage(error)}`);
+    throw new Error(
+      `Failed to delete inventory purchase: ${getErrorMessage(error)}`
+    );
   }
 }
