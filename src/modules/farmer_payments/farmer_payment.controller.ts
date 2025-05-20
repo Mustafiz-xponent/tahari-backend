@@ -1,4 +1,4 @@
-//  src/modules/farmer_payments/farmer_payment.controller.ts
+// src/modules/farmer_payments/farmer_payment.controller.ts
 
 /**
  * Controller layer for FarmerPayment entity operations.
@@ -7,8 +7,12 @@
 
 import { Request, Response } from "express";
 import * as farmerPaymentService from "./farmer_payment.service";
-import { zCreateFarmerPaymentDto, zUpdateFarmerPaymentDto } from "./farmer_payment.dto";
-import { ZodError, z } from "zod";
+import {
+  zCreateFarmerPaymentDto,
+  zUpdateFarmerPaymentDto,
+} from "./farmer_payment.dto";
+import { z } from "zod";
+import { handleErrorResponse } from "../../utils/errorResponseHandler";
 
 const paymentIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Payment ID must be a positive integer",
@@ -24,14 +28,13 @@ export const createFarmerPayment = async (
   try {
     const data = zCreateFarmerPaymentDto.parse(req.body);
     const payment = await farmerPaymentService.createFarmerPayment(data);
-    res.status(201).json({ message: "Farmer payment created successfully", payment });
+    res.status(201).json({
+      success: true,
+      message: "Farmer payment created successfully",
+      data: payment,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error creating farmer payment:", error);
-    res.status(500).json({ message: "Failed to create farmer payment" });
+    handleErrorResponse(error, res, "create farmer payment");
   }
 };
 
@@ -44,10 +47,13 @@ export const getAllFarmerPayments = async (
 ): Promise<void> => {
   try {
     const payments = await farmerPaymentService.getAllFarmerPayments();
-    res.json(payments);
+    res.json({
+      success: true,
+      message: "Farmer payments fetched successfully",
+      data: payments,
+    });
   } catch (error) {
-    console.error("Error fetching farmer payments:", error);
-    res.status(500).json({ message: "Failed to fetch farmer payments" });
+    handleErrorResponse(error, res, "fetch farmer payments");
   }
 };
 
@@ -62,17 +68,15 @@ export const getFarmerPaymentById = async (
     const paymentId = paymentIdSchema.parse(req.params.id);
     const payment = await farmerPaymentService.getFarmerPaymentById(paymentId);
     if (!payment) {
-      res.status(404).json({ message: "Farmer payment not found" });
-      return;
+      throw new Error("Farmer payment not found");
     }
-    res.json(payment);
+    res.json({
+      success: true,
+      message: "Farmer payment fetched successfully",
+      data: payment,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error fetching farmer payment:", error);
-    res.status(500).json({ message: "Failed to fetch farmer payment" });
+    handleErrorResponse(error, res, "fetch farmer payment");
   }
 };
 
@@ -86,15 +90,17 @@ export const updateFarmerPayment = async (
   try {
     const paymentId = paymentIdSchema.parse(req.params.id);
     const data = zUpdateFarmerPaymentDto.parse(req.body);
-    const updated = await farmerPaymentService.updateFarmerPayment(paymentId, data);
-    res.json({ message: "Farmer payment updated successfully", payment: updated });
+    const updated = await farmerPaymentService.updateFarmerPayment(
+      paymentId,
+      data
+    );
+    res.json({
+      success: true,
+      message: "Farmer payment updated successfully",
+      data: updated,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error updating farmer payment:", error);
-    res.status(500).json({ message: "Failed to update farmer payment" });
+    handleErrorResponse(error, res, "update farmer payment");
   }
 };
 
@@ -108,13 +114,12 @@ export const deleteFarmerPayment = async (
   try {
     const paymentId = paymentIdSchema.parse(req.params.id);
     await farmerPaymentService.deleteFarmerPayment(paymentId);
-    res.json({ message: "Farmer payment deleted successfully" });
+    res.json({
+      success: true,
+      message: "Farmer payment deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting farmer payment:", error);
-    res.status(500).json({ message: "Failed to delete farmer payment" });
+    handleErrorResponse(error, res, "delete farmer payment");
   }
 };

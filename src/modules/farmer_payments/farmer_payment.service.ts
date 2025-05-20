@@ -7,8 +7,11 @@
 
 import prisma from "../../prisma-client/prismaClient";
 import { FarmerPayment } from "../../../generated/prisma/client";
-import { CreateFarmerPaymentDto, UpdateFarmerPaymentDto } from "./farmer_payment.dto";
-import { getErrorMessage } from "@/utils/errorHandler";
+import {
+  CreateFarmerPaymentDto,
+  UpdateFarmerPaymentDto,
+} from "./farmer_payment.dto";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 /**
  * Create a new farmer payment
@@ -16,7 +19,9 @@ import { getErrorMessage } from "@/utils/errorHandler";
  * @returns The created farmer payment
  * @throws Error if the farmer payment cannot be created (e.g., invalid foreign keys)
  */
-export async function createFarmerPayment(data: CreateFarmerPaymentDto): Promise<FarmerPayment> {
+export async function createFarmerPayment(
+  data: CreateFarmerPaymentDto
+): Promise<FarmerPayment> {
   try {
     const farmerPayment = await prisma.farmerPayment.create({
       data: {
@@ -30,7 +35,9 @@ export async function createFarmerPayment(data: CreateFarmerPaymentDto): Promise
     });
     return farmerPayment;
   } catch (error) {
-    throw new Error(`Failed to create farmer payment: ${getErrorMessage(error)}`);
+    throw new Error(
+      `Failed to create farmer payment: ${getErrorMessage(error)}`
+    );
   }
 }
 
@@ -44,7 +51,9 @@ export async function getAllFarmerPayments(): Promise<FarmerPayment[]> {
     const farmerPayments = await prisma.farmerPayment.findMany();
     return farmerPayments;
   } catch (error) {
-    throw new Error(`Failed to fetch farmer payments: ${getErrorMessage(error)}`);
+    throw new Error(
+      `Failed to fetch farmer payments: ${getErrorMessage(error)}`
+    );
   }
 }
 
@@ -54,14 +63,18 @@ export async function getAllFarmerPayments(): Promise<FarmerPayment[]> {
  * @returns The farmer payment if found, or null if not found
  * @throws Error if the query fails
  */
-export async function getFarmerPaymentById(paymentId: BigInt): Promise<FarmerPayment | null> {
+export async function getFarmerPaymentById(
+  paymentId: BigInt
+): Promise<FarmerPayment | null> {
   try {
     const farmerPayment = await prisma.farmerPayment.findUnique({
       where: { paymentId: Number(paymentId) },
     });
     return farmerPayment;
   } catch (error) {
-    throw new Error(`Failed to fetch farmer payment: ${getErrorMessage(error)}`);
+    throw new Error(
+      `Failed to fetch farmer payment: ${getErrorMessage(error)}`
+    );
   }
 }
 
@@ -72,7 +85,10 @@ export async function getFarmerPaymentById(paymentId: BigInt): Promise<FarmerPay
  * @returns The updated farmer payment
  * @throws Error if the farmer payment is not found or update fails
  */
-export async function updateFarmerPayment(paymentId: BigInt, data: UpdateFarmerPaymentDto): Promise<FarmerPayment> {
+export async function updateFarmerPayment(
+  paymentId: BigInt,
+  data: UpdateFarmerPaymentDto
+): Promise<FarmerPayment> {
   try {
     const farmerPayment = await prisma.farmerPayment.update({
       where: { paymentId: Number(paymentId) },
@@ -87,7 +103,9 @@ export async function updateFarmerPayment(paymentId: BigInt, data: UpdateFarmerP
     });
     return farmerPayment;
   } catch (error) {
-    throw new Error(`Failed to update farmer payment: ${getErrorMessage(error)}`);
+    throw new Error(
+      `Failed to update farmer payment: ${getErrorMessage(error)}`
+    );
   }
 }
 
@@ -99,9 +117,11 @@ export async function updateFarmerPayment(paymentId: BigInt, data: UpdateFarmerP
 export async function deleteFarmerPayment(paymentId: BigInt): Promise<void> {
   try {
     await prisma.farmerPayment.delete({
-      where: { paymentId : Number(paymentId) },
+      where: { paymentId: Number(paymentId) },
     });
   } catch (error) {
-    throw new Error(`Failed to delete farmer payment: ${getErrorMessage(error)}`);
+    throw new Error(
+      `Failed to delete farmer payment: ${getErrorMessage(error)}`
+    );
   }
 }

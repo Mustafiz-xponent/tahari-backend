@@ -5,8 +5,8 @@
 
 import prisma from "../../prisma-client/prismaClient";
 import { Order } from "../../../generated/prisma/client";
-import { CreateOrderDto, UpdateOrderDto } from "./order.dto";
-import { getErrorMessage } from "@/utils/errorHandler";
+import { CreateOrderDto, UpdateOrderDto } from "./orders.dto";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 /**
  * Create a new order

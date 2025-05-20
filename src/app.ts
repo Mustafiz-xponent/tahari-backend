@@ -11,6 +11,8 @@ import categoryRoutes from "../src/modules/categories/category.routes";
 import productRoutes from "../src/modules/products/product.routes";
 import inventoryPurchaseRoutes from "../src/modules/inventory_purchases/inventory_purchase.routes";
 import farmerTransactionRoutes from "./modules/farmer_transactions/farmer_transactions.routes";
+import farmerPaymentRoutes from "./modules/farmer_payments/farmer_payment.routes";
+import orderRoutes from "./modules/orders/orders.routes";
 
 //
 
@@ -34,6 +36,8 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/inventory-purchases", inventoryPurchaseRoutes);
 app.use("/api/farmer-transactions", farmerTransactionRoutes);
+app.use("/api/farmer-payments", farmerPaymentRoutes);
+app.use("/api/orders", orderRoutes);
 
 // Basic Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
