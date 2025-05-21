@@ -12,7 +12,7 @@ import {
   CreateStockTransactionDto,
   UpdateStockTransactionDto,
 } from "./stock_transaction.dto";
-import { getErrorMessage } from "@/utils/errorHandler";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 /**
  * Create a new stock transaction

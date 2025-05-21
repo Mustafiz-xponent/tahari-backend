@@ -181,7 +181,8 @@ export function handleErrorResponse(
 
     res.status(statusCode).json({
       success: false,
-      message: errorMessage || "An error occurred",
+      message: `Failed to ${context}`,
+      error: errorMessage || "An error occurred",
     });
     return;
   }
