@@ -9,7 +9,7 @@ import {
   CreateOrderTrackingDto,
   UpdateOrderTrackingDto,
 } from "./order-tracking.dto";
-import { getErrorMessage } from "@/utils/errorHandler";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 /**
  * Create a new order tracking entry

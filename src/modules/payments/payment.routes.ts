@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import * as PaymentController from "./payments.controller";
+import * as PaymentController from "./payment.controller";
 
 const router = Router();
 

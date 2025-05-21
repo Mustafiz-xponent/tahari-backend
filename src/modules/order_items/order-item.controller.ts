@@ -6,7 +6,8 @@
 import { Request, Response } from "express";
 import * as orderItemService from "./order-item.service";
 import { zCreateOrderItemDto, zUpdateOrderItemDto } from "./order-item.dto";
-import { ZodError, z } from "zod";
+import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import { z } from "zod";
 
 const orderItemIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Order Item ID must be a positive integer",
@@ -22,16 +23,13 @@ export const createOrderItem = async (
   try {
     const data = zCreateOrderItemDto.parse(req.body);
     const orderItem = await orderItemService.createOrderItem(data);
-    res
-      .status(201)
-      .json({ message: "Order item created successfully", orderItem });
+    res.status(201).json({
+      success: true,
+      message: "Order item created successfully",
+      data: orderItem,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error creating order item:", error);
-    res.status(500).json({ message: "Failed to create order item" });
+    handleErrorResponse(error, res, "create order item");
   }
 };
 
@@ -44,10 +42,13 @@ export const getAllOrderItems = async (
 ): Promise<void> => {
   try {
     const orderItems = await orderItemService.getAllOrderItems();
-    res.json(orderItems);
+    res.json({
+      success: true,
+      message: "Order items fetched successfully",
+      data: orderItems,
+    });
   } catch (error) {
-    console.error("Error fetching order items:", error);
-    res.status(500).json({ message: "Failed to fetch order items" });
+    handleErrorResponse(error, res, "fetch order items");
   }
 };
 
@@ -62,17 +63,15 @@ export const getOrderItemById = async (
     const orderItemId = orderItemIdSchema.parse(req.params.id);
     const orderItem = await orderItemService.getOrderItemById(orderItemId);
     if (!orderItem) {
-      res.status(404).json({ message: "Order item not found" });
-      return;
+      throw new Error("Order item not found");
     }
-    res.json(orderItem);
+    res.json({
+      success: true,
+      message: "Order item fetched successfully",
+      data: orderItem,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error fetching order item:", error);
-    res.status(500).json({ message: "Failed to fetch order item" });
+    handleErrorResponse(error, res, "fetch order item");
   }
 };
 
@@ -88,16 +87,12 @@ export const updateOrderItem = async (
     const data = zUpdateOrderItemDto.parse(req.body);
     const updated = await orderItemService.updateOrderItem(orderItemId, data);
     res.json({
+      success: true,
       message: "Order item updated successfully",
-      orderItem: updated,
+      data: updated,
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error updating order item:", error);
-    res.status(500).json({ message: "Failed to update order item" });
+    handleErrorResponse(error, res, "update order item");
   }
 };
 
@@ -111,13 +106,12 @@ export const deleteOrderItem = async (
   try {
     const orderItemId = orderItemIdSchema.parse(req.params.id);
     await orderItemService.deleteOrderItem(orderItemId);
-    res.json({ message: "Order item deleted successfully" });
+    res.json({
+      success: true,
+      message: "Order item deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting order item:", error);
-    res.status(500).json({ message: "Failed to delete order item" });
+    handleErrorResponse(error, res, "delete order item");
   }
 };

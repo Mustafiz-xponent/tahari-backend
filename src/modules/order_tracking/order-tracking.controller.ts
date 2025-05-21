@@ -9,7 +9,8 @@ import {
   zCreateOrderTrackingDto,
   zUpdateOrderTrackingDto,
 } from "./order-tracking.dto";
-import { ZodError, z } from "zod";
+import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import { z } from "zod";
 
 const trackingIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Tracking ID must be a positive integer",
@@ -25,16 +26,13 @@ export const createOrderTracking = async (
   try {
     const data = zCreateOrderTrackingDto.parse(req.body);
     const orderTracking = await orderTrackingService.createOrderTracking(data);
-    res
-      .status(201)
-      .json({ message: "Order tracking created successfully", orderTracking });
+    res.status(201).json({
+      success: true,
+      message: "Order tracking created successfully",
+      data: orderTracking,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error creating order tracking:", error);
-    res.status(500).json({ message: "Failed to create order tracking" });
+    handleErrorResponse(error, res, "create order tracking");
   }
 };
 
@@ -47,10 +45,13 @@ export const getAllOrderTrackings = async (
 ): Promise<void> => {
   try {
     const orderTrackings = await orderTrackingService.getAllOrderTrackings();
-    res.json(orderTrackings);
+    res.json({
+      success: true,
+      message: "Order trackings fetched successfully",
+      data: orderTrackings,
+    });
   } catch (error) {
-    console.error("Error fetching order trackings:", error);
-    res.status(500).json({ message: "Failed to fetch order trackings" });
+    handleErrorResponse(error, res, "fetch order trackings");
   }
 };
 
@@ -67,17 +68,15 @@ export const getOrderTrackingById = async (
       trackingId
     );
     if (!orderTracking) {
-      res.status(404).json({ message: "Order tracking not found" });
-      return;
+      throw new Error("Order tracking not found");
     }
-    res.json(orderTracking);
+    res.json({
+      success: true,
+      message: "Order tracking fetched successfully",
+      data: orderTracking,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error fetching order tracking:", error);
-    res.status(500).json({ message: "Failed to fetch order tracking" });
+    handleErrorResponse(error, res, "fetch order tracking");
   }
 };
 
@@ -96,16 +95,12 @@ export const updateOrderTracking = async (
       data
     );
     res.json({
+      success: true,
       message: "Order tracking updated successfully",
-      orderTracking: updated,
+      data: updated,
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error updating order tracking:", error);
-    res.status(500).json({ message: "Failed to update order tracking" });
+    handleErrorResponse(error, res, "update order tracking");
   }
 };
 
@@ -119,13 +114,12 @@ export const deleteOrderTracking = async (
   try {
     const trackingId = trackingIdSchema.parse(req.params.id);
     await orderTrackingService.deleteOrderTracking(trackingId);
-    res.json({ message: "Order tracking deleted successfully" });
+    res.json({
+      success: true,
+      message: "Order tracking deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting order tracking:", error);
-    res.status(500).json({ message: "Failed to delete order tracking" });
+    handleErrorResponse(error, res, "delete order tracking");
   }
 };

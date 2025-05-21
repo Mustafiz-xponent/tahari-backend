@@ -6,7 +6,7 @@
 import prisma from "../../prisma-client/prismaClient";
 import { Payment } from "../../../generated/prisma/client";
 import { CreatePaymentDto, UpdatePaymentDto } from "./payment.dto";
-import { getErrorMessage } from "@/utils/errorHandler";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 /**
  * Create a new payment

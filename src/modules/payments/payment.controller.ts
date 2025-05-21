@@ -6,7 +6,8 @@
 import { Request, Response } from "express";
 import * as paymentService from "./payment.service";
 import { zCreatePaymentDto, zUpdatePaymentDto } from "./payment.dto";
-import { ZodError, z } from "zod";
+import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import { z } from "zod";
 
 const paymentIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Payment ID must be a positive integer",
@@ -22,14 +23,13 @@ export const createPayment = async (
   try {
     const data = zCreatePaymentDto.parse(req.body);
     const payment = await paymentService.createPayment(data);
-    res.status(201).json({ message: "Payment created successfully", payment });
+    res.status(201).json({
+      success: true,
+      message: "Payment created successfully",
+      data: payment,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error creating payment:", error);
-    res.status(500).json({ message: "Failed to create payment" });
+    handleErrorResponse(error, res, "create payment");
   }
 };
 
@@ -42,10 +42,13 @@ export const getAllPayments = async (
 ): Promise<void> => {
   try {
     const payments = await paymentService.getAllPayments();
-    res.json(payments);
+    res.json({
+      success: true,
+      message: "Payments fetched successfully",
+      data: payments,
+    });
   } catch (error) {
-    console.error("Error fetching payments:", error);
-    res.status(500).json({ message: "Failed to fetch payments" });
+    handleErrorResponse(error, res, "fetch payments");
   }
 };
 
@@ -60,17 +63,15 @@ export const getPaymentById = async (
     const paymentId = paymentIdSchema.parse(req.params.id);
     const payment = await paymentService.getPaymentById(paymentId);
     if (!payment) {
-      res.status(404).json({ message: "Payment not found" });
-      return;
+      throw new Error("Payment not found");
     }
-    res.json(payment);
+    res.json({
+      success: true,
+      message: "Payment fetched successfully",
+      data: payment,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error fetching payment:", error);
-    res.status(500).json({ message: "Failed to fetch payment" });
+    handleErrorResponse(error, res, "fetch payment");
   }
 };
 
@@ -85,14 +86,13 @@ export const updatePayment = async (
     const paymentId = paymentIdSchema.parse(req.params.id);
     const data = zUpdatePaymentDto.parse(req.body);
     const updated = await paymentService.updatePayment(paymentId, data);
-    res.json({ message: "Payment updated successfully", payment: updated });
+    res.json({
+      success: true,
+      message: "Payment updated successfully",
+      data: updated,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error updating payment:", error);
-    res.status(500).json({ message: "Failed to update payment" });
+    handleErrorResponse(error, res, "update payment");
   }
 };
 
@@ -106,13 +106,12 @@ export const deletePayment = async (
   try {
     const paymentId = paymentIdSchema.parse(req.params.id);
     await paymentService.deletePayment(paymentId);
-    res.json({ message: "Payment deleted successfully" });
+    res.json({
+      success: true,
+      message: "Payment deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting payment:", error);
-    res.status(500).json({ message: "Failed to delete payment" });
+    handleErrorResponse(error, res, "delete payment");
   }
 };
