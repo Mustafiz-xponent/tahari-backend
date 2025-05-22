@@ -6,7 +6,7 @@
 import prisma from "../../prisma-client/prismaClient";
 import { Wallet } from "../../../generated/prisma/client";
 import { CreateWalletDto, UpdateWalletDto } from "./wallet.dto";
-import { getErrorMessage } from "@/utils/errorHandler";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 /**
  * Create a new wallet
@@ -59,7 +59,7 @@ export async function getAllWallets(): Promise<Wallet[]> {
 export async function getWalletById(walletId: BigInt): Promise<Wallet | null> {
   try {
     const wallet = await prisma.wallet.findUnique({
-         where: { walletId : Number(walletId) },
+      where: { walletId: Number(walletId) },
     });
     return wallet;
   } catch (error) {
@@ -90,7 +90,7 @@ export async function updateWallet(
     }
 
     const wallet = await prisma.wallet.update({
-      where: { walletId : Number(walletId) },
+      where: { walletId: Number(walletId) },
       data: {
         customerId: data.customerId,
         balance: data.balance,

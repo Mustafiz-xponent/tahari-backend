@@ -9,7 +9,8 @@ import {
   zCreateWalletTransactionDto,
   zUpdateWalletTransactionDto,
 } from "./wallet_transaction.dto";
-import { ZodError, z } from "zod";
+import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import { z } from "zod";
 
 const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Transaction ID must be a positive integer",
@@ -27,19 +28,13 @@ export const createWalletTransaction = async (
     const transaction = await walletTransactionService.createWalletTransaction(
       data
     );
-    res
-      .status(201)
-      .json({
-        message: "Wallet transaction created successfully",
-        transaction,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Wallet transaction created successfully",
+      data: transaction,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error creating wallet transaction:", error);
-    res.status(500).json({ message: "Failed to create wallet transaction" });
+    handleErrorResponse(error, res, "create wallet transaction");
   }
 };
 
@@ -53,10 +48,13 @@ export const getAllWalletTransactions = async (
   try {
     const transactions =
       await walletTransactionService.getAllWalletTransactions();
-    res.json(transactions);
+    res.json({
+      success: true,
+      message: "Wallet transactions fetched successfully",
+      data: transactions,
+    });
   } catch (error) {
-    console.error("Error fetching wallet transactions:", error);
-    res.status(500).json({ message: "Failed to fetch wallet transactions" });
+    handleErrorResponse(error, res, "fetch wallet transactions");
   }
 };
 
@@ -73,17 +71,15 @@ export const getWalletTransactionById = async (
       transactionId
     );
     if (!transaction) {
-      res.status(404).json({ message: "Wallet transaction not found" });
-      return;
+      throw new Error("Wallet transaction not found");
     }
-    res.json(transaction);
+    res.json({
+      success: true,
+      message: "Wallet transaction fetched successfully",
+      data: transaction,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error fetching wallet transaction:", error);
-    res.status(500).json({ message: "Failed to fetch wallet transaction" });
+    handleErrorResponse(error, res, "fetch wallet transaction");
   }
 };
 
@@ -102,16 +98,12 @@ export const updateWalletTransaction = async (
       data
     );
     res.json({
+      success: true,
       message: "Wallet transaction updated successfully",
-      transaction: updated,
+      data: updated,
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error updating wallet transaction:", error);
-    res.status(500).json({ message: "Failed to update wallet transaction" });
+    handleErrorResponse(error, res, "update wallet transaction");
   }
 };
 
@@ -125,13 +117,12 @@ export const deleteWalletTransaction = async (
   try {
     const transactionId = transactionIdSchema.parse(req.params.id);
     await walletTransactionService.deleteWalletTransaction(transactionId);
-    res.json({ message: "Wallet transaction deleted successfully" });
+    res.json({
+      success: true,
+      message: "Wallet transaction deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting wallet transaction:", error);
-    res.status(500).json({ message: "Failed to delete wallet transaction" });
+    handleErrorResponse(error, res, "delete wallet transaction");
   }
 };

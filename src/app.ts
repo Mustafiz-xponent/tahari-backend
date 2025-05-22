@@ -17,6 +17,8 @@ import orderRoutes from "./modules/orders/orders.routes";
 import orderItemRoutes from "./modules/order_items/order-item.route";
 import orderTrackingRoutes from "./modules/order_tracking/order-tracking.routes";
 import paymentRoutes from "./modules/payments/payment.routes";
+import walletRoutes from "./modules/wallets/wallet.routes";
+import walletTransactionRoutes from "./modules/wallet_transactions/wallet_transaction.routes";
 
 //
 
@@ -46,6 +48,8 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/order-items", orderItemRoutes);
 app.use("/api/order-tracking", orderTrackingRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/wallets", walletRoutes);
+app.use("/api/wallet-transactions", walletTransactionRoutes);
 
 // Basic Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

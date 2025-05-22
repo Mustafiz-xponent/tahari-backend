@@ -9,7 +9,7 @@ import {
   CreateWalletTransactionDto,
   UpdateWalletTransactionDto,
 } from "./wallet_transaction.dto";
-import { getErrorMessage } from "@/utils/errorHandler";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 /**
  * Create a new wallet transaction
@@ -155,7 +155,7 @@ export async function deleteWalletTransaction(
 ): Promise<void> {
   try {
     await prisma.walletTransaction.delete({
-      where: { transactionId : Number(transactionId) },
+      where: { transactionId: Number(transactionId) },
     });
   } catch (error) {
     throw new Error(
