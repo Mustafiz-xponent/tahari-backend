@@ -9,7 +9,8 @@ import {
   zCreateSubscriptionDto,
   zUpdateSubscriptionDto,
 } from "./subscription.dto";
-import { ZodError, z } from "zod";
+import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import { z } from "zod";
 
 const subscriptionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Subscription ID must be a positive integer",
@@ -25,16 +26,13 @@ export const createSubscription = async (
   try {
     const data = zCreateSubscriptionDto.parse(req.body);
     const subscription = await subscriptionService.createSubscription(data);
-    res
-      .status(201)
-      .json({ message: "Subscription created successfully", subscription });
+    res.status(201).json({
+      success: true,
+      message: "Subscription created successfully",
+      data: subscription,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error creating subscription:", error);
-    res.status(500).json({ message: "Failed to create subscription" });
+    handleErrorResponse(error, res, "create subscription");
   }
 };
 
@@ -47,10 +45,13 @@ export const getAllSubscriptions = async (
 ): Promise<void> => {
   try {
     const subscriptions = await subscriptionService.getAllSubscriptions();
-    res.json(subscriptions);
+    res.json({
+      success: true,
+      message: "Subscriptions fetched successfully",
+      data: subscriptions,
+    });
   } catch (error) {
-    console.error("Error fetching subscriptions:", error);
-    res.status(500).json({ message: "Failed to fetch subscriptions" });
+    handleErrorResponse(error, res, "fetch subscriptions");
   }
 };
 
@@ -67,17 +68,15 @@ export const getSubscriptionById = async (
       subscriptionId
     );
     if (!subscription) {
-      res.status(404).json({ message: "Subscription not found" });
-      return;
+      throw new Error("Subscription not found");
     }
-    res.json(subscription);
+    res.json({
+      success: true,
+      message: "Subscription fetched successfully",
+      data: subscription,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error fetching subscription:", error);
-    res.status(500).json({ message: "Failed to fetch subscription" });
+    handleErrorResponse(error, res, "fetch subscription");
   }
 };
 
@@ -96,16 +95,12 @@ export const updateSubscription = async (
       data
     );
     res.json({
+      success: true,
       message: "Subscription updated successfully",
-      subscription: updated,
+      data: updated,
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error updating subscription:", error);
-    res.status(500).json({ message: "Failed to update subscription" });
+    handleErrorResponse(error, res, "update subscription");
   }
 };
 
@@ -119,13 +114,12 @@ export const deleteSubscription = async (
   try {
     const subscriptionId = subscriptionIdSchema.parse(req.params.id);
     await subscriptionService.deleteSubscription(subscriptionId);
-    res.json({ message: "Subscription deleted successfully" });
+    res.json({
+      success: true,
+      message: "Subscription deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting subscription:", error);
-    res.status(500).json({ message: "Failed to delete subscription" });
+    handleErrorResponse(error, res, "delete subscription");
   }
 };

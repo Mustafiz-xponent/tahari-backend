@@ -9,7 +9,8 @@ import {
   zCreateSubscriptionPlanDto,
   zUpdateSubscriptionPlanDto,
 } from "./subscription_plan.dto";
-import { ZodError, z } from "zod";
+import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import { z } from "zod";
 
 const planIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Plan ID must be a positive integer",
@@ -25,16 +26,13 @@ export const createSubscriptionPlan = async (
   try {
     const data = zCreateSubscriptionPlanDto.parse(req.body);
     const plan = await subscriptionPlanService.createSubscriptionPlan(data);
-    res
-      .status(201)
-      .json({ message: "Subscription plan created successfully", plan });
+    res.status(201).json({
+      success: true,
+      message: "Subscription plan created successfully",
+      data: plan,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error creating subscription plan:", error);
-    res.status(500).json({ message: "Failed to create subscription plan" });
+    handleErrorResponse(error, res, "create subscription plan");
   }
 };
 
@@ -47,10 +45,13 @@ export const getAllSubscriptionPlans = async (
 ): Promise<void> => {
   try {
     const plans = await subscriptionPlanService.getAllSubscriptionPlans();
-    res.json(plans);
+    res.json({
+      success: true,
+      message: "Subscription plans fetched successfully",
+      data: plans,
+    });
   } catch (error) {
-    console.error("Error fetching subscription plans:", error);
-    res.status(500).json({ message: "Failed to fetch subscription plans" });
+    handleErrorResponse(error, res, "fetch subscription plans");
   }
 };
 
@@ -65,17 +66,15 @@ export const getSubscriptionPlanById = async (
     const planId = planIdSchema.parse(req.params.id);
     const plan = await subscriptionPlanService.getSubscriptionPlanById(planId);
     if (!plan) {
-      res.status(404).json({ message: "Subscription plan not found" });
-      return;
+      throw new Error("Subscription plan not found");
     }
-    res.json(plan);
+    res.json({
+      success: true,
+      message: "Subscription plan fetched successfully",
+      data: plan,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error fetching subscription plan:", error);
-    res.status(500).json({ message: "Failed to fetch subscription plan" });
+    handleErrorResponse(error, res, "fetch subscription plan");
   }
 };
 
@@ -94,16 +93,12 @@ export const updateSubscriptionPlan = async (
       data
     );
     res.json({
+      success: true,
       message: "Subscription plan updated successfully",
-      plan: updated,
+      data: updated,
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error updating subscription plan:", error);
-    res.status(500).json({ message: "Failed to update subscription plan" });
+    handleErrorResponse(error, res, "update subscription plan");
   }
 };
 
@@ -117,13 +112,12 @@ export const deleteSubscriptionPlan = async (
   try {
     const planId = planIdSchema.parse(req.params.id);
     await subscriptionPlanService.deleteSubscriptionPlan(planId);
-    res.json({ message: "Subscription plan deleted successfully" });
+    res.json({
+      success: true,
+      message: "Subscription plan deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting subscription plan:", error);
-    res.status(500).json({ message: "Failed to delete subscription plan" });
+    handleErrorResponse(error, res, "delete subscription plan");
   }
 };

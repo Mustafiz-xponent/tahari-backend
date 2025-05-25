@@ -1,7 +1,6 @@
 /**
  * Data Transfer Objects (DTOs) for the Product entity
- * These interfaces define the expected shape of data when creating or updating a product.
- * You can also use these types with validation libraries like Zod or Joi if needed.
+ * Updated to handle image uploads with product operations
  */
 
 import { z } from "zod";
@@ -9,23 +8,40 @@ import { z } from "zod";
 /**
  * Zod schema for creating a new product.
  * Validates all required fields necessary for creation.
+ * Images are handled separately through file upload.
  */
 export const zCreateProductDto = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
-  price: z.number().positive("Price must be positive"),
-  stockQuantity: z
+  price: z.coerce.number().positive("Price must be positive"),
+  stockQuantity: z.coerce
     .number()
     .int()
     .nonnegative("Stock quantity must be a non-negative integer")
     .optional(),
-  reorderLevel: z
+  reorderLevel: z.coerce
     .number()
     .int()
     .nonnegative("Reorder level must be a non-negative integer")
     .optional(),
-  isSubscription: z.boolean().optional(),
-  isPreorder: z.boolean().optional(),
+  isSubscription: z
+    .union([z.boolean(), z.string()])
+    .transform((val) => {
+      if (typeof val === "string") {
+        return val.toLowerCase() === "true";
+      }
+      return val;
+    })
+    .optional(),
+  isPreorder: z
+    .union([z.boolean(), z.string()])
+    .transform((val) => {
+      if (typeof val === "string") {
+        return val.toLowerCase() === "true";
+      }
+      return val;
+    })
+    .optional(),
   preorderAvailabilityDate: z
     .string()
     .datetime()
@@ -33,13 +49,13 @@ export const zCreateProductDto = z.object({
     .transform((val) => (val ? new Date(val) : undefined)),
   categoryId: z
     .union([z.string(), z.number()])
-    .transform(BigInt)
+    .transform((val) => BigInt(val))
     .refine((val) => val > 0n, {
       message: "Category ID must be a positive integer",
     }),
   farmerId: z
     .union([z.string(), z.number()])
-    .transform(BigInt)
+    .transform((val) => BigInt(val))
     .refine((val) => val > 0n, {
       message: "Farmer ID must be a positive integer",
     }),
@@ -54,45 +70,109 @@ export type CreateProductDto = z.infer<typeof zCreateProductDto>;
 /**
  * Zod schema for updating a product.
  * All fields are optional to support partial updates.
+ * Images are handled separately through file upload.
  */
 export const zUpdateProductDto = z.object({
   name: z.string().min(1, "Name is required").optional(),
   description: z.string().optional(),
-  price: z.number().positive("Price must be positive").optional(),
-  stockQuantity: z
+  price: z.coerce.number().positive("Price must be positive").optional(),
+  stockQuantity: z.coerce
     .number()
     .int()
     .nonnegative("Stock quantity must be a non-negative integer")
     .optional(),
-  reorderLevel: z
+  reorderLevel: z.coerce
     .number()
     .int()
     .nonnegative("Reorder level must be a non-negative integer")
     .optional(),
-  isSubscription: z.boolean().optional(),
-  isPreorder: z.boolean().optional(),
+  isSubscription: z
+    .union([z.boolean(), z.string()])
+    .transform((val) => {
+      if (typeof val === "string") {
+        return val.toLowerCase() === "true";
+      }
+      return val;
+    })
+    .optional(),
+  isPreorder: z
+    .union([z.boolean(), z.string()])
+    .transform((val) => {
+      if (typeof val === "string") {
+        return val.toLowerCase() === "true";
+      }
+      return val;
+    })
+    .optional(),
   preorderAvailabilityDate: z
     .string()
     .datetime()
     .optional()
     .transform((val) => (val ? new Date(val) : undefined)),
+  imageUrls: z.array(z.string().url()).optional(), // For manual URL management
   categoryId: z
     .union([z.string(), z.number()])
-    .transform(BigInt)
+    .transform((val) => BigInt(val))
     .refine((val) => val > 0n, {
       message: "Category ID must be a positive integer",
     })
     .optional(),
   farmerId: z
     .union([z.string(), z.number()])
-    .transform(BigInt)
+    .transform((val) => BigInt(val))
     .refine((val) => val > 0n, {
       message: "Farmer ID must be a positive integer",
     })
     .optional(),
+  replaceImages: z
+    .union([z.boolean(), z.string()])
+    .transform((val) => {
+      if (typeof val === "string") {
+        return val.toLowerCase() === "true";
+      }
+      return val;
+    })
+    .optional()
+    .default(false), // Whether to replace existing images or add to them
 });
 
 /**
  * TypeScript type inferred from update schema.
  */
 export type UpdateProductDto = z.infer<typeof zUpdateProductDto>;
+
+/**
+ * Schema for removing specific images from a product
+ */
+export const zRemoveProductImagesDto = z.object({
+  productId: z
+    .union([z.string(), z.number()])
+    .transform((val) => BigInt(val))
+    .refine((val) => val > 0n, {
+      message: "Product ID must be a positive integer",
+    }),
+  imageUrls: z
+    .array(z.string().url())
+    .min(1, "At least one image URL is required"),
+});
+
+export type RemoveProductImagesDto = z.infer<typeof zRemoveProductImagesDto>;
+
+/**
+ * Schema for product query parameters
+ */
+export const zProductQueryDto = z.object({
+  include: z.enum(["relations"]).optional(),
+  category: z.string().optional(),
+  farmer: z.string().optional(),
+  isSubscription: z
+    .string()
+    .transform((val) => val.toLowerCase() === "true")
+    .optional(),
+  isPreorder: z
+    .string()
+    .transform((val) => val.toLowerCase() === "true")
+    .optional(),
+});
+
+export type ProductQueryDto = z.infer<typeof zProductQueryDto>;

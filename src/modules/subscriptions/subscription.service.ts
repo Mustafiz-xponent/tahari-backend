@@ -9,7 +9,7 @@ import {
   CreateSubscriptionDto,
   UpdateSubscriptionDto,
 } from "./subscription.dto";
-import { getErrorMessage } from "@/utils/errorHandler";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 /**
  * Create a new subscription

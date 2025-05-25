@@ -37,12 +37,6 @@ export const createStockTransaction = async (
     });
   } catch (error) {
     handleErrorResponse(error, res, "create stock transaction");
-    // if (error instanceof ZodError) {
-    //   res.status(400).json({ errors: error.flatten() });
-    //   return;
-    // }
-    // console.error("Error creating stock transaction:", error);
-    // res.status(500).json({ message: "Failed to create stock transaction" });
   }
 };
 
