@@ -9,7 +9,8 @@ import {
   zCreateSubscriptionDeliveryDto,
   zUpdateSubscriptionDeliveryDto,
 } from "./subscription-delivery.dto";
-import { ZodError, z } from "zod";
+import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import { z } from "zod";
 
 const deliveryIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Delivery ID must be a positive integer",
@@ -26,19 +27,13 @@ export const createSubscriptionDelivery = async (
     const data = zCreateSubscriptionDeliveryDto.parse(req.body);
     const subscriptionDelivery =
       await subscriptionDeliveryService.createSubscriptionDelivery(data);
-    res
-      .status(201)
-      .json({
-        message: "Subscription delivery created successfully",
-        subscriptionDelivery,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Subscription delivery created successfully",
+      data: subscriptionDelivery,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error creating subscription delivery:", error);
-    res.status(500).json({ message: "Failed to create subscription delivery" });
+    handleErrorResponse(error, res, "create subscription delivery");
   }
 };
 
@@ -52,12 +47,13 @@ export const getAllSubscriptionDeliveries = async (
   try {
     const subscriptionDeliveries =
       await subscriptionDeliveryService.getAllSubscriptionDeliveries();
-    res.json(subscriptionDeliveries);
+    res.json({
+      success: true,
+      message: "Subscription deliveries fetched successfully",
+      data: subscriptionDeliveries,
+    });
   } catch (error) {
-    console.error("Error fetching subscription deliveries:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to fetch subscription deliveries" });
+    handleErrorResponse(error, res, "fetch subscription deliveries");
   }
 };
 
@@ -73,17 +69,15 @@ export const getSubscriptionDeliveryById = async (
     const subscriptionDelivery =
       await subscriptionDeliveryService.getSubscriptionDeliveryById(deliveryId);
     if (!subscriptionDelivery) {
-      res.status(404).json({ message: "Subscription delivery not found" });
-      return;
+      throw new Error("Subscription delivery not found");
     }
-    res.json(subscriptionDelivery);
+    res.json({
+      success: true,
+      message: "Subscription delivery fetched successfully",
+      data: subscriptionDelivery,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error fetching subscription delivery:", error);
-    res.status(500).json({ message: "Failed to fetch subscription delivery" });
+    handleErrorResponse(error, res, "fetch subscription delivery");
   }
 };
 
@@ -103,16 +97,12 @@ export const updateSubscriptionDelivery = async (
         data
       );
     res.json({
+      success: true,
       message: "Subscription delivery updated successfully",
-      subscriptionDelivery: updated,
+      data: updated,
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error updating subscription delivery:", error);
-    res.status(500).json({ message: "Failed to update subscription delivery" });
+    handleErrorResponse(error, res, "update subscription delivery");
   }
 };
 
@@ -126,13 +116,12 @@ export const deleteSubscriptionDelivery = async (
   try {
     const deliveryId = deliveryIdSchema.parse(req.params.id);
     await subscriptionDeliveryService.deleteSubscriptionDelivery(deliveryId);
-    res.json({ message: "Subscription delivery deleted successfully" });
+    res.json({
+      success: true,
+      message: "Subscription delivery deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting subscription delivery:", error);
-    res.status(500).json({ message: "Failed to delete subscription delivery" });
+    handleErrorResponse(error, res, "delete subscription delivery");
   }
 };

@@ -19,8 +19,9 @@ import orderTrackingRoutes from "./modules/order_tracking/order-tracking.routes"
 import paymentRoutes from "./modules/payments/payment.routes";
 import walletRoutes from "./modules/wallets/wallet.routes";
 import walletTransactionRoutes from "./modules/wallet_transactions/wallet_transaction.routes";
-// import subscriptionRoutes from "./modules/subscriptions/subscription.routes";
+import subscriptionRoutes from "./modules/subscriptions/subscription.routes";
 import subscriptionPlanRoutes from "./modules/subscription_plans/subscription_plan.routes";
+import subscriptionDeliveryRoutes from "./modules/subscription_deliveries/subscription-delivery.routes";
 
 //
 
@@ -52,8 +53,9 @@ app.use("/api/order-tracking", orderTrackingRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/wallets", walletRoutes);
 app.use("/api/wallet-transactions", walletTransactionRoutes);
-// app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/subscription-plans", subscriptionPlanRoutes);
+app.use("/api/subscription-deliveries", subscriptionDeliveryRoutes);
 
 // Basic Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
