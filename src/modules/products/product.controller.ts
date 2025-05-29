@@ -33,7 +33,11 @@ export const createProduct = [
         });
       }
 
-      const product = await productService.createProduct(data, imageFiles);
+      const product = await productService.createProduct(
+        data,
+        imageFiles,
+        true
+      );
       res.status(201).json({
         success: true,
         message: "Product created successfully",

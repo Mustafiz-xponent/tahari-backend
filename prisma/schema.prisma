@@ -173,6 +173,7 @@ model Product {
   reorderLevel             Int                 @default(0)
   isSubscription           Boolean             @default(false)
   isPreorder               Boolean             @default(false)
+  isPrivateImages          Boolean             @default(false)
   preorderAvailabilityDate DateTime?
   imageUrls                String[]            @default([])
   createdAt                DateTime            @default(now())

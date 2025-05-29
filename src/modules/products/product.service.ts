@@ -1,29 +1,38 @@
-/**
- * Service layer for Product entity operations.
- * Updated to handle image uploads with product creation and updates.
- */
+// /**
+//  * Service layer for Product entity operations.
+//  * Updated to handle image uploads with product creation and updates.
+//  */
 
-import prisma from "../../prisma-client/prismaClient";
 import { Product } from "../../../generated/prisma/client";
-import { CreateProductDto, UpdateProductDto } from "./product.dto";
+import prisma from "../../prisma-client/prismaClient";
 import { getErrorMessage } from "../../utils/errorHandler";
 import {
-  uploadProductImages,
-  replaceProductImages,
   deleteMultipleFilesFromS3,
   extractS3KeyFromUrl,
+  getBatchAccessibleImageUrls,
+  replaceProductImages,
+  uploadProductImages,
 } from "../../utils/fileUpload/s3Aws";
+import { CreateProductDto, UpdateProductDto } from "./product.dto";
+
+// Add interface for product with accessible URLs
+interface ProductWithAccessibleImages extends Omit<Product, "imageUrls"> {
+  imageUrls: string[];
+  accessibleImageUrls?: string[];
+}
 
 /**
  * Create a new product with optional image uploads
  * @param data - Data required to create a product
  * @param imageFiles - Optional array of image files to upload
+ * @param usePrivateBucket - Whether to store images in private bucket
  * @returns The created product with image URLs
  * @throws Error if the product cannot be created
  */
 export async function createProduct(
   data: CreateProductDto,
-  imageFiles?: File[]
+  imageFiles?: File[],
+  usePrivateBucket: boolean = false
 ): Promise<Product> {
   try {
     // First create the product without images
@@ -38,6 +47,7 @@ export async function createProduct(
         isPreorder: data.isPreorder ?? false,
         preorderAvailabilityDate: data.preorderAvailabilityDate,
         imageUrls: [], // Start with empty array
+        isPrivateImages: usePrivateBucket, // Store whether images are private
         categoryId: data.categoryId,
         farmerId: data.farmerId,
       },
@@ -48,7 +58,8 @@ export async function createProduct(
       try {
         const uploadResults = await uploadProductImages(
           imageFiles,
-          product.productId
+          product.productId,
+          usePrivateBucket
         );
         const imageUrls = uploadResults.map((result) => result.url);
 
@@ -79,12 +90,16 @@ export async function createProduct(
 /**
  * Retrieve all products with optional filtering and relations
  * @param includeRelations - Whether to include category and farmer relations
- * @returns An array of all products
+ * @param generateAccessibleUrls - Whether to generate presigned URLs for private images
+ * @param urlExpiresIn - Expiration time for presigned URLs in seconds
+ * @returns An array of all products with accessible image URLs
  * @throws Error if the query fails
  */
 export async function getAllProducts(
-  includeRelations = false
-): Promise<Product[]> {
+  includeRelations = false,
+  generateAccessibleUrls = true,
+  urlExpiresIn = 300
+): Promise<ProductWithAccessibleImages[]> {
   try {
     const products = await prisma.product.findMany({
       include: includeRelations
@@ -94,7 +109,32 @@ export async function getAllProducts(
           }
         : undefined,
     });
-    return products;
+
+    // Generate accessible URLs if requested
+    if (generateAccessibleUrls) {
+      const productsWithAccessibleUrls = await Promise.all(
+        products.map(async (product) => {
+          if (product.imageUrls.length === 0) {
+            return { ...product, accessibleImageUrls: [] };
+          }
+
+          const accessibleUrls = await getBatchAccessibleImageUrls(
+            product.imageUrls,
+            product.isPrivateImages || false,
+            urlExpiresIn
+          );
+
+          return {
+            ...product,
+            accessibleImageUrls: accessibleUrls,
+          };
+        })
+      );
+
+      return productsWithAccessibleUrls;
+    }
+
+    return products.map((product) => ({ ...product, accessibleImageUrls: [] }));
   } catch (error) {
     throw new Error(`Failed to fetch products: ${getErrorMessage(error)}`);
   }
@@ -104,13 +144,17 @@ export async function getAllProducts(
  * Retrieve a product by its ID with optional relations
  * @param productId - The ID of the product
  * @param includeRelations - Whether to include category and farmer relations
- * @returns The product if found, or null if not found
+ * @param generateAccessibleUrls - Whether to generate presigned URLs for private images
+ * @param urlExpiresIn - Expiration time for presigned URLs in seconds
+ * @returns The product if found with accessible image URLs, or null if not found
  * @throws Error if the query fails
  */
 export async function getProductById(
   productId: BigInt,
-  includeRelations = false
-): Promise<Product | null> {
+  includeRelations = false,
+  generateAccessibleUrls = true,
+  urlExpiresIn = 300
+): Promise<ProductWithAccessibleImages | null> {
   try {
     const product = await prisma.product.findUnique({
       where: { productId: Number(productId) },
@@ -121,7 +165,26 @@ export async function getProductById(
           }
         : undefined,
     });
-    return product;
+
+    if (!product) {
+      return null;
+    }
+
+    // Generate accessible URLs if requested
+    if (generateAccessibleUrls && product.imageUrls.length > 0) {
+      const accessibleUrls = await getBatchAccessibleImageUrls(
+        product.imageUrls,
+        product.isPrivateImages || false,
+        urlExpiresIn
+      );
+
+      return {
+        ...product,
+        accessibleImageUrls: accessibleUrls,
+      };
+    }
+
+    return { ...product, accessibleImageUrls: [] };
   } catch (error) {
     throw new Error(`Failed to fetch product: ${getErrorMessage(error)}`);
   }
@@ -133,6 +196,7 @@ export async function getProductById(
  * @param data - Data to update the product
  * @param imageFiles - Optional array of new image files
  * @param replaceImages - Whether to replace existing images or add to them
+ * @param usePrivateBucket - Whether new images should be stored in private bucket
  * @returns The updated product
  * @throws Error if the product is not found or update fails
  */
@@ -140,19 +204,26 @@ export async function updateProduct(
   productId: bigint,
   data: UpdateProductDto,
   imageFiles?: File[],
-  replaceImages = false
+  replaceImages = false,
+  usePrivateBucket?: boolean
 ): Promise<Product> {
   try {
-    // Get current product to access existing image URLs
+    // Get current product to access existing image URLs and privacy setting
     const currentProduct = await prisma.product.findUnique({
       where: { productId: Number(productId) },
-      select: { imageUrls: true },
+      select: {
+        imageUrls: true,
+        isPrivateImages: true,
+      },
     });
 
     if (!currentProduct) {
       throw new Error("Product not found");
     }
 
+    // Determine privacy setting for new images
+    const shouldUsePrivate =
+      usePrivateBucket ?? currentProduct.isPrivateImages ?? false;
     let finalImageUrls = currentProduct.imageUrls;
 
     // Handle image uploads if provided
@@ -163,14 +234,17 @@ export async function updateProduct(
           const uploadResults = await replaceProductImages(
             imageFiles,
             currentProduct.imageUrls,
-            productId
+            productId,
+            shouldUsePrivate,
+            currentProduct.isPrivateImages || false
           );
           finalImageUrls = uploadResults.map((result) => result.url);
         } else {
           // Add to existing images
           const uploadResults = await uploadProductImages(
             imageFiles,
-            productId
+            productId,
+            shouldUsePrivate
           );
           finalImageUrls = [
             ...currentProduct.imageUrls,
@@ -199,6 +273,7 @@ export async function updateProduct(
         isPreorder: data.isPreorder,
         preorderAvailabilityDate: data.preorderAvailabilityDate,
         imageUrls: data.imageUrls ?? finalImageUrls, // Use provided URLs or processed ones
+        isPrivateImages: usePrivateBucket ?? currentProduct.isPrivateImages,
         categoryId: data.categoryId,
         farmerId: data.farmerId,
       },
@@ -216,10 +291,13 @@ export async function updateProduct(
  */
 export async function deleteProduct(productId: BigInt): Promise<void> {
   try {
-    // First, get the product to access image URLs
+    // First, get the product to access image URLs and privacy setting
     const product = await prisma.product.findUnique({
       where: { productId: Number(productId) },
-      select: { imageUrls: true },
+      select: {
+        imageUrls: true,
+        isPrivateImages: true,
+      },
     });
 
     if (!product) {
@@ -239,9 +317,9 @@ export async function deleteProduct(productId: BigInt): Promise<void> {
 
       if (s3Keys.length > 0) {
         // Run cleanup in background
-        deleteMultipleFilesFromS3(s3Keys)
+        deleteMultipleFilesFromS3(s3Keys, product.isPrivateImages || false)
           .then(() => {
-            console.log("✅ Successfully deleted S3 files:", s3Keys); // Success log
+            console.log("✅ Successfully deleted S3 files:", s3Keys);
           })
           .catch((error) => {
             console.error(
@@ -270,7 +348,10 @@ export async function removeSpecificProductImages(
     // Get current product
     const currentProduct = await prisma.product.findUnique({
       where: { productId: Number(productId) },
-      select: { imageUrls: true },
+      select: {
+        imageUrls: true,
+        isPrivateImages: true,
+      },
     });
 
     if (!currentProduct) {
@@ -288,7 +369,10 @@ export async function removeSpecificProductImages(
       .filter((key): key is string => key !== null);
 
     if (s3Keys.length > 0) {
-      deleteMultipleFilesFromS3(s3Keys).catch((error) => {
+      deleteMultipleFilesFromS3(
+        s3Keys,
+        currentProduct.isPrivateImages || false
+      ).catch((error) => {
         console.error("Failed to delete images from S3:", error);
       });
     }
@@ -303,6 +387,41 @@ export async function removeSpecificProductImages(
   } catch (error) {
     throw new Error(
       `Failed to remove product images: ${getErrorMessage(error)}`
+    );
+  }
+}
+
+/**
+ * Generate fresh presigned URLs for a product's private images
+ * @param productId - The ID of the product
+ * @param expiresIn - Expiration time in seconds
+ * @returns Array of presigned URLs
+ */
+export async function refreshProductImageUrls(
+  productId: BigInt,
+  expiresIn: number = 300
+): Promise<string[]> {
+  try {
+    const product = await prisma.product.findUnique({
+      where: { productId: Number(productId) },
+      select: {
+        imageUrls: true,
+        isPrivateImages: true,
+      },
+    });
+
+    if (!product || !product.imageUrls.length) {
+      return [];
+    }
+
+    return await getBatchAccessibleImageUrls(
+      product.imageUrls,
+      product.isPrivateImages || false,
+      expiresIn
+    );
+  } catch (error) {
+    throw new Error(
+      `Failed to refresh product image URLs: ${getErrorMessage(error)}`
     );
   }
 }
