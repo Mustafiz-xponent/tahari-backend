@@ -5,7 +5,11 @@
 
 import { Request, Response } from "express";
 import * as orderItemService from "./order-item.service";
-import { zCreateOrderItemDto, zUpdateOrderItemDto } from "./order-item.dto";
+import {
+  zCreateOrderItemDto,
+  zCreateOrderItemsDto,
+  zUpdateOrderItemDto,
+} from "./order-item.dto";
 import { handleErrorResponse } from "../../utils/errorResponseHandler";
 import { z } from "zod";
 
@@ -16,20 +20,47 @@ const orderItemIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
 /**
  * Create a new order item
  */
-export const createOrderItem = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+// export const createOrderItem = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const data = zCreateOrderItemDto.parse(req.body);
+//     const orderItem = await orderItemService.createOrderItem(data);
+//     res.status(201).json({
+//       success: true,
+//       message: "Order item created successfully",
+//       data: orderItem,
+//     });
+//   } catch (error) {
+//     handleErrorResponse(error, res, "create order item");
+//   }
+// };
+
+export const createOrderItem = async (req: Request, res: Response) => {
   try {
-    const data = zCreateOrderItemDto.parse(req.body);
-    const orderItem = await orderItemService.createOrderItem(data);
-    res.status(201).json({
-      success: true,
-      message: "Order item created successfully",
-      data: orderItem,
-    });
+    // Check if request is for multiple items
+    if (req.body.items && Array.isArray(req.body.items)) {
+      const data = zCreateOrderItemsDto.parse(req.body);
+      const items = await orderItemService.createOrderItems(data);
+      res.status(201).json({
+        success: true,
+        message: `Created ${items.length} order items`,
+        data: items,
+      });
+    }
+    // Handle single item creation
+    else {
+      const data = zCreateOrderItemDto.parse(req.body);
+      const item = await orderItemService.createOrderItem(data);
+      res.status(201).json({
+        success: true,
+        message: "Order item created successfully",
+        data: item,
+      });
+    }
   } catch (error) {
-    handleErrorResponse(error, res, "create order item");
+    handleErrorResponse(error, res, "create order item(s)");
   }
 };
 

@@ -6,6 +6,11 @@
 
 import { z } from "zod";
 
+// Id validation
+const idSchema = z.coerce.bigint().refine((val) => val > 0n, {
+  message: "ID must be a positive integer",
+});
+
 // Validation for subtotal based on quantity and unitPrice
 const subtotalValidation = (data: {
   quantity: number;
@@ -21,32 +26,78 @@ const subtotalValidation = (data: {
  */
 export const zCreateOrderItemDto = z
   .object({
-    quantity: z.number().int().positive("Quantity must be a positive integer"),
-    unitPrice: z.number().nonnegative("Unit price must be non-negative"),
-    subtotal: z.number().nonnegative("Subtotal must be non-negative"),
-    orderId: z
-      .union([z.string(), z.number()])
-      .transform(BigInt)
-      .refine((val) => val > 0n, {
-        message: "Order ID must be a positive integer",
-      }),
-    productId: z
-      .union([z.string(), z.number()])
-      .transform(BigInt)
-      .refine((val) => val > 0n, {
-        message: "Product ID must be a positive integer",
-      }),
+    orderId: idSchema,
+    productId: idSchema,
+    quantity: z.number().int().positive(),
+    unitPrice: z.number().nonnegative(),
+    subtotal: z.number().nonnegative(),
   })
-  .refine(subtotalValidation, {
-    message: "Subtotal must equal quantity * unitPrice",
-    path: ["subtotal"],
-  });
+  .refine(subtotalValidation);
 
 /**
- * TypeScript type inferred from create schema.
+ * TypeScript type inferred from create item schema.
  * Use this type in services or elsewhere.
  */
 export type CreateOrderItemDto = z.infer<typeof zCreateOrderItemDto>;
+
+/**
+ * Zod schema for creating multiple order items.
+ * Validates all required fields necessary for creation.
+ */
+export const zCreateOrderItemsDto = z.object({
+  orderId: idSchema,
+  items: z
+    .array(
+      z
+        .object({
+          productId: idSchema,
+          quantity: z.number().int().positive(),
+          unitPrice: z.number().nonnegative(),
+          subtotal: z.number().nonnegative(),
+        })
+        .refine(subtotalValidation)
+    )
+    .min(1, "At least one order item is required"),
+});
+
+/**
+ * TypeScript type inferred from create items schema.
+ * Use this type in services or elsewhere.
+ */
+export type CreateOrderItemsDto = z.infer<typeof zCreateOrderItemsDto>;
+
+// /**
+//  * Zod schema for creating a new order item.
+//  * Validates all required fields necessary for creation.
+//  */
+// export const zCreateOrderItemDto = z
+//   .object({
+//     quantity: z.number().int().positive("Quantity must be a positive integer"),
+//     unitPrice: z.number().nonnegative("Unit price must be non-negative"),
+//     subtotal: z.number().nonnegative("Subtotal must be non-negative"),
+//     orderId: z
+//       .union([z.string(), z.number()])
+//       .transform(BigInt)
+//       .refine((val) => val > 0n, {
+//         message: "Order ID must be a positive integer",
+//       }),
+//     productId: z
+//       .union([z.string(), z.number()])
+//       .transform(BigInt)
+//       .refine((val) => val > 0n, {
+//         message: "Product ID must be a positive integer",
+//       }),
+//   })
+//   .refine(subtotalValidation, {
+//     message: "Subtotal must equal quantity * unitPrice",
+//     path: ["subtotal"],
+//   });
+
+// /**
+//  * TypeScript type inferred from create schema.
+//  * Use this type in services or elsewhere.
+//  */
+// export type CreateOrderItemDto = z.infer<typeof zCreateOrderItemDto>;
 
 /**
  * Zod schema for updating an order item.
