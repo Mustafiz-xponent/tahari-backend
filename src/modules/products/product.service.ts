@@ -1,7 +1,7 @@
-// /**
-//  * Service layer for Product entity operations.
-//  * Updated to handle image uploads with product creation and updates.
-//  */
+/**
+ * Service layer for Product entity operations.
+ * Updated to handle image uploads with product creation and updates.
+ */
 
 import { Product } from "../../../generated/prisma/client";
 import prisma from "../../prisma-client/prismaClient";
@@ -19,6 +19,19 @@ import { CreateProductDto, UpdateProductDto } from "./product.dto";
 interface ProductWithAccessibleImages extends Omit<Product, "imageUrls"> {
   imageUrls: string[];
   accessibleImageUrls?: string[];
+}
+
+interface PaginationParams {
+  page: number;
+  limit: number;
+  skip: number;
+}
+
+interface PaginatedProductResult {
+  products: ProductWithAccessibleImages[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
 }
 
 /**
@@ -87,20 +100,105 @@ export async function createProduct(
   }
 }
 
+// /**
+//  * Retrieve all products with optional filtering and relations
+//  * @param includeRelations - Whether to include category and farmer relations
+//  * @param generateAccessibleUrls - Whether to generate presigned URLs for private images
+//  * @param urlExpiresIn - Expiration time for presigned URLs in seconds
+//  * @returns An array of all products with accessible image URLs
+//  * @throws Error if the query fails
+//  */
+// export async function getAllProducts(
+//   includeRelations = false,
+//   generateAccessibleUrls = true,
+//   urlExpiresIn = 300
+// ): Promise<ProductWithAccessibleImages[]> {
+//   try {
+//     const products = await prisma.product.findMany({
+//       include: includeRelations
+//         ? {
+//             category: true,
+//             farmer: true,
+//           }
+//         : undefined,
+//     });
+
+//     // Generate accessible URLs if requested
+//     if (generateAccessibleUrls) {
+//       const productsWithAccessibleUrls = await Promise.all(
+//         products.map(async (product) => {
+//           if (product.imageUrls.length === 0) {
+//             return { ...product, accessibleImageUrls: [] };
+//           }
+
+//           const accessibleUrls = await getBatchAccessibleImageUrls(
+//             product.imageUrls,
+//             product.isPrivateImages || false,
+//             urlExpiresIn
+//           );
+
+//           return {
+//             ...product,
+//             accessibleImageUrls: accessibleUrls,
+//           };
+//         })
+//       );
+
+//       return productsWithAccessibleUrls;
+//     }
+
+//     return products.map((product) => ({ ...product, accessibleImageUrls: [] }));
+//   } catch (error) {
+//     throw new Error(`Failed to fetch products: ${getErrorMessage(error)}`);
+//   }
+// }
+
 /**
- * Retrieve all products with optional filtering and relations
+ * Retrieve all products with optional filtering, relations, and pagination
  * @param includeRelations - Whether to include category and farmer relations
  * @param generateAccessibleUrls - Whether to generate presigned URLs for private images
  * @param urlExpiresIn - Expiration time for presigned URLs in seconds
- * @returns An array of all products with accessible image URLs
+ * @param paginationParams - Pagination parameters (page, limit, skip)
+ * @returns Paginated products with accessible image URLs and pagination metadata
  * @throws Error if the query fails
  */
 export async function getAllProducts(
   includeRelations = false,
   generateAccessibleUrls = true,
-  urlExpiresIn = 300
-): Promise<ProductWithAccessibleImages[]> {
+  urlExpiresIn = 300,
+  paginationParams?: PaginationParams
+): Promise<PaginatedProductResult> {
   try {
+    // If no pagination params provided, return all products (backward compatibility)
+    if (!paginationParams) {
+      const products = await prisma.product.findMany({
+        include: includeRelations
+          ? {
+              category: true,
+              farmer: true,
+            }
+          : undefined,
+      });
+
+      // Generate accessible URLs if requested
+      const processedProducts = generateAccessibleUrls
+        ? await processProductsWithAccessibleUrls(products, urlExpiresIn)
+        : products.map((product) => ({ ...product, accessibleImageUrls: [] }));
+
+      return {
+        products: processedProducts,
+        totalCount: products.length,
+        totalPages: 1,
+        currentPage: 1,
+      };
+    }
+
+    const { limit, skip, page } = paginationParams;
+
+    // Get total count for pagination metadata
+    const totalCount = await prisma.product.count();
+
+    // Get paginated products
     const products = await prisma.product.findMany({
       include: includeRelations
         ? {
@@ -108,33 +206,26 @@ export async function getAllProducts(
             farmer: true,
           }
         : undefined,
+      take: limit,
+      skip: skip,
+      orderBy: {
+        createdAt: "desc", // Order by newest first, you can modify this as needed
+      },
     });
 
     // Generate accessible URLs if requested
-    if (generateAccessibleUrls) {
-      const productsWithAccessibleUrls = await Promise.all(
-        products.map(async (product) => {
-          if (product.imageUrls.length === 0) {
-            return { ...product, accessibleImageUrls: [] };
-          }
+    const processedProducts = generateAccessibleUrls
+      ? await processProductsWithAccessibleUrls(products, urlExpiresIn)
+      : products.map((product) => ({ ...product, accessibleImageUrls: [] }));
 
-          const accessibleUrls = await getBatchAccessibleImageUrls(
-            product.imageUrls,
-            product.isPrivateImages || false,
-            urlExpiresIn
-          );
+    const totalPages = Math.ceil(totalCount / limit);
 
-          return {
-            ...product,
-            accessibleImageUrls: accessibleUrls,
-          };
-        })
-      );
-
-      return productsWithAccessibleUrls;
-    }
-
-    return products.map((product) => ({ ...product, accessibleImageUrls: [] }));
+    return {
+      products: processedProducts,
+      totalCount,
+      totalPages,
+      currentPage: page,
+    };
   } catch (error) {
     throw new Error(`Failed to fetch products: ${getErrorMessage(error)}`);
   }
@@ -424,4 +515,34 @@ export async function refreshProductImageUrls(
       `Failed to refresh product image URLs: ${getErrorMessage(error)}`
     );
   }
+}
+
+/**
+ * Helper function to process products with accessible URLs
+ * @param products - Array of products
+ * @param urlExpiresIn - Expiration time for presigned URLs in seconds
+ * @returns Products with accessible image URLs
+ */
+async function processProductsWithAccessibleUrls(
+  products: any[],
+  urlExpiresIn: number
+): Promise<ProductWithAccessibleImages[]> {
+  return Promise.all(
+    products.map(async (product) => {
+      if (product.imageUrls.length === 0) {
+        return { ...product, accessibleImageUrls: [] };
+      }
+
+      const accessibleUrls = await getBatchAccessibleImageUrls(
+        product.imageUrls,
+        product.isPrivateImages || false,
+        urlExpiresIn
+      );
+
+      return {
+        ...product,
+        accessibleImageUrls: accessibleUrls,
+      };
+    })
+  );
 }

@@ -14,6 +14,19 @@ const productIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Product ID must be a positive integer",
 });
 
+// Types for pagination
+interface PaginationQuery {
+  page?: string;
+  limit?: string;
+  include?: string;
+}
+
+interface PaginationParams {
+  page: number;
+  limit: number;
+  skip: number;
+}
+
 /**
  * Create a new product with optional image uploads
  */
@@ -52,17 +65,80 @@ export const createProduct = [
 /**
  * Get all products with optional relations
  */
+// export const getAllProducts = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const includeRelations = req.query.include === "relations";
+//     const products = await productService.getAllProducts(includeRelations);
+//     res.json({
+//       success: true,
+//       message: "Products retrieved successfully",
+//       data: products,
+//     });
+//   } catch (error) {
+//     handleErrorResponse(error, res, "fetch products");
+//   }
+// };
+
+/**
+ * Get all products with optional relations and pagination
+ */
 export const getAllProducts = async (
-  req: Request,
+  req: Request<{}, {}, {}, PaginationQuery>,
   res: Response
 ): Promise<void> => {
   try {
+    // Parse pagination parameters
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 100); // Max 100 items per page
+    const skip = (page - 1) * limit;
+
+    // Validate pagination parameters
+    if (page < 1) {
+      res.status(400).json({
+        success: false,
+        message: "Page number must be greater than 0",
+      });
+      return;
+    }
+
+    if (limit < 1) {
+      res.status(400).json({
+        success: false,
+        message: "Limit must be greater than 0",
+      });
+      return;
+    }
+
     const includeRelations = req.query.include === "relations";
-    const products = await productService.getAllProducts(includeRelations);
+
+    const paginationParams: PaginationParams = {
+      page,
+      limit,
+      skip,
+    };
+
+    const result = await productService.getAllProducts(
+      includeRelations,
+      true, // generateAccessibleUrls
+      300, // urlExpiresIn
+      paginationParams
+    );
+
     res.json({
       success: true,
       message: "Products retrieved successfully",
-      data: products,
+      data: result.products,
+      pagination: {
+        currentPage: page,
+        totalPages: result.totalPages,
+        totalItems: result.totalCount,
+        itemsPerPage: limit,
+        hasNextPage: page < result.totalPages,
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
     handleErrorResponse(error, res, "fetch products");
