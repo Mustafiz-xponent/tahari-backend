@@ -24,7 +24,11 @@ export const createCategory = async (
 // Get all categories
 export const getAllCategories = async (): Promise<Category[]> => {
   try {
-    return await prisma.category.findMany();
+    return await prisma.category.findMany({
+      include: {
+        products: true,
+      },
+    });
   } catch (error) {
     throw new Error(`Error fetching categories: ${getErrorMessage(error)}`);
   }
