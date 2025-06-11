@@ -50,6 +50,22 @@ export type CreateStockTransactionDto = z.infer<
 >;
 
 /**
+ * Zod schema for creating stock transactions - always expects an array
+ */
+export const zCreateStockTransactionArrayDto = z
+  .array(zCreateStockTransactionDto)
+  .min(1, "At least one transaction is required")
+  .max(100, "Maximum 100 transactions allowed per request");
+
+/**
+ * TypeScript type inferred from create schema.
+ * Use this type in services or elsewhere.
+ */
+export type CreateStockTransactionArrayDto = z.infer<
+  typeof zCreateStockTransactionArrayDto
+>;
+
+/**
  * Zod schema for updating a stock transaction.
  * All fields are optional to support partial updates.
  */

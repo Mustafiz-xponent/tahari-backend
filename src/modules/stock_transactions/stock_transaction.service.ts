@@ -14,31 +14,70 @@ import {
 } from "./stock_transaction.dto";
 import { getErrorMessage } from "../../utils/errorHandler";
 
-/**
- * Create a new stock transaction
- * @param data - Data required to create a stock transaction
- * @returns The created stock transaction
- * @throws Error if the stock transaction cannot be created (e.g., invalid foreign keys)
- */
+// /**
+//  * Create a new stock transaction
+//  * @param data - Data required to create a stock transaction
+//  * @returns The created stock transaction
+//  * @throws Error if the stock transaction cannot be created (e.g., invalid foreign keys)
+//  */
 
+// export async function createStockTransaction(
+//   data: CreateStockTransactionDto
+// ): Promise<StockTransaction> {
+//   try {
+//     const stockTransaction = await prisma.stockTransaction.create({
+//       data: {
+//         quantity: data.quantity,
+//         transactionType: data.transactionType,
+//         productId: data.productId,
+//         purchaseId: data.purchaseId,
+//         orderId: data.orderId,
+//         description: data.description,
+//       },
+//     });
+//     return stockTransaction;
+//   } catch (error) {
+//     throw new Error(
+//       `Failed to create stock transaction: ${getErrorMessage(error)}`
+//     );
+//   }
+// }
+
+/**
+ * Create stock transactions - processes array of transaction data
+ * @param data - Array of transaction data
+ * @returns Array of created StockTransactions
+ * @throws Error if the stock transactions cannot be created
+ */
 export async function createStockTransaction(
-  data: CreateStockTransactionDto
-): Promise<StockTransaction> {
+  data: CreateStockTransactionDto[]
+): Promise<StockTransaction[]> {
   try {
-    const stockTransaction = await prisma.stockTransaction.create({
-      data: {
-        quantity: data.quantity,
-        transactionType: data.transactionType,
-        productId: data.productId,
-        purchaseId: data.purchaseId,
-        orderId: data.orderId,
-        description: data.description,
-      },
+    // Use Prisma transaction to ensure atomicity - all succeed or all fail
+    const createdTransactions = await prisma.$transaction(async (tx) => {
+      const results: StockTransaction[] = [];
+
+      for (const transactionData of data) {
+        const stockTransaction = await tx.stockTransaction.create({
+          data: {
+            quantity: transactionData.quantity,
+            transactionType: transactionData.transactionType,
+            productId: transactionData.productId,
+            purchaseId: transactionData.purchaseId,
+            orderId: transactionData.orderId,
+            description: transactionData.description,
+          },
+        });
+        results.push(stockTransaction);
+      }
+
+      return results;
     });
-    return stockTransaction;
+
+    return createdTransactions;
   } catch (error) {
     throw new Error(
-      `Failed to create stock transaction: ${getErrorMessage(error)}`
+      `Failed to create stock transactions: ${getErrorMessage(error)}`
     );
   }
 }

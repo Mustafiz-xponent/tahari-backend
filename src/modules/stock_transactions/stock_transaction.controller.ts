@@ -9,6 +9,7 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import { handleErrorResponse } from "../../utils/errorResponseHandler";
 import {
+  zCreateStockTransactionArrayDto,
   zCreateStockTransactionDto,
   zUpdateStockTransactionDto,
 } from "./stock_transaction.dto";
@@ -18,22 +19,48 @@ const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Transaction ID must be a positive integer",
 });
 
+// /**
+//  * Create a new stock transaction
+//  */
+// export const createStockTransaction = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const data = zCreateStockTransactionDto.parse(req.body);
+//     const transaction = await stockTransactionService.createStockTransaction(
+//       data
+//     );
+//     res.status(201).json({
+//       success: true,
+//       message: "Stock transaction created successfully",
+//       data: transaction,
+//     });
+//   } catch (error) {
+//     handleErrorResponse(error, res, "create stock transaction");
+//   }
+// };
+
 /**
- * Create a new stock transaction
+ * Create stock transaction(s) - always processes array of transactions
  */
 export const createStockTransaction = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const data = zCreateStockTransactionDto.parse(req.body);
-    const transaction = await stockTransactionService.createStockTransaction(
+    const data = zCreateStockTransactionArrayDto.parse(req.body);
+    const transactions = await stockTransactionService.createStockTransaction(
       data
     );
+
     res.status(201).json({
       success: true,
-      message: "Stock transaction created successfully",
-      data: transaction,
+      message: `${transactions.length} stock transaction${
+        transactions.length > 1 ? "s" : ""
+      } created successfully`,
+      data: transactions,
+      count: transactions.length,
     });
   } catch (error) {
     handleErrorResponse(error, res, "create stock transaction");
