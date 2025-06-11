@@ -19,7 +19,7 @@ router.get("/", ProductController.getAllProducts);
 router.get("/:id", ProductController.getProductById);
 
 // Route to update a product's details
-router.put("/:id", authMiddleware("ADMIN"), ProductController.updateProduct);
+router.put("/:id", ProductController.updateProduct);
 
 // Route to delete a product
 router.delete("/:id", authMiddleware("ADMIN"), ProductController.deleteProduct);
