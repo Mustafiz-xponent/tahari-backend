@@ -10,6 +10,7 @@ import {
   deleteMultipleFilesFromS3,
   extractS3KeyFromUrl,
   getBatchAccessibleImageUrls,
+  processProductsWithAccessibleUrls,
   replaceProductImages,
   uploadProductImages,
 } from "../../utils/fileUpload/s3Aws";
@@ -228,6 +229,56 @@ export async function getAllProducts(
     };
   } catch (error) {
     throw new Error(`Failed to fetch products: ${getErrorMessage(error)}`);
+  }
+}
+
+/**
+ * Fetches products by a partial name match, with optional inclusion of related data
+ * and generation of accessible image URLs.
+ *
+ * @param {string} productName - The partial name to search for products.
+ * @param {boolean} [includeRelations=false] - Whether to include related data (category and farmer) in the results.
+ * @param {boolean} [generateAccessibleUrls=true] - Whether to generate accessible image URLs for the products.
+ * @param {number} [urlExpiresIn=300] - Expiry time in seconds for generated accessible image URLs.
+ * @returns {Promise<ProductWithAccessibleImages[]>} - A promise resolving to an array of products with accessible image URLs.
+ * @throws {Error} - Throws an error if the fetching process fails.
+ */
+export async function getProductByName(
+  productName: string,
+  includeRelations = false,
+  generateAccessibleUrls = true,
+  urlExpiresIn = 300
+): Promise<ProductWithAccessibleImages[]> {
+  try {
+    const products = await prisma.product.findMany({
+      where: {
+        name: {
+          contains: productName,
+          mode: "insensitive", // Case-insensitive partial search
+        },
+      },
+      include: includeRelations
+        ? {
+            category: true,
+            farmer: true,
+          }
+        : undefined,
+    });
+
+    if (!products || products.length === 0) {
+      return [];
+    }
+
+    // Generate accessible URLs if requested
+    const processedProducts = generateAccessibleUrls
+      ? await processProductsWithAccessibleUrls(products, urlExpiresIn)
+      : products.map((product) => ({ ...product, accessibleImageUrls: [] }));
+
+    return processedProducts;
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch products by partial name: ${getErrorMessage(error)}`
+    );
   }
 }
 
@@ -515,34 +566,4 @@ export async function refreshProductImageUrls(
       `Failed to refresh product image URLs: ${getErrorMessage(error)}`
     );
   }
-}
-
-/**
- * Helper function to process products with accessible URLs
- * @param products - Array of products
- * @param urlExpiresIn - Expiration time for presigned URLs in seconds
- * @returns Products with accessible image URLs
- */
-async function processProductsWithAccessibleUrls(
-  products: any[],
-  urlExpiresIn: number
-): Promise<ProductWithAccessibleImages[]> {
-  return Promise.all(
-    products.map(async (product) => {
-      if (product.imageUrls.length === 0) {
-        return { ...product, accessibleImageUrls: [] };
-      }
-
-      const accessibleUrls = await getBatchAccessibleImageUrls(
-        product.imageUrls,
-        product.isPrivateImages || false,
-        urlExpiresIn
-      );
-
-      return {
-        ...product,
-        accessibleImageUrls: accessibleUrls,
-      };
-    })
-  );
 }

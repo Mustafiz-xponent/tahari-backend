@@ -6,6 +6,14 @@
 import { z } from "zod";
 
 /**
+ * Schema for validating product name parameter
+ */
+export const productNameSchema = z
+  .string()
+  .min(1, "Product name is required")
+  .max(255, "Product name is too long");
+
+/**
  * Zod schema for creating a new product.
  * Validates all required fields necessary for creation.
  * Images are handled separately through file upload.

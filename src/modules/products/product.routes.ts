@@ -16,7 +16,11 @@ router.post("/", authMiddleware("ADMIN"), ProductController.createProduct);
 router.get("/", ProductController.getAllProducts);
 
 // Route to get a product by ID
-router.get("/:id", ProductController.getProductById);
+// router.get("/:id", ProductController.getProductById);
+router.get("/id/:id", ProductController.getProductById);
+
+// Route to get a product by name
+router.get("/name/:name", ProductController.getProductByName);
 
 // Route to update a product's details
 router.put("/:id", ProductController.updateProduct);

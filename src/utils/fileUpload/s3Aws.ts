@@ -4,12 +4,13 @@
  */
 
 import {
-  S3Client,
-  PutObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { Product } from "../../../generated/prisma/client";
 
 // Configure AWS S3 client
 const s3Client = new S3Client({
@@ -19,6 +20,12 @@ const s3Client = new S3Client({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });
+
+// Add interface for product with accessible URLs
+interface ProductWithAccessibleImages extends Omit<Product, "imageUrls"> {
+  imageUrls: string[];
+  accessibleImageUrls?: string[];
+}
 
 /**
  * Upload any file to S3 (Public or Private Bucket)
@@ -353,4 +360,34 @@ export async function getBatchAccessibleImageUrls(
   const results = await getMultiplePresignedUrls(s3Keys, expiresIn);
 
   return results.map((result) => (result.success ? result.url : ""));
+}
+
+/**
+ * Helper function to process products with accessible URLs
+ * @param products - Array of products
+ * @param urlExpiresIn - Expiration time for presigned URLs in seconds
+ * @returns Products with accessible image URLs
+ */
+export async function processProductsWithAccessibleUrls(
+  products: any[],
+  urlExpiresIn: number
+): Promise<ProductWithAccessibleImages[]> {
+  return Promise.all(
+    products.map(async (product) => {
+      if (product.imageUrls.length === 0) {
+        return { ...product, accessibleImageUrls: [] };
+      }
+
+      const accessibleUrls = await getBatchAccessibleImageUrls(
+        product.imageUrls,
+        product.isPrivateImages || false,
+        urlExpiresIn
+      );
+
+      return {
+        ...product,
+        accessibleImageUrls: accessibleUrls,
+      };
+    })
+  );
 }

@@ -7,7 +7,11 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import upload from "../../utils/fileUpload/configMulterUpload";
 import { handleErrorResponse } from "../../utils/errorResponseHandler";
-import { zCreateProductDto, zUpdateProductDto } from "./product.dto";
+import {
+  productNameSchema,
+  zCreateProductDto,
+  zUpdateProductDto,
+} from "./product.dto";
 import * as productService from "./product.service";
 
 const productIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
@@ -142,6 +146,40 @@ export const getAllProducts = async (
     });
   } catch (error) {
     handleErrorResponse(error, res, "fetch products");
+  }
+};
+
+/**
+ * Get product by name with optional relations
+ */
+export const getProductByName = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const productName = productNameSchema.parse(req.params.name);
+    const includeRelations = req.query.include === "relations";
+
+    const product = await productService.getProductByName(
+      productName,
+      includeRelations
+    );
+
+    if (!product) {
+      res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      message: "Product retrieved successfully",
+      data: product,
+    });
+  } catch (error) {
+    handleErrorResponse(error, res, "fetch product by name");
   }
 };
 
