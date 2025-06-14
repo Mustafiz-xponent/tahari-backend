@@ -33,15 +33,41 @@ export const createCategory = async (
   }
 };
 
+// /**
+//  * Get all categories
+//  */
+// export const getAllCategories = async (
+//   _req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const categories = await categoryService.getAllCategories();
+//     res.json({
+//       success: true,
+//       message: "Categories retrieved successfully",
+//       data: categories,
+//     });
+//   } catch (error) {
+//     handleErrorResponse(error, res, "fetch categories");
+//   }
+// };
+
 /**
- * Get all categories
+ * Get all categories with accessible image URLs for products
  */
 export const getAllCategories = async (
-  _req: Request,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const categories = await categoryService.getAllCategories();
+    const generateAccessibleUrls = req.query.generateAccessibleUrls !== "false"; // Default to true
+    const urlExpiresIn = parseInt(req.query.urlExpiresIn as string) || 300; // Default 5 minutes
+
+    const categories = await categoryService.getAllCategories(
+      generateAccessibleUrls,
+      urlExpiresIn
+    );
+
     res.json({
       success: true,
       message: "Categories retrieved successfully",
@@ -52,8 +78,31 @@ export const getAllCategories = async (
   }
 };
 
+// /**
+//  * Get a single category by ID
+//  */
+// export const getCategoryById = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const categoryId = BigInt(req.params.id);
+//     const category = await categoryService.getCategoryById(categoryId);
+//     if (!category) {
+//       throw new Error("Category not found.");
+//     }
+//     res.json({
+//       success: true,
+//       message: "Category retrieved successfully",
+//       data: category,
+//     });
+//   } catch (error) {
+//     handleErrorResponse(error, res, "fetch category");
+//   }
+// };
+
 /**
- * Get a single category by ID
+ * Get a single category by ID with accessible image URLs for products
  */
 export const getCategoryById = async (
   req: Request,
@@ -61,10 +110,23 @@ export const getCategoryById = async (
 ): Promise<void> => {
   try {
     const categoryId = BigInt(req.params.id);
-    const category = await categoryService.getCategoryById(categoryId);
+    const generateAccessibleUrls = req.query.generateAccessibleUrls !== "false"; // Default to true
+    const urlExpiresIn = parseInt(req.query.urlExpiresIn as string) || 300; // Default 5 minutes
+
+    const category = await categoryService.getCategoryById(
+      categoryId,
+      generateAccessibleUrls,
+      urlExpiresIn
+    );
+
     if (!category) {
-      throw new Error("Category not found.");
+      res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+      return;
     }
+
     res.json({
       success: true,
       message: "Category retrieved successfully",
