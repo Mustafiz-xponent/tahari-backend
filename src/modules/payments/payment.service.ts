@@ -4,42 +4,92 @@
  */
 
 import prisma from "../../prisma-client/prismaClient";
-import { Payment } from "../../../generated/prisma/client";
+import { Payment, WalletTransaction } from "../../../generated/prisma/client";
 import { CreatePaymentDto, UpdatePaymentDto } from "./payment.dto";
 import { getErrorMessage } from "../../utils/errorHandler";
+import { processWalletPayment } from "../../utils/processPayment";
 
 /**
  * Create a new payment
  */
-export async function createPayment(data: CreatePaymentDto): Promise<Payment> {
+// export async function createPayment(data: CreatePaymentDto): Promise<Payment> {
+//   try {
+//     const order = await prisma.order.findUnique({
+//       where: { orderId: Number(data.orderId) },
+//     });
+
+//     if (!order) {
+//       throw new Error("Order not found");
+//     }
+
+//     if (data.walletTransactionId) {
+//       const walletTransaction = await prisma.walletTransaction.findUnique({
+//         where: { transactionId: Number(data.walletTransactionId) },
+//       });
+//       if (!walletTransaction) {
+//         throw new Error("Wallet transaction not found");
+//       }
+//     }
+
+//     const payment = await prisma.payment.create({
+//       data: {
+//         amount: data.amount,
+//         paymentMethod: data.paymentMethod,
+//         paymentStatus: data.paymentStatus,
+//         transactionId: data.transactionId,
+//         orderId: data.orderId,
+//         walletTransactionId: data.walletTransactionId,
+//       },
+//     });
+//     return payment;
+//   } catch (error) {
+//     throw new Error(`Failed to create payment: ${getErrorMessage(error)}`);
+//   }
+// }
+
+/**
+ * create order payment through wallet or SSLCommerz
+ * @param data - Payment processing data
+ * @returns Payment result with success status
+ */
+export interface PaymentResult {
+  success: boolean;
+  payment?: Payment;
+  walletTransaction?: WalletTransaction;
+  message: string;
+  redirectUrl?: string; // For SSLCommerz redirect
+}
+export async function createPayment(
+  data: CreatePaymentDto
+): Promise<PaymentResult> {
   try {
+    // Validate order exists and is pending payment
     const order = await prisma.order.findUnique({
       where: { orderId: Number(data.orderId) },
+      include: {
+        customer: {
+          include: {
+            wallet: true,
+          },
+        },
+        orderItems: true,
+      },
     });
     if (!order) {
       throw new Error("Order not found");
     }
 
-    if (data.walletTransactionId) {
-      const walletTransaction = await prisma.walletTransaction.findUnique({
-        where: { transactionId: Number(data.walletTransactionId) },
-      });
-      if (!walletTransaction) {
-        throw new Error("Wallet transaction not found");
-      }
+    if (order.paymentStatus !== "PENDING") {
+      throw new Error(
+        `Order payment is already ${order.paymentStatus.toLowerCase()}`
+      );
     }
 
-    const payment = await prisma.payment.create({
-      data: {
-        amount: data.amount,
-        paymentMethod: data.paymentMethod,
-        paymentStatus: data.paymentStatus,
-        transactionId: data.transactionId,
-        orderId: data.orderId,
-        walletTransactionId: data.walletTransactionId,
-      },
-    });
-    return payment;
+    if (order.paymentMethod === "WALLET") {
+      return await processWalletPayment(data, order);
+    } else {
+      throw new Error("Invalid payment method");
+    }
   } catch (error) {
     throw new Error(`Failed to create payment: ${getErrorMessage(error)}`);
   }

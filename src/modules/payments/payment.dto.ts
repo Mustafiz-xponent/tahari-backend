@@ -5,16 +5,20 @@
 
 import { z } from "zod";
 
-const paymentStatusEnum = z.enum(["PENDING", "COMPLETED", "FAILED","REFUNDED"]);
+const paymentStatusEnum = z.enum([
+  "PENDING",
+  "COMPLETED",
+  "FAILED",
+  "REFUNDED",
+]);
 
- 
 /**
  * Zod schema for creating a new payment.
  */
 export const zCreatePaymentDto = z.object({
-  amount: z.number().positive("Amount must be a positive number"),
-  paymentMethod: z.string().min(1, "Payment method is required"),
-  paymentStatus: paymentStatusEnum,
+  amount: z.number().positive("Amount must be a positive number").optional(),
+  paymentMethod: z.string().min(1, "Payment method is required").optional(),
+  paymentStatus: paymentStatusEnum.optional(),
   orderId: z
     .union([z.string(), z.number()])
     .transform(BigInt)

@@ -29,7 +29,6 @@ export const authMiddleware = (
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-
       if (decoded.role !== role) {
         res.status(403).json({ message: "Unauthorized" });
         return;

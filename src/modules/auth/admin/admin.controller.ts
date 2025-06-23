@@ -19,7 +19,7 @@ export const createAdmin = async (req: Request, res: Response) => {
   try {
     const data = zCreateAdminDto.parse(req.body);
     const { user } = await adminService.createAdmin(data);
-    res.status(201).json({
+    res.status(201).json({ 
       success: true,
       message: "Admin created successfully",
       data: { user },
