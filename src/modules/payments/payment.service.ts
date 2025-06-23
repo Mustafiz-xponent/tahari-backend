@@ -85,7 +85,7 @@ export async function createPayment(
       );
     }
 
-    if (order.paymentMethod === "WALLET") {
+    if (order.paymentMethod.toUpperCase() === "WALLET") {
       return await processWalletPayment(data, order);
     } else {
       throw new Error("Invalid payment method");

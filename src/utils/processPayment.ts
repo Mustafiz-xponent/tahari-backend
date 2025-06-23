@@ -67,6 +67,15 @@ export async function processWalletPayment(
         status: "CONFIRMED",
       },
     });
+    // Track the order update
+    await tx.orderTracking.create({
+      data: {
+        orderId: Number(data.orderId),
+        status: "CONFIRMED",
+        description: "Order confirmed and payment completed via wallet",
+      },
+    });
+
     for (const item of order.orderItems) {
       // Decrement product stock
       await tx.product.update({
