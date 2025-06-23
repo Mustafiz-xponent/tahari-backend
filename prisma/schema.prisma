@@ -155,10 +155,12 @@ model Farmer {
 
 // Categories table for product categorization
 model Category {
-  categoryId  BigInt    @id @default(autoincrement())
-  name        String    @unique
-  description String?
-  products    Product[]
+  categoryId     BigInt    @id @default(autoincrement())
+  name           String    @unique
+  imageUrl       String?
+  isPrivateImage Boolean   @default(false)
+  description    String?
+  products       Product[]
 
   @@index([categoryId])
 }
