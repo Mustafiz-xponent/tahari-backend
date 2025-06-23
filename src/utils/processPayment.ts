@@ -2,10 +2,7 @@ import { CreatePaymentDto } from "@/modules/payments/payment.dto";
 import prisma from "../prisma-client/prismaClient";
 import { Payment, WalletTransaction } from "../../generated/prisma/client";
 export interface PaymentResult {
-  success: boolean;
   payment?: Payment;
-  walletTransaction?: WalletTransaction;
-  message: string;
   redirectUrl?: string; // For SSLCommerz redirect
 }
 /**
@@ -100,10 +97,7 @@ export async function processWalletPayment(
     }
 
     return {
-      success: true,
       payment,
-      walletTransaction,
-      message: "Payment completed successfully through wallet",
     };
   });
 }

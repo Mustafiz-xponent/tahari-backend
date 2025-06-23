@@ -53,10 +53,7 @@ import { processWalletPayment } from "../../utils/processPayment";
  * @returns Payment result with success status
  */
 export interface PaymentResult {
-  success: boolean;
   payment?: Payment;
-  walletTransaction?: WalletTransaction;
-  message: string;
   redirectUrl?: string; // For SSLCommerz redirect
 }
 export async function createPayment(
