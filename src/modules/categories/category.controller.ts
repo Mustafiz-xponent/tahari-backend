@@ -8,6 +8,7 @@ import * as categoryService from "./category.service";
 import { zCreateCategoryDto, zUpdateCategoryDto } from "./category.dto";
 import { handleErrorResponse } from "../../utils/errorResponseHandler";
 import { z } from "zod";
+import upload from "../../utils/fileUpload/configMulterUpload";
 
 const categoryIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Category ID must be a positive integer",
@@ -16,22 +17,27 @@ const categoryIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
 /**
  * Create a new category
  */
-export const createCategory = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const data = zCreateCategoryDto.parse(req.body);
-    const category = await categoryService.createCategory(data);
-    res.status(201).json({
-      success: true,
-      message: "Category created successfully",
-      data: category,
-    });
-  } catch (error) {
-    handleErrorResponse(error, res, "create category");
-  }
-};
+export const createCategory = [
+  upload.single("image"),
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const data = zCreateCategoryDto.parse(req.body);
+      const category = await categoryService.createCategory(data);
+      const file = req.file;
+
+      if (!file) {
+        throw new Error("Image file is required");
+      }
+      res.status(201).json({
+        success: true,
+        message: "Category created successfully",
+        data: category,
+      });
+    } catch (error) {
+      handleErrorResponse(error, res, "create category");
+    }
+  },
+];
 
 // /**
 //  * Get all categories

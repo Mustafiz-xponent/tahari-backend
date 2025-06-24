@@ -136,17 +136,32 @@ export async function verifyCustomerOtp(
 
   const user = await prisma.user.findUnique({
     where: { phone: data.phone },
+    include: {
+      customer: {
+        include: {
+          wallet: true,
+        },
+      },
+    },
   });
 
   if (!user || user.role !== "CUSTOMER") {
     throw new Error("Customer not found");
   }
 
+  if (user.customer && !user.customer.wallet) {
+    await prisma.wallet.create({
+      data: {
+        customerId: user.customer.customerId,
+      },
+    });
+  }
+
   const updatedUser = await prisma.user.update({
     where: { phone: data.phone },
     data: { status: "ACTIVE" },
   });
-
+  console.log(user);
   await prisma.otp.deleteMany({
     where: { phone: data.phone },
   });
