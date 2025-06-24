@@ -2,6 +2,7 @@ import { CreatePaymentDto } from "@/modules/payments/payment.dto";
 import prisma from "../prisma-client/prismaClient";
 import { Payment } from "../../generated/prisma/client";
 import { getErrorMessage } from "./errorHandler";
+import axios from "axios";
 
 export interface PaymentResult {
   payment?: Payment;
@@ -106,19 +107,120 @@ export async function processWalletPayment(
 /**
  * Process payment through SSLCommerz
  */
+// export async function processSSLCommerzPayment(
+//   data: CreatePaymentDto,
+//   order: any
+// ): Promise<PaymentResult> {
+//   try {
+//     // Initialize SSLCommerz payment
+//     const sslcommerzResponse = await initializeSSLCommerzPayment({
+//       orderId: data.orderId,
+//       amount: order.totalAmount,
+//       customerEmail: order.customer.user.email,
+//       customerPhone: order.customer.user.phone,
+//       customerName: order.customer.user.name,
+//     });
+//     // Create pending payment record
+//     const payment = await prisma.payment.create({
+//       data: {
+//         amount: order.totalAmount,
+//         paymentMethod: "SSLCOMMERZ",
+//         paymentStatus: "PENDING",
+//         transactionId: sslcommerzResponse.sessionkey,
+//         orderId: Number(data.orderId),
+//       },
+//     });
+
+//     return {
+//       payment,
+//       redirectUrl: sslcommerzResponse.redirectGatewayURL,
+//     };
+//   } catch (error) {
+//     throw new Error(`SSLCommerz payment failed: ${getErrorMessage(error)}`);
+//   }
+// }
+
+/**
+ * Initialize SSLCommerz payment gateway
+ */
+// async function initializeSSLCommerzPayment(data: {
+//   orderId: bigint;
+//   amount: number;
+//   customerEmail?: string;
+//   customerPhone: string;
+//   customerName?: string;
+// }) {
+//   // SSLCommerz configuration
+//   const SSLCommerzPayment = require("sslcommerz-lts");
+
+//   const sslcz = new SSLCommerzPayment(
+//     process.env.SSLCOMMERZ_STORE_ID,
+//     process.env.SSLCOMMERZ_STORE_PASSWD,
+//     process.env.NODE_ENV === "production" // is_live
+//   );
+//   const paymentData = {
+//     total_amount: data.amount,
+//     currency: "BDT",
+//     tran_id: `ORDER_${data.orderId}_${Date.now()}`,
+//     success_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/success`,
+//     fail_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/fail`,
+//     cancel_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/cancel`,
+//     ipn_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/ipn`,
+//     shipping_method: "Courier",
+//     product_name: `Order Payment #${data.orderId}`,
+//     product_category: "Food",
+//     product_profile: "general",
+//     cus_name: data.customerName || "Customer",
+//     cus_email: data.customerEmail || "customer@example.com",
+//     cus_add1: "N/A",
+//     cus_city: "Chittagong",
+//     cus_state: "Chittagong",
+//     cus_postcode: "1000",
+//     cus_country: "Bangladesh",
+//     cus_phone: data.customerPhone,
+//     ship_name: data.customerName || "Customer",
+//     ship_add1: "N/A",
+//     ship_city: "Chittagong",
+//     ship_state: "Chittagong",
+//     ship_postcode: "1000",
+//     ship_country: "Bangladesh",
+//   };
+//   return await sslcz.init(paymentData);
+// }
+/**
+ * Process payment through SSLCommerz using manual implementation
+ */
 export async function processSSLCommerzPayment(
   data: CreatePaymentDto,
   order: any
 ): Promise<PaymentResult> {
   try {
-    // Initialize SSLCommerz payment
-    const sslcommerzResponse = await initializeSSLCommerzPayment({
+    console.log("Starting SSLCommerz payment process for order:", data.orderId);
+
+    // Initialize SSLCommerz payment using manual implementation
+    const sslcommerzResponse = await initializeSSLCommerzPaymentManual({
       orderId: data.orderId,
       amount: order.totalAmount,
       customerEmail: order.customer.user.email,
       customerPhone: order.customer.user.phone,
       customerName: order.customer.user.name,
     });
+
+    console.log("SSLCommerz response received:", {
+      status: sslcommerzResponse?.status,
+      sessionkey: sslcommerzResponse?.sessionkey,
+      hasRedirectUrl: !!sslcommerzResponse?.redirectGatewayURL,
+    });
+
+    // Validate SSLCommerz response
+    if (!sslcommerzResponse || sslcommerzResponse.status !== "SUCCESS") {
+      throw new Error(
+        `SSLCommerz initialization failed: ${
+          sslcommerzResponse?.failedreason || "Unknown error"
+        }`
+      );
+    }
+
     // Create pending payment record
     const payment = await prisma.payment.create({
       data: {
@@ -130,59 +232,201 @@ export async function processSSLCommerzPayment(
       },
     });
 
+    console.log("Payment record created successfully:", payment.paymentId);
+
     return {
       payment,
       redirectUrl: sslcommerzResponse.redirectGatewayURL,
     };
   } catch (error) {
+    console.error("SSLCommerz payment processing error:", error);
     throw new Error(`SSLCommerz payment failed: ${getErrorMessage(error)}`);
   }
 }
 
 /**
- * Initialize SSLCommerz payment gateway
+ * Manual SSLCommerz payment gateway initialization using direct API calls
  */
-async function initializeSSLCommerzPayment(data: {
+async function initializeSSLCommerzPaymentManual(data: {
   orderId: bigint;
   amount: number;
   customerEmail?: string;
   customerPhone: string;
   customerName?: string;
 }) {
-  // SSLCommerz configuration
-  const SSLCommerzPayment = require("sslcommerz-lts");
+  try {
+    console.log("Initializing SSLCommerz manually with data:", {
+      orderId: data.orderId,
+      amount: data.amount,
+      customerPhone: data.customerPhone,
+    });
 
-  const sslcz = new SSLCommerzPayment(
-    process.env.SSLCOMMERZ_STORE_ID,
-    process.env.SSLCOMMERZ_STORE_PASSWD,
-    process.env.NODE_ENV === "production" // is_live
-  );
-  const paymentData = {
-    total_amount: data.amount,
-    currency: "BDT",
-    tran_id: `ORDER_${data.orderId}_${Date.now()}`,
-    success_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/success`,
-    fail_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/fail`,
-    cancel_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/cancel`,
-    ipn_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/ipn`,
-    shipping_method: "Courier",
-    product_name: `Order Payment #${data.orderId}`,
-    product_category: "Food",
-    product_profile: "general",
-    cus_name: data.customerName || "Customer",
-    cus_email: data.customerEmail || "customer@example.com",
-    cus_add1: "N/A",
-    cus_city: "Chittagong",
-    cus_state: "Chittagong",
-    cus_postcode: "1000",
-    cus_country: "Bangladesh",
-    cus_phone: data.customerPhone,
-    ship_name: data.customerName || "Customer",
-    ship_add1: "N/A",
-    ship_city: "Chittagong",
-    ship_state: "Chittagong",
-    ship_postcode: "1000",
-    ship_country: "Bangladesh",
-  };
-  return await sslcz.init(paymentData);
+    // Validate environment variables
+    if (
+      !process.env.SSLCOMMERZ_STORE_ID ||
+      !process.env.SSLCOMMERZ_STORE_PASSWD
+    ) {
+      throw new Error("SSLCommerz credentials not configured");
+    }
+
+    // Determine the base URL based on environment
+    const isLive = process.env.NODE_ENV === "production";
+    const baseUrl = isLive
+      ? "https://securepay.sslcommerz.com"
+      : "https://sandbox.sslcommerz.com";
+
+    console.log("Using SSLCommerz base URL:", baseUrl);
+
+    const transactionId = `ORDER_${data.orderId}_${Date.now()}`;
+    console.log("Generated transaction ID:", transactionId);
+
+    // Prepare payment data for SSLCommerz API
+    const paymentData = {
+      store_id: process.env.SSLCOMMERZ_STORE_ID,
+      store_passwd: process.env.SSLCOMMERZ_STORE_PASSWD,
+      total_amount: Number(data.amount).toFixed(2),
+      currency: "BDT",
+      tran_id: transactionId,
+      success_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/success`,
+      fail_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/fail`,
+      cancel_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/cancel`,
+      ipn_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/ipn`,
+      shipping_method: "Courier",
+      product_name: `Order Payment #${data.orderId}`,
+      product_category: "Food",
+      product_profile: "general",
+      cus_name: data.customerName || "Customer",
+      cus_email: data.customerEmail || "customer@example.com",
+      cus_add1: "N/A",
+      cus_city: "Chittagong",
+      cus_state: "Chittagong",
+      cus_postcode: "1000",
+      cus_country: "Bangladesh",
+      cus_phone: data.customerPhone,
+      ship_name: data.customerName || "Customer",
+      ship_add1: "N/A",
+      ship_city: "Chittagong",
+      ship_state: "Chittagong",
+      ship_postcode: "1000",
+      ship_country: "Bangladesh",
+    };
+
+    console.log("Making direct API call to SSLCommerz");
+    console.log("Payment data:", { ...paymentData, store_passwd: "[HIDDEN]" });
+
+    // Make the API call to SSLCommerz
+    const response = await axios.post(
+      `${baseUrl}/gwprocess/v4/api.php`,
+      new URLSearchParams(paymentData).toString(),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+        },
+        timeout: 30000, // 30 seconds timeout
+      }
+    );
+
+    console.log("SSLCommerz API response status:", response.status);
+    console.log("SSLCommerz API response data:", response.data);
+
+    // Check if the response is successful
+    if (response.data.status === "SUCCESS") {
+      return {
+        status: "SUCCESS",
+        sessionkey: response.data.sessionkey,
+        redirectGatewayURL: response.data.redirectGatewayURL,
+        failedreason: null,
+      };
+    } else {
+      console.error("SSLCommerz API returned failure:", response.data);
+      return {
+        status: "FAILED",
+        sessionkey: null,
+        redirectGatewayURL: null,
+        failedreason:
+          response.data.failedreason || "Unknown error from SSLCommerz",
+      };
+    }
+  } catch (error) {
+    console.error("SSLCommerz manual initialization error:", error);
+
+    if (axios.isAxiosError(error)) {
+      console.error("SSLCommerz API request failed:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+        code: error.code,
+      });
+
+      // Handle specific HTTP errors
+      if (error.response?.status === 400) {
+        throw new Error(
+          `SSLCommerz API Bad Request: ${
+            error.response.data?.failedreason || "Invalid request parameters"
+          }`
+        );
+      } else if (error.response?.status === 401) {
+        throw new Error(
+          "SSLCommerz API Authentication failed: Invalid store credentials"
+        );
+      } else if (error.response?.status >= 500) {
+        throw new Error("SSLCommerz API server error: Please try again later");
+      } else {
+        throw new Error(`SSLCommerz API request failed: ${error.message}`);
+      }
+    }
+
+    // Handle network errors
+    if (error.code === "ECONNABORTED") {
+      throw new Error("SSLCommerz API timeout: Request took too long");
+    } else if (error.code === "ENOTFOUND" || error.code === "ECONNREFUSED") {
+      throw new Error("SSLCommerz API connection failed: Network error");
+    }
+
+    throw error;
+  }
+}
+
+/**
+ * Validate SSLCommerz payment using manual implementation
+ */
+export async function validateSSLCommerzPaymentManual(validationData: any) {
+  try {
+    const isLive = process.env.NODE_ENV === "production";
+    const baseUrl = isLive
+      ? "https://securepay.sslcommerz.com"
+      : "https://sandbox.sslcommerz.com";
+
+    const validationParams = {
+      store_id: process.env.SSLCOMMERZ_STORE_ID!,
+      store_passwd: process.env.SSLCOMMERZ_STORE_PASSWD!,
+      val_id: validationData.val_id,
+    };
+
+    console.log(
+      "Validating SSLCommerz payment with val_id:",
+      validationData.val_id
+    );
+
+    const response = await axios.post(
+      `${baseUrl}/validator/api/validationserverAPI.php`,
+      new URLSearchParams(validationParams).toString(),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+        },
+        timeout: 30000,
+      }
+    );
+
+    console.log("SSLCommerz validation response:", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("SSLCommerz validation error:", error);
+    throw error;
+  }
 }

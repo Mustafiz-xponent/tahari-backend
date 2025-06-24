@@ -10,6 +10,7 @@ import {
   processWalletPayment,
   processSSLCommerzPayment,
 } from "../../utils/processPayment";
+import axios from "axios";
 
 /**
  * Create a new payment
@@ -102,19 +103,79 @@ export async function createPayment(
 /**
  * Handle SSLCommerz payment success callback
  */
+// export async function handleSSLCommerzSuccess(
+//   validationData: any
+// ): Promise<PaymentResult> {
+//   try {
+//     // Validate payment with SSLCommerz
+//     const SSLCommerzPayment = require("sslcommerz-lts");
+//     const sslcz = new SSLCommerzPayment(
+//       process.env.SSLCOMMERZ_STORE_ID,
+//       process.env.SSLCOMMERZ_STORE_PASSWD,
+//       process.env.NODE_ENV === "production"
+//     );
+
+//     const validation = await sslcz.validate(validationData);
+
+//     if (validation.status === "VALID") {
+//       // Extract order ID from transaction ID
+//       const tranId = validationData.tran_id;
+//       const orderIdMatch = tranId.match(/ORDER_(\d+)_/);
+
+//       if (!orderIdMatch) {
+//         throw new Error("Invalid transaction ID format");
+//       }
+
+//       const orderId = BigInt(orderIdMatch[1]);
+
+//       // Update payment and order in transaction
+//       return await prisma.$transaction(async (tx) => {
+//         // Update payment status
+//         const payment = await tx.payment.updateMany({
+//           where: {
+//             orderId: Number(orderId),
+//             paymentStatus: "PENDING",
+//           },
+//           data: {
+//             paymentStatus: "COMPLETED",
+//             transactionId: validationData.tran_id,
+//           },
+//         });
+
+//         // Update order status
+//         await tx.order.update({
+//           where: { orderId: Number(orderId) },
+//           data: {
+//             paymentStatus: "COMPLETED",
+//             status: "CONFIRMED",
+//           },
+//         });
+
+//         return {
+//           success: true,
+//           message: "SSLCommerz payment completed successfully",
+//           // payment,
+//         };
+//       });
+//     } else {
+//       throw new Error("Payment validation failed");
+//     }
+//   } catch (error) {
+//     throw new Error(
+//       `SSLCommerz success handling failed: ${getErrorMessage(error)}`
+//     );
+//   }
+// }
 export async function handleSSLCommerzSuccess(
   validationData: any
 ): Promise<PaymentResult> {
   try {
-    // Validate payment with SSLCommerz
-    const SSLCommerzPayment = require("sslcommerz-lts");
-    const sslcz = new SSLCommerzPayment(
-      process.env.SSLCOMMERZ_STORE_ID,
-      process.env.SSLCOMMERZ_STORE_PASSWD,
-      process.env.NODE_ENV === "production"
-    );
+    console.log("Processing SSLCommerz success callback:", validationData);
 
-    const validation = await sslcz.validate(validationData);
+    // Validate payment with SSLCommerz using manual implementation
+    const validation = await validateSSLCommerzPaymentManual(validationData);
+
+    console.log("SSLCommerz validation result:", validation);
 
     if (validation.status === "VALID") {
       // Extract order ID from transaction ID
@@ -126,6 +187,7 @@ export async function handleSSLCommerzSuccess(
       }
 
       const orderId = BigInt(orderIdMatch[1]);
+      console.log("Extracted order ID:", orderId);
 
       // Update payment and order in transaction
       return await prisma.$transaction(async (tx) => {
@@ -141,6 +203,20 @@ export async function handleSSLCommerzSuccess(
           },
         });
 
+        console.log("Updated payment records:", payment.count);
+
+        // Get the order with items for stock management
+        const order = await tx.order.findUnique({
+          where: { orderId: Number(orderId) },
+          include: {
+            orderItems: true,
+          },
+        });
+
+        if (!order) {
+          throw new Error("Order not found");
+        }
+
         // Update order status
         await tx.order.update({
           where: { orderId: Number(orderId) },
@@ -150,19 +226,110 @@ export async function handleSSLCommerzSuccess(
           },
         });
 
+        // Track the order update
+        await tx.orderTracking.create({
+          data: {
+            orderId: Number(orderId),
+            status: "CONFIRMED",
+            description: "Order confirmed and payment completed via SSLCommerz",
+          },
+        });
+
+        // Update stock for each order item
+        for (const item of order.orderItems) {
+          // Decrement product stock
+          await tx.product.update({
+            where: { productId: item.productId },
+            data: {
+              stockQuantity: {
+                decrement: item.quantity,
+              },
+            },
+          });
+
+          // Create stock transaction record
+          await tx.stockTransaction.create({
+            data: {
+              quantity: item.quantity,
+              transactionType: "OUT",
+              productId: item.productId,
+              orderId: Number(orderId),
+              description: `Stock reduced for Order #${orderId} - SSLCommerz payment`,
+            },
+          });
+        }
+
+        console.log("Order and stock updated successfully");
+
         return {
           success: true,
           message: "SSLCommerz payment completed successfully",
-          // payment,
         };
       });
     } else {
-      throw new Error("Payment validation failed");
+      console.error("Payment validation failed:", validation);
+      throw new Error(
+        `Payment validation failed: ${
+          validation.failedreason || "Unknown validation error"
+        }`
+      );
     }
   } catch (error) {
+    console.error("SSLCommerz success handling error:", error);
     throw new Error(
       `SSLCommerz success handling failed: ${getErrorMessage(error)}`
     );
+  }
+}
+
+/**
+ * Validate SSLCommerz payment using manual implementation
+ */
+async function validateSSLCommerzPaymentManual(validationData: any) {
+  try {
+    const isLive = process.env.NODE_ENV === "production";
+    const baseUrl = isLive
+      ? "https://securepay.sslcommerz.com"
+      : "https://sandbox.sslcommerz.com";
+
+    const validationParams = {
+      store_id: process.env.SSLCOMMERZ_STORE_ID!,
+      store_passwd: process.env.SSLCOMMERZ_STORE_PASSWD!,
+      val_id: validationData.val_id,
+    };
+
+    console.log(
+      "Validating SSLCommerz payment with val_id:",
+      validationData.val_id
+    );
+
+    const response = await axios.post(
+      `${baseUrl}/validator/api/validationserverAPI.php`,
+      new URLSearchParams(validationParams).toString(),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+        },
+        timeout: 30000,
+      }
+    );
+
+    console.log("SSLCommerz validation response:", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("SSLCommerz validation error:", error);
+
+    if (axios.isAxiosError(error)) {
+      console.error("Validation API request failed:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
+
+    throw error;
   }
 }
 /**
