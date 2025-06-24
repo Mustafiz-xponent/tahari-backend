@@ -104,91 +104,9 @@ export async function processWalletPayment(
     };
   });
 }
+
 /**
  * Process payment through SSLCommerz
- */
-// export async function processSSLCommerzPayment(
-//   data: CreatePaymentDto,
-//   order: any
-// ): Promise<PaymentResult> {
-//   try {
-//     // Initialize SSLCommerz payment
-//     const sslcommerzResponse = await initializeSSLCommerzPayment({
-//       orderId: data.orderId,
-//       amount: order.totalAmount,
-//       customerEmail: order.customer.user.email,
-//       customerPhone: order.customer.user.phone,
-//       customerName: order.customer.user.name,
-//     });
-//     // Create pending payment record
-//     const payment = await prisma.payment.create({
-//       data: {
-//         amount: order.totalAmount,
-//         paymentMethod: "SSLCOMMERZ",
-//         paymentStatus: "PENDING",
-//         transactionId: sslcommerzResponse.sessionkey,
-//         orderId: Number(data.orderId),
-//       },
-//     });
-
-//     return {
-//       payment,
-//       redirectUrl: sslcommerzResponse.redirectGatewayURL,
-//     };
-//   } catch (error) {
-//     throw new Error(`SSLCommerz payment failed: ${getErrorMessage(error)}`);
-//   }
-// }
-
-/**
- * Initialize SSLCommerz payment gateway
- */
-// async function initializeSSLCommerzPayment(data: {
-//   orderId: bigint;
-//   amount: number;
-//   customerEmail?: string;
-//   customerPhone: string;
-//   customerName?: string;
-// }) {
-//   // SSLCommerz configuration
-//   const SSLCommerzPayment = require("sslcommerz-lts");
-
-//   const sslcz = new SSLCommerzPayment(
-//     process.env.SSLCOMMERZ_STORE_ID,
-//     process.env.SSLCOMMERZ_STORE_PASSWD,
-//     process.env.NODE_ENV === "production" // is_live
-//   );
-//   const paymentData = {
-//     total_amount: data.amount,
-//     currency: "BDT",
-//     tran_id: `ORDER_${data.orderId}_${Date.now()}`,
-//     success_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/success`,
-//     fail_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/fail`,
-//     cancel_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/cancel`,
-//     ipn_url: `${process.env.SERVER_URL}/api/payments/sslcommerz/ipn`,
-//     shipping_method: "Courier",
-//     product_name: `Order Payment #${data.orderId}`,
-//     product_category: "Food",
-//     product_profile: "general",
-//     cus_name: data.customerName || "Customer",
-//     cus_email: data.customerEmail || "customer@example.com",
-//     cus_add1: "N/A",
-//     cus_city: "Chittagong",
-//     cus_state: "Chittagong",
-//     cus_postcode: "1000",
-//     cus_country: "Bangladesh",
-//     cus_phone: data.customerPhone,
-//     ship_name: data.customerName || "Customer",
-//     ship_add1: "N/A",
-//     ship_city: "Chittagong",
-//     ship_state: "Chittagong",
-//     ship_postcode: "1000",
-//     ship_country: "Bangladesh",
-//   };
-//   return await sslcz.init(paymentData);
-// }
-/**
- * Process payment through SSLCommerz using manual implementation
  */
 export async function processSSLCommerzPayment(
   data: CreatePaymentDto,
@@ -196,7 +114,7 @@ export async function processSSLCommerzPayment(
 ): Promise<PaymentResult> {
   try {
     // Initialize SSLCommerz payment using manual implementation
-    const sslcommerzResponse = await initializeSSLCommerzPaymentManual({
+    const sslcommerzResponse = await initializeSSLCommerzPayment({
       orderId: data.orderId,
       amount: order.totalAmount,
       customerEmail: order.customer.user.email,
@@ -235,9 +153,9 @@ export async function processSSLCommerzPayment(
 }
 
 /**
- * Manual SSLCommerz payment gateway initialization using direct API calls
+ *  SSLCommerz payment gateway initialization using direct API calls
  */
-async function initializeSSLCommerzPaymentManual(data: {
+async function initializeSSLCommerzPayment(data: {
   orderId: bigint;
   amount: number;
   customerEmail?: string;
@@ -305,8 +223,6 @@ async function initializeSSLCommerzPaymentManual(data: {
       }
     );
 
-    console.log("SSLCommerz API response data:", response.data);
-
     // Check if the response is successful
     if (response.data.status === "SUCCESS") {
       return {
@@ -364,7 +280,7 @@ async function initializeSSLCommerzPaymentManual(data: {
 }
 
 /**
- * Validate SSLCommerz payment using manual implementation
+ * Validate SSLCommerz payment
  */
 export async function validateSSLCommerzPayment(validationData: any) {
   try {
@@ -378,11 +294,6 @@ export async function validateSSLCommerzPayment(validationData: any) {
       store_passwd: process.env.SSLCOMMERZ_STORE_PASSWD!,
       val_id: validationData.val_id,
     };
-
-    console.log(
-      "Validating SSLCommerz payment with val_id:",
-      validationData.val_id
-    );
 
     const response = await axios.post(
       `${baseUrl}/validator/api/validationserverAPI.php`,
@@ -398,7 +309,6 @@ export async function validateSSLCommerzPayment(validationData: any) {
 
     return response.data;
   } catch (error) {
-    console.error("SSLCommerz validation error:", error);
     throw error;
   }
 }

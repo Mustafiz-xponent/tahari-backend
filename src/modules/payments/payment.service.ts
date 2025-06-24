@@ -13,47 +13,9 @@ import {
 import axios from "axios";
 
 /**
- * Create a new payment
- */
-// export async function createPayment(data: CreatePaymentDto): Promise<Payment> {
-//   try {
-//     const order = await prisma.order.findUnique({
-//       where: { orderId: Number(data.orderId) },
-//     });
-
-//     if (!order) {
-//       throw new Error("Order not found");
-//     }
-
-//     if (data.walletTransactionId) {
-//       const walletTransaction = await prisma.walletTransaction.findUnique({
-//         where: { transactionId: Number(data.walletTransactionId) },
-//       });
-//       if (!walletTransaction) {
-//         throw new Error("Wallet transaction not found");
-//       }
-//     }
-
-//     const payment = await prisma.payment.create({
-//       data: {
-//         amount: data.amount,
-//         paymentMethod: data.paymentMethod,
-//         paymentStatus: data.paymentStatus,
-//         transactionId: data.transactionId,
-//         orderId: data.orderId,
-//         walletTransactionId: data.walletTransactionId,
-//       },
-//     });
-//     return payment;
-//   } catch (error) {
-//     throw new Error(`Failed to create payment: ${getErrorMessage(error)}`);
-//   }
-// }
-
-/**
  * create order payment through wallet or SSLCommerz
  * @param data - Payment processing data
- * @returns Payment result with success status
+ * @returns Payment result
  */
 export interface PaymentResult {
   success?: boolean;
@@ -100,85 +62,13 @@ export async function createPayment(
     throw new Error(`Failed to create payment: ${getErrorMessage(error)}`);
   }
 }
-/**
- * Handle SSLCommerz payment success callback
- */
-// export async function handleSSLCommerzSuccess(
-//   validationData: any
-// ): Promise<PaymentResult> {
-//   try {
-//     // Validate payment with SSLCommerz
-//     const SSLCommerzPayment = require("sslcommerz-lts");
-//     const sslcz = new SSLCommerzPayment(
-//       process.env.SSLCOMMERZ_STORE_ID,
-//       process.env.SSLCOMMERZ_STORE_PASSWD,
-//       process.env.NODE_ENV === "production"
-//     );
 
-//     const validation = await sslcz.validate(validationData);
-
-//     if (validation.status === "VALID") {
-//       // Extract order ID from transaction ID
-//       const tranId = validationData.tran_id;
-//       const orderIdMatch = tranId.match(/ORDER_(\d+)_/);
-
-//       if (!orderIdMatch) {
-//         throw new Error("Invalid transaction ID format");
-//       }
-
-//       const orderId = BigInt(orderIdMatch[1]);
-
-//       // Update payment and order in transaction
-//       return await prisma.$transaction(async (tx) => {
-//         // Update payment status
-//         const payment = await tx.payment.updateMany({
-//           where: {
-//             orderId: Number(orderId),
-//             paymentStatus: "PENDING",
-//           },
-//           data: {
-//             paymentStatus: "COMPLETED",
-//             transactionId: validationData.tran_id,
-//           },
-//         });
-
-//         // Update order status
-//         await tx.order.update({
-//           where: { orderId: Number(orderId) },
-//           data: {
-//             paymentStatus: "COMPLETED",
-//             status: "CONFIRMED",
-//           },
-//         });
-
-//         return {
-//           success: true,
-//           message: "SSLCommerz payment completed successfully",
-//           // payment,
-//         };
-//       });
-//     } else {
-//       throw new Error("Payment validation failed");
-//     }
-//   } catch (error) {
-//     throw new Error(
-//       `SSLCommerz success handling failed: ${getErrorMessage(error)}`
-//     );
-//   }
-// }
 export async function handleSSLCommerzSuccess(
   validationData: any
 ): Promise<PaymentResult> {
   try {
-    console.log(
-      "Processing SSLCommerz success callback:",
-      validationData.tran_id
-    );
-
     // Validate payment with SSLCommerz  implementation
     const validation = await validateSSLCommerzPayment(validationData);
-
-    console.log("SSLCommerz validation result:", validation);
 
     if (validation.status === "VALID") {
       // Extract order ID from transaction ID
@@ -190,7 +80,6 @@ export async function handleSSLCommerzSuccess(
       }
 
       const orderId = BigInt(orderIdMatch[1]);
-      console.log("Extracted order ID:", orderId);
 
       // Update payment and order in transaction
       return await prisma.$transaction(async (tx) => {
@@ -205,8 +94,6 @@ export async function handleSSLCommerzSuccess(
             transactionId: validationData.tran_id,
           },
         });
-
-        console.log("Updated payment records:", payment.count);
 
         // Get the order with items for stock management
         const order = await tx.order.findUnique({
@@ -262,15 +149,12 @@ export async function handleSSLCommerzSuccess(
           });
         }
 
-        console.log("Order and stock updated successfully");
-
         return {
           success: true,
           message: "SSLCommerz payment completed successfully",
         };
       });
     } else {
-      console.error("Payment validation failed:", validation);
       throw new Error(
         `Payment validation failed: ${
           validation.failedreason || "Unknown validation error"
@@ -278,7 +162,6 @@ export async function handleSSLCommerzSuccess(
       );
     }
   } catch (error) {
-    console.error("SSLCommerz success handling error:", error);
     throw new Error(
       `SSLCommerz success handling failed: ${getErrorMessage(error)}`
     );
@@ -315,20 +198,8 @@ async function validateSSLCommerzPayment(validationData: any) {
         timeout: 30000,
       }
     );
-
-    console.log("SSLCommerz validation response:", response.data);
     return response.data;
   } catch (error) {
-    console.error("SSLCommerz validation error:", error);
-
-    if (axios.isAxiosError(error)) {
-      console.error("Validation API request failed:", {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message,
-      });
-    }
-
     throw error;
   }
 }
@@ -367,10 +238,7 @@ export async function handleSSLCommerzFailure(failureData: any): Promise<void> {
       });
     }
   } catch (error) {
-    console.error(
-      "Failed to handle SSLCommerz failure:",
-      getErrorMessage(error)
-    );
+    throw error;
   }
 }
 /**
