@@ -2,15 +2,19 @@
  * Service layer for Category entity operations.
  * Contains business logic and database interactions for categories.
  */
-
 import { getErrorMessage } from "../../utils/errorHandler";
 import prisma from "../../prisma-client/prismaClient";
 import { Category, Product } from "@/generated/prisma/client";
-import { CreateCategoryDto, UpdateCategoryDto } from "./category.dto";
+import { UpdateCategoryDto, CreateCategoryDto } from "./category.dto";
 import {
   getBatchAccessibleImageUrls,
   processProductsWithAccessibleUrls,
 } from "../../utils/fileUpload/s3Aws";
+import {
+  uploadFileToS3,
+  getAccessibleImageUrl,
+} from "../../utils/fileUpload/s3Aws";
+import { multerFileToFileObject } from "../../utils/fileUpload/configMulterUpload";
 
 export interface ProductWithAccessibleImages extends Product {
   accessibleImageUrls: string[];
@@ -22,13 +26,37 @@ export interface CategoryWithAccessibleImages
   products: ProductWithAccessibleImages[];
 }
 
+interface IMulterFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  buffer: Buffer;
+  size: number;
+}
 // Create a new category
-export const createCategory = async (
-  data: CreateCategoryDto
-): Promise<Category> => {
+export const createCategory = async ({
+  data,
+  file,
+}: {
+  data: CreateCategoryDto;
+  file: IMulterFile;
+}): Promise<Category> => {
   try {
+    // Upload image to S3
+    const fileObject = multerFileToFileObject(file);
+    const result = await uploadFileToS3(
+      fileObject,
+      "categories",
+      undefined,
+      true
+    );
+
     return await prisma.category.create({
-      data,
+      data: {
+        ...data,
+        imageUrl: result.url,
+      },
     });
   } catch (error) {
     throw new Error(`Error creating category: ${getErrorMessage(error)}`);
@@ -61,10 +89,22 @@ export const getAllCategories = async (
         products: true,
       },
     });
+    const categoriesWithUrls = await Promise.all(
+      categories.map(async (category) => {
+        const accessibleUrl = await getAccessibleImageUrl(
+          category.imageUrl as string,
+          category.isPrivateImage
+        );
 
+        return {
+          ...category,
+          accessibleImageUrl: accessibleUrl,
+        };
+      })
+    );
     // Process each category to add accessible URLs to products
     const processedCategories = await Promise.all(
-      categories.map(async (category) => {
+      categoriesWithUrls.map(async (category) => {
         const processedProducts = await Promise.all(
           category.products.map(async (product) => {
             if (generateAccessibleUrls && product.imageUrls.length > 0) {

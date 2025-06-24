@@ -158,7 +158,7 @@ model Category {
   categoryId     BigInt    @id @default(autoincrement())
   name           String    @unique
   imageUrl       String?
-  isPrivateImage Boolean   @default(false)
+  isPrivateImage Boolean   @default(true)
   description    String?
   products       Product[]
 

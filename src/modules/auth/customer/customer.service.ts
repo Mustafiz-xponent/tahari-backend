@@ -148,7 +148,7 @@ export async function verifyCustomerOtp(
   if (!user || user.role !== "CUSTOMER") {
     throw new Error("Customer not found");
   }
-
+  // create customer wallet if not exist--
   if (user.customer && !user.customer.wallet) {
     await prisma.wallet.create({
       data: {

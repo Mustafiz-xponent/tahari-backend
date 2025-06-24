@@ -5,7 +5,7 @@
 
 import { Request, Response } from "express";
 import { z } from "zod";
-import upload from "../../utils/fileUpload/configMulterUpload";
+import { upload } from "../../utils/fileUpload/configMulterUpload";
 import { handleErrorResponse } from "../../utils/errorResponseHandler";
 import {
   productNameSchema,
