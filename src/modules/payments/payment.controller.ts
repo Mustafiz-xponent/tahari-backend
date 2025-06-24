@@ -32,6 +32,73 @@ export const createPayment = async (
     handleErrorResponse(error, res, "create payment");
   }
 };
+/**
+ * Handle SSLCommerz success callback
+ */
+export const handleSSLCommerzSuccess = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const result = await paymentService.handleSSLCommerzSuccess(req.body);
+
+    if (result.success) {
+      res.redirect(`${process.env.FRONTEND_URL}/payment/success`);
+    } else {
+      res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+    }
+  } catch (error) {
+    console.error("SSLCommerz success callback error:", error);
+    res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+  }
+};
+
+/**
+ * Handle SSLCommerz failure callback
+ */
+export const handleSSLCommerzFailure = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    await paymentService.handleSSLCommerzFailure(req.body);
+    res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+  } catch (error) {
+    console.error("SSLCommerz failure callback error:", error);
+    res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+  }
+};
+/**
+ * Handle SSLCommerz cancel callback
+ */
+export const handleSSLCommerzCancel = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    await paymentService.handleSSLCommerzFailure(req.body);
+    res.redirect(`${process.env.FRONTEND_URL}/payment/cancelled`);
+  } catch (error) {
+    console.error("SSLCommerz cancel callback error:", error);
+    res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+  }
+};
+
+/**
+ * Handle SSLCommerz IPN (Instant Payment Notification)
+ */
+export const handleSSLCommerzIPN = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const result = await paymentService.handleSSLCommerzSuccess(req.body);
+    res.status(200).send("OK");
+  } catch (error) {
+    console.error("SSLCommerz IPN error:", error);
+    res.status(500).send("ERROR");
+  }
+};
 
 /**
  * Get all payments

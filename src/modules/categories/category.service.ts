@@ -40,22 +40,20 @@ export const createCategory = async ({
   file,
 }: {
   data: CreateCategoryDto;
-  file: IMulterFile;
+  file?: IMulterFile;
 }): Promise<Category> => {
   try {
     // Upload image to S3
-    const fileObject = multerFileToFileObject(file);
-    const result = await uploadFileToS3(
-      fileObject,
-      "categories",
-      undefined,
-      true
-    );
+    let result;
+    if (file) {
+      const fileObject = multerFileToFileObject(file);
+      result = await uploadFileToS3(fileObject, "categories", undefined, true);
+    }
 
     return await prisma.category.create({
       data: {
         ...data,
-        imageUrl: result.url,
+        imageUrl: result ? result.url : null,
       },
     });
   } catch (error) {
@@ -91,11 +89,13 @@ export const getAllCategories = async (
     });
     const categoriesWithUrls = await Promise.all(
       categories.map(async (category) => {
-        const accessibleUrl = await getAccessibleImageUrl(
-          category.imageUrl as string,
-          category.isPrivateImage
-        );
-
+        let accessibleUrl: string | undefined;
+        if (category.imageUrl) {
+          accessibleUrl = await getAccessibleImageUrl(
+            category.imageUrl as string,
+            category.isPrivateImage
+          );
+        }
         return {
           ...category,
           accessibleImageUrl: accessibleUrl,

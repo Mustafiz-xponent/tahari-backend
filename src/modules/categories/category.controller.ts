@@ -22,9 +22,6 @@ export const createCategory = [
     try {
       const data = zCreateCategoryDto.parse(req.body);
       const file = req.file;
-      if (!file) {
-        throw new Error("Image file is required");
-      }
 
       const category = await categoryService.createCategory({
         data,

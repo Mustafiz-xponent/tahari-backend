@@ -23,4 +23,10 @@ router.put("/:id", PaymentController.updatePayment);
 // Route to delete a payment
 router.delete("/:id", PaymentController.deletePayment);
 
+// SSLCommerz callback routes
+router.post("/sslcommerz/success", PaymentController.handleSSLCommerzSuccess);
+router.post("/sslcommerz/fail", PaymentController.handleSSLCommerzFailure);
+router.post("/sslcommerz/cancel", PaymentController.handleSSLCommerzCancel);
+router.post("/sslcommerz/ipn", PaymentController.handleSSLCommerzIPN);
+
 export default router;
