@@ -170,10 +170,13 @@ export async function handleSSLCommerzSuccess(
   validationData: any
 ): Promise<PaymentResult> {
   try {
-    console.log("Processing SSLCommerz success callback:", validationData);
+    console.log(
+      "Processing SSLCommerz success callback:",
+      validationData.tran_id
+    );
 
-    // Validate payment with SSLCommerz using manual implementation
-    const validation = await validateSSLCommerzPaymentManual(validationData);
+    // Validate payment with SSLCommerz  implementation
+    const validation = await validateSSLCommerzPayment(validationData);
 
     console.log("SSLCommerz validation result:", validation);
 
@@ -283,9 +286,9 @@ export async function handleSSLCommerzSuccess(
 }
 
 /**
- * Validate SSLCommerz payment using manual implementation
+ * Validate SSLCommerz payment
  */
-async function validateSSLCommerzPaymentManual(validationData: any) {
+async function validateSSLCommerzPayment(validationData: any) {
   try {
     const isLive = process.env.NODE_ENV === "production";
     const baseUrl = isLive
@@ -293,9 +296,11 @@ async function validateSSLCommerzPaymentManual(validationData: any) {
       : "https://sandbox.sslcommerz.com";
 
     const validationParams = {
+      val_id: validationData.val_id,
       store_id: process.env.SSLCOMMERZ_STORE_ID!,
       store_passwd: process.env.SSLCOMMERZ_STORE_PASSWD!,
-      val_id: validationData.val_id,
+      v: 1, // optional
+      format: "json", // optional: for JSON response instead of XML
     };
 
     console.log(
@@ -303,20 +308,15 @@ async function validateSSLCommerzPaymentManual(validationData: any) {
       validationData.val_id
     );
 
-    const response = await axios.post(
+    const response = await axios.get(
       `${baseUrl}/validator/api/validationserverAPI.php`,
-      new URLSearchParams(validationParams).toString(),
       {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Accept: "application/json",
-        },
+        params: validationParams,
         timeout: 30000,
       }
     );
 
     console.log("SSLCommerz validation response:", response.data);
-
     return response.data;
   } catch (error) {
     console.error("SSLCommerz validation error:", error);
@@ -332,6 +332,7 @@ async function validateSSLCommerzPaymentManual(validationData: any) {
     throw error;
   }
 }
+
 /**
  * Handle SSLCommerz payment failure
  */

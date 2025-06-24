@@ -43,13 +43,12 @@ export const handleSSLCommerzSuccess = async (
     const result = await paymentService.handleSSLCommerzSuccess(req.body);
 
     if (result.success) {
-      res.redirect(`${process.env.FRONTEND_URL}/payment/success`);
+      res.redirect(`${process.env.CLIENT_URL}/payment/success`);
     } else {
-      res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+      res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
     }
   } catch (error) {
-    console.error("SSLCommerz success callback error:", error);
-    res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+    res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
   }
 };
 
@@ -62,10 +61,9 @@ export const handleSSLCommerzFailure = async (
 ): Promise<void> => {
   try {
     await paymentService.handleSSLCommerzFailure(req.body);
-    res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+    res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
   } catch (error) {
-    console.error("SSLCommerz failure callback error:", error);
-    res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+    res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
   }
 };
 /**
@@ -77,10 +75,9 @@ export const handleSSLCommerzCancel = async (
 ): Promise<void> => {
   try {
     await paymentService.handleSSLCommerzFailure(req.body);
-    res.redirect(`${process.env.FRONTEND_URL}/payment/cancelled`);
+    res.redirect(`${process.env.CLIENT_URL}/payment/cancelled`);
   } catch (error) {
-    console.error("SSLCommerz cancel callback error:", error);
-    res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+    res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
   }
 };
 

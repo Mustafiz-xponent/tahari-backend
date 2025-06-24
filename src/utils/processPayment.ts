@@ -195,8 +195,6 @@ export async function processSSLCommerzPayment(
   order: any
 ): Promise<PaymentResult> {
   try {
-    console.log("Starting SSLCommerz payment process for order:", data.orderId);
-
     // Initialize SSLCommerz payment using manual implementation
     const sslcommerzResponse = await initializeSSLCommerzPaymentManual({
       orderId: data.orderId,
@@ -204,12 +202,6 @@ export async function processSSLCommerzPayment(
       customerEmail: order.customer.user.email,
       customerPhone: order.customer.user.phone,
       customerName: order.customer.user.name,
-    });
-
-    console.log("SSLCommerz response received:", {
-      status: sslcommerzResponse?.status,
-      sessionkey: sslcommerzResponse?.sessionkey,
-      hasRedirectUrl: !!sslcommerzResponse?.redirectGatewayURL,
     });
 
     // Validate SSLCommerz response
@@ -232,8 +224,6 @@ export async function processSSLCommerzPayment(
       },
     });
 
-    console.log("Payment record created successfully:", payment.paymentId);
-
     return {
       payment,
       redirectUrl: sslcommerzResponse.redirectGatewayURL,
@@ -255,12 +245,6 @@ async function initializeSSLCommerzPaymentManual(data: {
   customerName?: string;
 }) {
   try {
-    console.log("Initializing SSLCommerz manually with data:", {
-      orderId: data.orderId,
-      amount: data.amount,
-      customerPhone: data.customerPhone,
-    });
-
     // Validate environment variables
     if (
       !process.env.SSLCOMMERZ_STORE_ID ||
@@ -275,10 +259,7 @@ async function initializeSSLCommerzPaymentManual(data: {
       ? "https://securepay.sslcommerz.com"
       : "https://sandbox.sslcommerz.com";
 
-    console.log("Using SSLCommerz base URL:", baseUrl);
-
     const transactionId = `ORDER_${data.orderId}_${Date.now()}`;
-    console.log("Generated transaction ID:", transactionId);
 
     // Prepare payment data for SSLCommerz API
     const paymentData = {
@@ -311,9 +292,6 @@ async function initializeSSLCommerzPaymentManual(data: {
       ship_country: "Bangladesh",
     };
 
-    console.log("Making direct API call to SSLCommerz");
-    console.log("Payment data:", { ...paymentData, store_passwd: "[HIDDEN]" });
-
     // Make the API call to SSLCommerz
     const response = await axios.post(
       `${baseUrl}/gwprocess/v4/api.php`,
@@ -327,7 +305,6 @@ async function initializeSSLCommerzPaymentManual(data: {
       }
     );
 
-    console.log("SSLCommerz API response status:", response.status);
     console.log("SSLCommerz API response data:", response.data);
 
     // Check if the response is successful
@@ -339,7 +316,6 @@ async function initializeSSLCommerzPaymentManual(data: {
         failedreason: null,
       };
     } else {
-      console.error("SSLCommerz API returned failure:", response.data);
       return {
         status: "FAILED",
         sessionkey: null,
@@ -348,42 +324,40 @@ async function initializeSSLCommerzPaymentManual(data: {
           response.data.failedreason || "Unknown error from SSLCommerz",
       };
     }
-  } catch (error) {
-    console.error("SSLCommerz manual initialization error:", error);
+  } catch (error: unknown) {
+    // if (axios.isAxiosError(error)) {
+    //   console.error("SSLCommerz API request failed:", {
+    //     status: error.response?.status,
+    //     statusText: error.response?.statusText,
+    //     data: error.response?.data,
+    //     message: error.message,
+    //     code: error.code,
+    //   });
 
-    if (axios.isAxiosError(error)) {
-      console.error("SSLCommerz API request failed:", {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-        code: error.code,
-      });
-
-      // Handle specific HTTP errors
-      if (error.response?.status === 400) {
-        throw new Error(
-          `SSLCommerz API Bad Request: ${
-            error.response.data?.failedreason || "Invalid request parameters"
-          }`
-        );
-      } else if (error.response?.status === 401) {
-        throw new Error(
-          "SSLCommerz API Authentication failed: Invalid store credentials"
-        );
-      } else if (error.response?.status >= 500) {
-        throw new Error("SSLCommerz API server error: Please try again later");
-      } else {
-        throw new Error(`SSLCommerz API request failed: ${error.message}`);
-      }
-    }
+    //   // Handle specific HTTP errors
+    //   if (error.response?.status === 400) {
+    //     throw new Error(
+    //       `SSLCommerz API Bad Request: ${
+    //         error.response.data?.failedreason || "Invalid request parameters"
+    //       }`
+    //     );
+    //   } else if (error.response?.status === 401) {
+    //     throw new Error(
+    //       "SSLCommerz API Authentication failed: Invalid store credentials"
+    //     );
+    //   } else if (error.response?.status >= 500) {
+    //     throw new Error("SSLCommerz API server error: Please try again later");
+    //   } else {
+    //     throw new Error(`SSLCommerz API request failed: ${error.message}`);
+    //   }
+    // }
 
     // Handle network errors
-    if (error.code === "ECONNABORTED") {
-      throw new Error("SSLCommerz API timeout: Request took too long");
-    } else if (error.code === "ENOTFOUND" || error.code === "ECONNREFUSED") {
-      throw new Error("SSLCommerz API connection failed: Network error");
-    }
+    // if (error.code === "ECONNABORTED") {
+    //   throw new Error("SSLCommerz API timeout: Request took too long");
+    // } else if (error.code === "ENOTFOUND" || error.code === "ECONNREFUSED") {
+    //   throw new Error("SSLCommerz API connection failed: Network error");
+    // }
 
     throw error;
   }
@@ -392,7 +366,7 @@ async function initializeSSLCommerzPaymentManual(data: {
 /**
  * Validate SSLCommerz payment using manual implementation
  */
-export async function validateSSLCommerzPaymentManual(validationData: any) {
+export async function validateSSLCommerzPayment(validationData: any) {
   try {
     const isLive = process.env.NODE_ENV === "production";
     const baseUrl = isLive
@@ -421,8 +395,6 @@ export async function validateSSLCommerzPaymentManual(validationData: any) {
         timeout: 30000,
       }
     );
-
-    console.log("SSLCommerz validation response:", response.data);
 
     return response.data;
   } catch (error) {
