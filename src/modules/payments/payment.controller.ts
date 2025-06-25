@@ -40,16 +40,17 @@ export const handleSSLCommerzSuccess = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log("SUCCESS WEBHOOK CALLED");
     const result = await paymentService.handleSSLCommerzSuccess(req.body);
 
     if (result.success) {
-      res.redirect(`${process.env.FRONTEND_URL}/payment/success`);
+      res.redirect(`${process.env.CLIENT_URL}/payment/success`);
     } else {
-      res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+      res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
     }
   } catch (error) {
-    console.error("SSLCommerz success callback error:", error);
-    res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+    console.log("SUCCESS ERROR:", error);
+    res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
   }
 };
 
@@ -61,11 +62,11 @@ export const handleSSLCommerzFailure = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log("FAILURE WEBHOOK CALLED");
     await paymentService.handleSSLCommerzFailure(req.body);
-    res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+    res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
   } catch (error) {
-    console.error("SSLCommerz failure callback error:", error);
-    res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+    res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
   }
 };
 /**
@@ -76,11 +77,11 @@ export const handleSSLCommerzCancel = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log("CANCEL WEBHOOK CALLED");
     await paymentService.handleSSLCommerzFailure(req.body);
-    res.redirect(`${process.env.FRONTEND_URL}/payment/cancelled`);
+    res.redirect(`${process.env.CLIENT_URL}/payment/cancelled`);
   } catch (error) {
-    console.error("SSLCommerz cancel callback error:", error);
-    res.redirect(`${process.env.FRONTEND_URL}/payment/failed`);
+    res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
   }
 };
 
@@ -92,11 +93,12 @@ export const handleSSLCommerzIPN = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log("IPN WEBHOOK CALLED");
     const result = await paymentService.handleSSLCommerzSuccess(req.body);
-    res.status(200).send("OK");
+    res.status(200).json({ message: "IPN received successfully" });
   } catch (error) {
     console.error("SSLCommerz IPN error:", error);
-    res.status(500).send("ERROR");
+    res.status(200).json({ message: "IPN received successfully" });
   }
 };
 

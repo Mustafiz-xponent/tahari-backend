@@ -31,6 +31,7 @@ const app = express();
 
 // Core Middleware
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Global BigInt Serializer
 (BigInt.prototype as any).toJSON = function () {

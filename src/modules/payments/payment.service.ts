@@ -10,49 +10,12 @@ import {
   processWalletPayment,
   processSSLCommerzPayment,
 } from "../../utils/processPayment";
-
-/**
- * Create a new payment
- */
-// export async function createPayment(data: CreatePaymentDto): Promise<Payment> {
-//   try {
-//     const order = await prisma.order.findUnique({
-//       where: { orderId: Number(data.orderId) },
-//     });
-
-//     if (!order) {
-//       throw new Error("Order not found");
-//     }
-
-//     if (data.walletTransactionId) {
-//       const walletTransaction = await prisma.walletTransaction.findUnique({
-//         where: { transactionId: Number(data.walletTransactionId) },
-//       });
-//       if (!walletTransaction) {
-//         throw new Error("Wallet transaction not found");
-//       }
-//     }
-
-//     const payment = await prisma.payment.create({
-//       data: {
-//         amount: data.amount,
-//         paymentMethod: data.paymentMethod,
-//         paymentStatus: data.paymentStatus,
-//         transactionId: data.transactionId,
-//         orderId: data.orderId,
-//         walletTransactionId: data.walletTransactionId,
-//       },
-//     });
-//     return payment;
-//   } catch (error) {
-//     throw new Error(`Failed to create payment: ${getErrorMessage(error)}`);
-//   }
-// }
+import axios from "axios";
 
 /**
  * create order payment through wallet or SSLCommerz
  * @param data - Payment processing data
- * @returns Payment result with success status
+ * @returns Payment result
  */
 export interface PaymentResult {
   success?: boolean;
@@ -77,13 +40,14 @@ export async function createPayment(
         orderItems: true,
       },
     });
+
     if (!order) {
       throw new Error("Order not found");
     }
 
-    if (order.paymentStatus !== "PENDING") {
+    if (!["PENDING", "FAILED"].includes(order.paymentStatus)) {
       throw new Error(
-        `Order payment is already ${order.paymentStatus.toLowerCase()}`
+        `Order is not payable. Current status: ${order.paymentStatus}`
       );
     }
 
@@ -95,32 +59,21 @@ export async function createPayment(
       throw new Error("Invalid payment method");
     }
   } catch (error) {
-    console.log("error:", error);
     throw new Error(`Failed to create payment: ${getErrorMessage(error)}`);
   }
 }
-/**
- * Handle SSLCommerz payment success callback
- */
+
 export async function handleSSLCommerzSuccess(
   validationData: any
 ): Promise<PaymentResult> {
   try {
-    // Validate payment with SSLCommerz
-    const SSLCommerzPayment = require("sslcommerz-lts");
-    const sslcz = new SSLCommerzPayment(
-      process.env.SSLCOMMERZ_STORE_ID,
-      process.env.SSLCOMMERZ_STORE_PASSWD,
-      process.env.NODE_ENV === "production"
-    );
-
-    const validation = await sslcz.validate(validationData);
+    // Validate payment with SSLCommerz  implementation
+    const validation = await validateSSLCommerzPayment(validationData);
 
     if (validation.status === "VALID") {
       // Extract order ID from transaction ID
       const tranId = validationData.tran_id;
       const orderIdMatch = tranId.match(/ORDER_(\d+)_/);
-
       if (!orderIdMatch) {
         throw new Error("Invalid transaction ID format");
       }
@@ -129,35 +82,95 @@ export async function handleSSLCommerzSuccess(
 
       // Update payment and order in transaction
       return await prisma.$transaction(async (tx) => {
-        // Update payment status
-        const payment = await tx.payment.updateMany({
+        // Check payment status
+        const payment = await tx.payment.findFirst({
           where: {
             orderId: Number(orderId),
-            paymentStatus: "PENDING",
-          },
-          data: {
-            paymentStatus: "COMPLETED",
-            transactionId: validationData.tran_id,
+            transactionId: tranId,
           },
         });
 
-        // Update order status
+        if (!payment) throw new Error("Payment record not found");
+        if (payment.paymentStatus === "COMPLETED") {
+          return {
+            success: true,
+            message: "Payment was already processed successfully",
+          };
+        }
+
+        if (payment.paymentStatus !== "PENDING") {
+          throw new Error(
+            `Cannot complete payment with status: ${payment.paymentStatus}`
+          );
+        }
+        // Mark payment as COMPLETED
+        await tx.payment.update({
+          where: { paymentId: payment.paymentId },
+          data: {
+            paymentStatus: "COMPLETED",
+            transactionId: tranId,
+          },
+        });
+        // Fetch the order
+        const order = await tx.order.findUnique({
+          where: { orderId },
+          include: {
+            orderItems: true,
+          },
+        });
+
+        if (!order) throw new Error("Order not found");
+        //  Update order
         await tx.order.update({
-          where: { orderId: Number(orderId) },
+          where: { orderId },
           data: {
             paymentStatus: "COMPLETED",
             status: "CONFIRMED",
           },
         });
 
+        //  Track status change
+        await tx.orderTracking.create({
+          data: {
+            orderId,
+            status: "CONFIRMED",
+            description: "Order confirmed and payment completed via SSLCommerz",
+          },
+        });
+
+        // Reduce stock and log transaction
+        for (const item of order.orderItems) {
+          await tx.product.update({
+            where: { productId: item.productId },
+            data: {
+              stockQuantity: {
+                decrement: item.quantity,
+              },
+            },
+          });
+
+          await tx.stockTransaction.create({
+            data: {
+              quantity: item.quantity,
+              transactionType: "OUT",
+              productId: item.productId,
+              orderId,
+              description: `Stock reduced for Order #${orderId} - SSLCommerz payment`,
+            },
+          });
+        }
+
         return {
           success: true,
           message: "SSLCommerz payment completed successfully",
-          // payment,
         };
       });
     } else {
-      throw new Error("Payment validation failed");
+      throw new Error(
+        `Payment validation failed: ${
+          validation.failedreason || "Unknown validation error"
+        }`
+      );
     }
   } catch (error) {
     throw new Error(
@@ -165,6 +178,38 @@ export async function handleSSLCommerzSuccess(
     );
   }
 }
+
+/**
+ * Validate SSLCommerz payment
+ */
+async function validateSSLCommerzPayment(validationData: any) {
+  try {
+    const isLive = process.env.NODE_ENV === "production";
+    const baseUrl = isLive
+      ? "https://securepay.sslcommerz.com"
+      : "https://sandbox.sslcommerz.com";
+
+    const validationParams = {
+      val_id: validationData.val_id,
+      store_id: process.env.SSLCOMMERZ_STORE_ID!,
+      store_passwd: process.env.SSLCOMMERZ_STORE_PASSWD!,
+      v: 1, // optional
+      format: "json", // optional: for JSON response instead of XML
+    };
+
+    const response = await axios.get(
+      `${baseUrl}/validator/api/validationserverAPI.php`,
+      {
+        params: validationParams,
+        timeout: 30000,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 /**
  * Handle SSLCommerz payment failure
  */
@@ -173,35 +218,57 @@ export async function handleSSLCommerzFailure(failureData: any): Promise<void> {
     // Extract order ID and update payment status
     const tranId = failureData.tran_id;
     const orderIdMatch = tranId.match(/ORDER_(\d+)_/);
-
-    if (orderIdMatch) {
-      const orderId = BigInt(orderIdMatch[1]);
-
-      await prisma.$transaction(async (tx) => {
-        // Update payment status to failed
-        await tx.payment.updateMany({
-          where: {
-            orderId: Number(orderId),
-            paymentStatus: "PENDING",
-          },
-          data: {
-            paymentStatus: "FAILED",
-          },
-        });
-
-        // Update order status
-        await tx.order.update({
-          where: { orderId: Number(orderId) },
-          data: {
-            paymentStatus: "FAILED",
-          },
-        });
-      });
+    if (!orderIdMatch) {
+      throw new Error("Invalid transaction ID format");
     }
+
+    const orderId = Number(orderIdMatch[1]);
+    await prisma.$transaction(async (tx) => {
+      // Find the specific payment record
+      const payment = await tx.payment.findFirst({
+        where: {
+          orderId,
+          transactionId: tranId,
+        },
+      });
+
+      if (!payment) {
+        throw new Error(`No matching payment found for orderId ${orderId}`);
+      }
+
+      if (payment.paymentStatus === "FAILED") {
+        // Already failed, nothing to do
+        return;
+      }
+
+      if (payment.paymentStatus !== "PENDING") {
+        throw new Error(
+          `Cannot mark payment as FAILED — current status is ${payment.paymentStatus}`
+        );
+      }
+
+      // Mark payment as FAILED
+      await tx.payment.update({
+        where: { paymentId: payment.paymentId },
+        data: { paymentStatus: "FAILED" },
+      });
+
+      // Update order status if still pending
+      const order = await tx.order.findUnique({
+        where: { orderId },
+      });
+
+      if (order && order.paymentStatus === "PENDING") {
+        await tx.order.update({
+          where: { orderId },
+          data: { paymentStatus: "FAILED" },
+        });
+      }
+    });
   } catch (error) {
-    console.error(
-      "Failed to handle SSLCommerz failure:",
-      getErrorMessage(error)
+    console.error("handleSSLCommerzFailure error:", error);
+    throw new Error(
+      `Failed to handle SSLCommerz payment: ${getErrorMessage(error)}`
     );
   }
 }
