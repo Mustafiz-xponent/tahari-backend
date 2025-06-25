@@ -279,40 +279,31 @@ async function initializeSSLCommerzPayment(data: {
       };
     }
   } catch (error: unknown) {
-    // if (axios.isAxiosError(error)) {
-    //   console.error("SSLCommerz API request failed:", {
-    //     status: error.response?.status,
-    //     statusText: error.response?.statusText,
-    //     data: error.response?.data,
-    //     message: error.message,
-    //     code: error.code,
-    //   });
-
-    //   // Handle specific HTTP errors
-    //   if (error.response?.status === 400) {
-    //     throw new Error(
-    //       `SSLCommerz API Bad Request: ${
-    //         error.response.data?.failedreason || "Invalid request parameters"
-    //       }`
-    //     );
-    //   } else if (error.response?.status === 401) {
-    //     throw new Error(
-    //       "SSLCommerz API Authentication failed: Invalid store credentials"
-    //     );
-    //   } else if (error.response?.status >= 500) {
-    //     throw new Error("SSLCommerz API server error: Please try again later");
-    //   } else {
-    //     throw new Error(`SSLCommerz API request failed: ${error.message}`);
-    //   }
-    // }
-
+    if (axios.isAxiosError(error)) {
+      // Handle specific HTTP errors
+      if (error.response?.status === 400) {
+        throw new Error(
+          `SSLCommerz API Bad Request: ${
+            error.response.data?.failedreason || "Invalid request parameters"
+          }`
+        );
+      } else if (error.response?.status === 401) {
+        throw new Error(
+          "SSLCommerz API Authentication failed: Invalid store credentials"
+        );
+      } else if (error.response?.status! >= 500) {
+        throw new Error("SSLCommerz API server error: Please try again later");
+      } else {
+        throw new Error(`SSLCommerz API request failed: ${error.message}`);
+      }
+    }
+    const code = (error as any).code;
     // Handle network errors
-    // if (error.code === "ECONNABORTED") {
-    //   throw new Error("SSLCommerz API timeout: Request took too long");
-    // } else if (error.code === "ENOTFOUND" || error.code === "ECONNREFUSED") {
-    //   throw new Error("SSLCommerz API connection failed: Network error");
-    // }
-
+    if (code === "ECONNABORTED") {
+      throw new Error("SSLCommerz API timeout: Request took too long");
+    } else if (code === "ENOTFOUND" || code === "ECONNREFUSED") {
+      throw new Error("SSLCommerz API connection failed: Network error");
+    }
     throw error;
   }
 }
