@@ -265,7 +265,7 @@ async function initializeSSLCommerzPayment(data: {
       return {
         status: "SUCCESS",
         sessionkey: response.data.sessionkey,
-        redirectGatewayURL: response.data.redirectGatewayURL,
+        redirectGatewayURL: response.data.GatewayPageURL,
         failedreason: null,
         transactionId,
       };
