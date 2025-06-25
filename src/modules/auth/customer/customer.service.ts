@@ -160,6 +160,13 @@ export async function verifyCustomerOtp(
   const updatedUser = await prisma.user.update({
     where: { phone: data.phone },
     data: { status: "ACTIVE" },
+    include: {
+      customer: {
+        include: {
+          wallet: true,
+        },
+      },
+    },
   });
   console.log(user);
   await prisma.otp.deleteMany({

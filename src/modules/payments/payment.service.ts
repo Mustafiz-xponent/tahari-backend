@@ -186,11 +186,6 @@ async function validateSSLCommerzPayment(validationData: any) {
       format: "json", // optional: for JSON response instead of XML
     };
 
-    console.log(
-      "Validating SSLCommerz payment with val_id:",
-      validationData.val_id
-    );
-
     const response = await axios.get(
       `${baseUrl}/validator/api/validationserverAPI.php`,
       {
