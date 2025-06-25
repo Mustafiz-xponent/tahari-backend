@@ -164,6 +164,9 @@ export async function verifyCustomerOtp(
       customer: {
         include: {
           wallet: true,
+        select: {
+          customerId: true,
+          wallet: { select: { walletId: true } },
         },
       },
     },
