@@ -9,6 +9,7 @@ import { getErrorMessage } from "../../utils/errorHandler";
 import {
   processWalletPayment,
   processSSLCommerzPayment,
+  processCodPayment,
 } from "../../utils/processPayment";
 import axios from "axios";
 
@@ -55,6 +56,8 @@ export async function createPayment(
       return await processWalletPayment(data, order);
     } else if (order.paymentMethod.toUpperCase() === "SSLCOMMERZ") {
       return await processSSLCommerzPayment(data, order);
+    } else if (order.paymentMethod.toUpperCase() === "COD") {
+      return await processCodPayment(data, order);
     } else {
       throw new Error("Invalid payment method");
     }

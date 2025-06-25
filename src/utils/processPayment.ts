@@ -104,7 +104,47 @@ export async function processWalletPayment(
     };
   });
 }
+/**
+ * Process COD payment
+ */
+export async function processCodPayment(
+  data: CreatePaymentDto,
+  order: any
+): Promise<PaymentResult> {
+  return await prisma.$transaction(async (tx) => {
+    // Create a pending payment record
+    const payment = await tx.payment.create({
+      data: {
+        amount: order.totalAmount,
+        paymentMethod: "COD",
+        paymentStatus: "PENDING",
+        orderId: Number(data.orderId),
+      },
+    });
 
+    // Update order status to "PLACED" or "AWAITING_CONFIRMATION"
+    await tx.order.update({
+      where: { orderId: Number(data.orderId) },
+      data: {
+        paymentStatus: "PENDING",
+        status: "PENDING",
+      },
+    });
+
+    // Track the order update
+    await tx.orderTracking.create({
+      data: {
+        orderId: Number(data.orderId),
+        status: "PENDING",
+        description: "Order created and payment pending for Cash on Delivery",
+      },
+    });
+
+    return {
+      payment,
+    };
+  });
+}
 /**
  * Process payment through SSLCommerz
  */
