@@ -157,14 +157,13 @@ export async function processSSLCommerzPayment(
         }`
       );
     }
-
     let payment;
     if (existingPayment) {
-      // Update the failed or pending payment to new session key
+      // Update the failed or pending payment
       payment = await prisma.payment.update({
         where: { paymentId: existingPayment.paymentId },
         data: {
-          transactionId: sslcommerzResponse.sessionkey,
+          transactionId: sslcommerzResponse.transactionId,
           paymentStatus: "PENDING",
         },
       });
@@ -175,7 +174,7 @@ export async function processSSLCommerzPayment(
           amount: order.totalAmount,
           paymentMethod: "SSLCOMMERZ",
           paymentStatus: "PENDING",
-          transactionId: sslcommerzResponse.sessionkey,
+          transactionId: sslcommerzResponse.transactionId,
           orderId: Number(data.orderId),
         },
       });
@@ -261,7 +260,6 @@ async function initializeSSLCommerzPayment(data: {
         timeout: 30000, // 30 seconds timeout
       }
     );
-
     // Check if the response is successful
     if (response.data.status === "SUCCESS") {
       return {
@@ -269,6 +267,7 @@ async function initializeSSLCommerzPayment(data: {
         sessionkey: response.data.sessionkey,
         redirectGatewayURL: response.data.redirectGatewayURL,
         failedreason: null,
+        transactionId,
       };
     } else {
       return {

@@ -59,7 +59,6 @@ export async function createPayment(
       throw new Error("Invalid payment method");
     }
   } catch (error) {
-    console.log("error:", error);
     throw new Error(`Failed to create payment: ${getErrorMessage(error)}`);
   }
 }
@@ -75,7 +74,6 @@ export async function handleSSLCommerzSuccess(
       // Extract order ID from transaction ID
       const tranId = validationData.tran_id;
       const orderIdMatch = tranId.match(/ORDER_(\d+)_/);
-
       if (!orderIdMatch) {
         throw new Error("Invalid transaction ID format");
       }
@@ -87,7 +85,7 @@ export async function handleSSLCommerzSuccess(
         // Check payment status
         const payment = await tx.payment.findFirst({
           where: {
-            orderId,
+            orderId: Number(orderId),
             transactionId: tranId,
           },
         });

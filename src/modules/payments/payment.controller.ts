@@ -40,6 +40,7 @@ export const handleSSLCommerzSuccess = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log("SUCCESS WEBHOOK CALLED");
     const result = await paymentService.handleSSLCommerzSuccess(req.body);
 
     if (result.success) {
@@ -48,6 +49,7 @@ export const handleSSLCommerzSuccess = async (
       res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
     }
   } catch (error) {
+    console.log("SUCCESS ERROR:", error);
     res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
   }
 };
@@ -60,6 +62,7 @@ export const handleSSLCommerzFailure = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log("FAILURE WEBHOOK CALLED");
     await paymentService.handleSSLCommerzFailure(req.body);
     res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
   } catch (error) {
@@ -74,6 +77,7 @@ export const handleSSLCommerzCancel = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log("CANCEL WEBHOOK CALLED");
     await paymentService.handleSSLCommerzFailure(req.body);
     res.redirect(`${process.env.CLIENT_URL}/payment/cancelled`);
   } catch (error) {
@@ -89,6 +93,7 @@ export const handleSSLCommerzIPN = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log("IPN WEBHOOK CALLED");
     const result = await paymentService.handleSSLCommerzSuccess(req.body);
     res.status(200).json({ message: "IPN received successfully" });
   } catch (error) {
