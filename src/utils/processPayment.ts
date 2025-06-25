@@ -113,6 +113,33 @@ export async function processSSLCommerzPayment(
   order: any
 ): Promise<PaymentResult> {
   try {
+    // Check if there's any existing COMPLETED or REFUNDED payment for this order
+    const completedOrRefunded = await prisma.payment.findFirst({
+      where: {
+        orderId: Number(data.orderId),
+        paymentMethod: "SSLCOMMERZ",
+        paymentStatus: {
+          in: ["COMPLETED", "REFUNDED"],
+        },
+      },
+    });
+
+    if (completedOrRefunded) {
+      throw new Error(
+        `This order has already been ${completedOrRefunded.paymentStatus}. Payment not allowed.`
+      );
+    }
+    // Check if SSLCommerz payment already PENDING or FAILED for this order
+    const existingPayment = await prisma.payment.findFirst({
+      where: {
+        orderId: Number(data.orderId),
+        paymentMethod: "SSLCOMMERZ",
+        paymentStatus: {
+          in: ["PENDING", "FAILED"],
+        },
+      },
+    });
+
     // Initialize SSLCommerz payment using manual implementation
     const sslcommerzResponse = await initializeSSLCommerzPayment({
       orderId: data.orderId,
@@ -131,16 +158,28 @@ export async function processSSLCommerzPayment(
       );
     }
 
-    // Create pending payment record
-    const payment = await prisma.payment.create({
-      data: {
-        amount: order.totalAmount,
-        paymentMethod: "SSLCOMMERZ",
-        paymentStatus: "PENDING",
-        transactionId: sslcommerzResponse.sessionkey,
-        orderId: Number(data.orderId),
-      },
-    });
+    let payment;
+    if (existingPayment) {
+      // Update the failed or pending payment to new session key
+      payment = await prisma.payment.update({
+        where: { paymentId: existingPayment.paymentId },
+        data: {
+          transactionId: sslcommerzResponse.sessionkey,
+          paymentStatus: "PENDING",
+        },
+      });
+    } else {
+      // Create new payment
+      payment = await prisma.payment.create({
+        data: {
+          amount: order.totalAmount,
+          paymentMethod: "SSLCOMMERZ",
+          paymentStatus: "PENDING",
+          transactionId: sslcommerzResponse.sessionkey,
+          orderId: Number(data.orderId),
+        },
+      });
+    }
 
     return {
       payment,

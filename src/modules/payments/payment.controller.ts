@@ -90,10 +90,10 @@ export const handleSSLCommerzIPN = async (
 ): Promise<void> => {
   try {
     const result = await paymentService.handleSSLCommerzSuccess(req.body);
-    res.status(200).send("OK");
+    res.status(200).json({ message: "IPN received successfully" });
   } catch (error) {
     console.error("SSLCommerz IPN error:", error);
-    res.status(500).send("ERROR");
+    res.status(200).json({ message: "IPN received successfully" });
   }
 };
 
