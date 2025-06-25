@@ -162,8 +162,9 @@ export async function verifyCustomerOtp(
     data: { status: "ACTIVE" },
     include: {
       customer: {
-        include: {
-          wallet: true,
+        select: {
+          customerId: true,
+          wallet: { select: { walletId: true } },
         },
       },
     },
