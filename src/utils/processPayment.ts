@@ -112,6 +112,17 @@ export async function processCodPayment(
   order: any
 ): Promise<PaymentResult> {
   return await prisma.$transaction(async (tx) => {
+    const existingPayment = await tx.payment.findFirst({
+      where: {
+        orderId: Number(data.orderId),
+      },
+    });
+
+    if (existingPayment) {
+      throw new Error(
+        `Payment record already exists for order #${data.orderId}`
+      );
+    }
     // Create a pending payment record
     const payment = await tx.payment.create({
       data: {
