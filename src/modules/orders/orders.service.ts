@@ -7,6 +7,7 @@ import prisma from "../../prisma-client/prismaClient";
 import { Order, OrderStatus } from "../../../generated/prisma/client";
 import { CreateOrderDto, UpdateOrderDto } from "./orders.dto";
 import { getErrorMessage } from "../../utils/errorHandler";
+import { getBatchAccessibleImageUrls } from "../../utils/fileUpload/s3Aws";
 
 interface CustomerOrdersResult {
   orders: Order[];
@@ -190,6 +191,7 @@ export async function getOrdersByCustomerId({
     if (!customer) {
       throw new Error("Customer not found");
     }
+    // Fetch all customer orders--
     const orders = await prisma.order.findMany({
       where: {
         customerId: Number(customerId),
@@ -197,11 +199,10 @@ export async function getOrdersByCustomerId({
       },
       include: {
         orderItems: {
-          include: {
+          select: {
             product: true,
           },
         },
-        customer: true,
       },
       take: limit,
       skip: skip,
@@ -212,6 +213,33 @@ export async function getOrdersByCustomerId({
     if (!orders) {
       throw new Error("Orders not found");
     }
+
+    const processedOrdersWithImageUrls = await Promise.all(
+      orders.map(async (order) => {
+        const updatedOrderItems = await Promise.all(
+          order.orderItems.map(async (item) => {
+            const accessibleUrls =
+              item.product.imageUrls.length > 0
+                ? await getBatchAccessibleImageUrls(
+                    item.product.imageUrls,
+                    true,
+                    300
+                  )
+                : [];
+
+            return {
+              ...item.product,
+              accessibleImageUrls: accessibleUrls,
+            };
+          })
+        );
+        return {
+          ...order,
+          orderItems: updatedOrderItems,
+        };
+      })
+    );
+
     const totalOrders = await prisma.order.count({
       where: {
         customerId: Number(customerId),
@@ -220,7 +248,7 @@ export async function getOrdersByCustomerId({
     });
 
     return {
-      orders,
+      orders: processedOrdersWithImageUrls,
       currentPage: page,
       totalPages: Math.ceil(totalOrders / limit),
       totalCount: totalOrders,

@@ -370,7 +370,7 @@ export async function getBatchAccessibleImageUrls(
  */
 export async function processProductsWithAccessibleUrls(
   products: any[],
-  urlExpiresIn: number
+  urlExpiresIn: number = 300
 ): Promise<ProductWithAccessibleImages[]> {
   return Promise.all(
     products.map(async (product) => {
