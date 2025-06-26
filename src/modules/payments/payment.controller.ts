@@ -44,13 +44,13 @@ export const handleSSLCommerzSuccess = async (
     const result = await paymentService.handleSSLCommerzSuccess(req.body);
 
     if (result.success) {
-      res.redirect(`${process.env.CLIENT_URL}/payment/success`);
+      res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
     } else {
-      res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
+      res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
     }
   } catch (error) {
     console.log("SUCCESS ERROR:", error);
-    res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
+    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
   }
 };
 
@@ -64,9 +64,9 @@ export const handleSSLCommerzFailure = async (
   try {
     console.log("FAILURE WEBHOOK CALLED");
     await paymentService.handleSSLCommerzFailure(req.body);
-    res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
+    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
   } catch (error) {
-    res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
+    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
   }
 };
 /**
@@ -79,9 +79,9 @@ export const handleSSLCommerzCancel = async (
   try {
     console.log("CANCEL WEBHOOK CALLED");
     await paymentService.handleSSLCommerzFailure(req.body);
-    res.redirect(`${process.env.CLIENT_URL}/payment/cancelled`);
+    res.redirect(`${process.env.PAYMENT_CANCEL_DEEP_LINK}`);
   } catch (error) {
-    res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
+    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
   }
 };
 
