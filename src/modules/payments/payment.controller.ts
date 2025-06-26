@@ -44,19 +44,16 @@ export const handleSSLCommerzSuccess = async (
     const result = await paymentService.handleSSLCommerzSuccess(req.body);
 
     if (result.success) {
-      // res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
-      res.redirect("https://flutter.dev/");
-      console.log("hello flutter success");
+      res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
+      console.log("PAYMENT COMPLETED");
     } else {
-      // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-      res.redirect("https://flutter.dev/");
-      console.log("hello flutter failed");
+      res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+      console.log("PAYMENT FAILED");
     }
   } catch (error) {
     console.log("SUCCESS ERROR:", error);
-    // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-    res.redirect("https://flutter.dev/");
-    console.log("hello flutter failed");
+    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    console.log("PAYMENT FAILED");
   }
 };
 
@@ -70,13 +67,11 @@ export const handleSSLCommerzFailure = async (
   try {
     console.log("FAILURE WEBHOOK CALLED");
     await paymentService.handleSSLCommerzFailure(req.body);
-    // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-    res.redirect("https://flutter.dev/");
-    console.log("hello flutter failed");
+    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    console.log("PAYMENT FAILED");
   } catch (error) {
-    // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-    res.redirect("https://flutter.dev/");
-    console.log("hello flutter failed");
+    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    console.log("PAYMENT FAILED");
   }
 };
 /**
@@ -90,8 +85,10 @@ export const handleSSLCommerzCancel = async (
     console.log("CANCEL WEBHOOK CALLED");
     await paymentService.handleSSLCommerzFailure(req.body);
     res.redirect(`${process.env.PAYMENT_CANCEL_DEEP_LINK}`);
+    console.log("PAYMENT CANCELLED");
   } catch (error) {
     res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    console.log("PAYMENT CANCELLED");
   }
 };
 

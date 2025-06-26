@@ -155,7 +155,7 @@ export const getOrdersByCustomerId = async (
     const sort = req.query.sort === "asc" ? "asc" : "desc";
     const status = req.query.status?.toUpperCase() as string | undefined;
     const customerId = BigInt(req.params.customerId);
-    const orders = await orderService.getOrdersByCustomerId({
+    const result = await orderService.getOrdersByCustomerId({
       customerId,
       page,
       limit,
@@ -167,7 +167,15 @@ export const getOrdersByCustomerId = async (
     res.status(200).json({
       success: true,
       message: "Customer orders fetched successfully",
-      data: orders,
+      data: result.orders,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalCount,
+        itemsPerPage: limit,
+        hasNextPage: page < result.totalPages,
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
     handleErrorResponse(error, res, "fetch customer orders");
