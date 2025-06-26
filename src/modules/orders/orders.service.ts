@@ -52,7 +52,17 @@ export async function createOrder(data: CreateOrderDto): Promise<Order> {
  */
 export async function getAllOrders(): Promise<Order[]> {
   try {
-    const orders = await prisma.order.findMany();
+    const orders = await prisma.order.findMany({
+      include: {
+        orderItems: {
+          include: {
+            product: true,
+          },
+        },
+        customer: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
     return orders;
   } catch (error) {
     throw new Error(`Failed to fetch orders: ${getErrorMessage(error)}`);

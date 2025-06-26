@@ -133,7 +133,7 @@ export async function processCodPayment(
       },
     });
 
-    // Update order status to "PLACED" or "AWAITING_CONFIRMATION"
+    // Update order status "AWAITING_CONFIRMATION"
     await tx.order.update({
       where: { orderId: Number(data.orderId) },
       data: {
