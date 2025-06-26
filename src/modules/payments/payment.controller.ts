@@ -44,13 +44,19 @@ export const handleSSLCommerzSuccess = async (
     const result = await paymentService.handleSSLCommerzSuccess(req.body);
 
     if (result.success) {
-      res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
+      // res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
+      res.redirect("https://flutter.dev/");
+      console.log("hello flutter success");
     } else {
-      res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+      // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+      res.redirect("https://flutter.dev/");
+      console.log("hello flutter failed");
     }
   } catch (error) {
     console.log("SUCCESS ERROR:", error);
-    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    res.redirect("https://flutter.dev/");
+    console.log("hello flutter failed");
   }
 };
 
@@ -64,9 +70,13 @@ export const handleSSLCommerzFailure = async (
   try {
     console.log("FAILURE WEBHOOK CALLED");
     await paymentService.handleSSLCommerzFailure(req.body);
-    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    res.redirect("https://flutter.dev/");
+    console.log("hello flutter failed");
   } catch (error) {
-    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    res.redirect("https://flutter.dev/");
+    console.log("hello flutter failed");
   }
 };
 /**
