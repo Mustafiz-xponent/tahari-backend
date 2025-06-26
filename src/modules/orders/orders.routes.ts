@@ -23,4 +23,7 @@ router.put("/:id", OrderController.updateOrder);
 // Route to delete an order
 router.delete("/:id", OrderController.deleteOrder);
 
+// Route to get orders for a specific customer
+router.get("/customer/:customerId", OrderController.getOrdersByCustomerId);
+
 export default router;

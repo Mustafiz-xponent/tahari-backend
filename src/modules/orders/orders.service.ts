@@ -4,9 +4,16 @@
  */
 
 import prisma from "../../prisma-client/prismaClient";
-import { Order } from "../../../generated/prisma/client";
+import { Order, OrderStatus } from "../../../generated/prisma/client";
 import { CreateOrderDto, UpdateOrderDto } from "./orders.dto";
 import { getErrorMessage } from "../../utils/errorHandler";
+
+interface CustomerOrdersResult {
+  orders: Order[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+}
 
 /**
  * Create a new order
@@ -151,5 +158,76 @@ export async function deleteOrder(orderId: BigInt): Promise<void> {
     });
   } catch (error) {
     throw new Error(`Failed to delete order: ${getErrorMessage(error)}`);
+  }
+}
+
+/**
+ * Get all orders for a specific customer
+ * @param customerID - The ID of the customer
+ * @returns An array of orders for the customer
+ * @throws Error if the order is not found or deletion fails
+ */
+export async function getOrdersByCustomerId({
+  customerId,
+  page,
+  limit,
+  sort,
+  status,
+  skip,
+}: {
+  customerId: BigInt;
+  page: number;
+  limit: number;
+  sort: string;
+  status: string | undefined;
+  skip: number;
+}): Promise<CustomerOrdersResult> {
+  try {
+    const customer = await prisma.customer.findUnique({
+      where: { customerId: Number(customerId) },
+      select: { customerId: true },
+    });
+    if (!customer) {
+      throw new Error("Customer not found");
+    }
+    const orders = await prisma.order.findMany({
+      where: {
+        customerId: Number(customerId),
+        ...(status ? { status: status as OrderStatus } : {}),
+      },
+      include: {
+        orderItems: {
+          include: {
+            product: true,
+          },
+        },
+        customer: true,
+      },
+      take: limit,
+      skip: skip,
+      orderBy: {
+        createdAt: sort === "asc" ? "asc" : "desc",
+      },
+    });
+    if (!orders) {
+      throw new Error("Orders not found");
+    }
+    const totalOrders = await prisma.order.count({
+      where: {
+        customerId: Number(customerId),
+        ...(status ? { status: status as OrderStatus } : {}),
+      },
+    });
+
+    return {
+      orders,
+      currentPage: page,
+      totalPages: Math.ceil(totalOrders / limit),
+      totalCount: totalOrders,
+    };
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch customer orders: ${getErrorMessage(error)}`
+    );
   }
 }

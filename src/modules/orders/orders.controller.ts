@@ -8,6 +8,7 @@ import * as orderService from "./orders.service";
 import { zCreateOrderDto, zUpdateOrderDto } from "./orders.dto";
 import { handleErrorResponse } from "../../utils/errorResponseHandler";
 import { z } from "zod";
+import { OrderStatus } from "@/generated/prisma/client";
 
 const orderIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Order ID must be a positive integer",
@@ -36,15 +37,15 @@ export const createOrder = async (
 /**
  * Get all orders
  */
-interface AllOrdersQuery {
+interface OrdersQuery {
   page?: string;
   limit?: string;
-  status?: string;
+  status?: OrderStatus;
   customerId?: string;
-  sort?: string;
+  sort?: "asc" | "desc";
 }
 export const getAllOrders = async (
-  req: Request<{}, {}, {}, AllOrdersQuery>,
+  req: Request<{}, {}, {}, OrdersQuery>,
   res: Response
 ): Promise<void> => {
   try {
@@ -135,5 +136,40 @@ export const deleteOrder = async (
     });
   } catch (error) {
     handleErrorResponse(error, res, "delete order");
+  }
+};
+/**
+ * Get all customer orders
+ */
+export const getOrdersByCustomerId = async (
+  req: Request<{ customerId: string }, {}, {}, OrdersQuery>,
+  res: Response
+): Promise<void> => {
+  try {
+    const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+    const limit = Math.min(
+      Math.max(parseInt(req.query.limit as string) || 10, 1),
+      100
+    ); // Max 100 items per page
+    const skip = (page - 1) * limit;
+    const sort = req.query.sort === "asc" ? "asc" : "desc";
+    const status = req.query.status?.toUpperCase() as string | undefined;
+    const customerId = BigInt(req.params.customerId);
+    const orders = await orderService.getOrdersByCustomerId({
+      customerId,
+      page,
+      limit,
+      sort,
+      status,
+      skip,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Customer orders fetched successfully",
+      data: orders,
+    });
+  } catch (error) {
+    handleErrorResponse(error, res, "fetch customer orders");
   }
 };
