@@ -50,6 +50,7 @@ export async function createOrder(data: CreateOrderDto): Promise<Order> {
  * @returns An array of all orders
  * @throws Error if the query fails
  */
+
 export async function getAllOrders(): Promise<Order[]> {
   try {
     const orders = await prisma.order.findMany({
@@ -79,6 +80,14 @@ export async function getOrderById(orderId: BigInt): Promise<Order | null> {
   try {
     const order = await prisma.order.findUnique({
       where: { orderId: Number(orderId) },
+      include: {
+        orderItems: {
+          include: {
+            product: true,
+          },
+        },
+        customer: true,
+      },
     });
     return order;
   } catch (error) {

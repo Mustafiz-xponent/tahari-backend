@@ -36,12 +36,34 @@ export const createOrder = async (
 /**
  * Get all orders
  */
+interface AllOrdersQuery {
+  page?: string;
+  limit?: string;
+  status?: string;
+  customerId?: string;
+  sort?: string;
+}
 export const getAllOrders = async (
-  _req: Request,
+  req: Request<{}, {}, {}, AllOrdersQuery>,
   res: Response
 ): Promise<void> => {
   try {
+    const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+    const limit = Math.min(
+      Math.max(parseInt(req.query.limit as string) || 10, 1),
+      100
+    ); // Max 100 items per page
+    const skip = (page - 1) * limit;
+    const sort = req.query.sort === "asc" ? "asc" : "desc";
+
+    const status = req.query.status as string | undefined;
+    const customerId = req.query.customerId
+      ? BigInt(req.query.customerId as string)
+      : undefined;
+    // TODO: add pagination & filter functionality
+
     const orders = await orderService.getAllOrders();
+
     res.json({
       success: true,
       message: "Orders fetched successfully",
