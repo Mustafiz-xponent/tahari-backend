@@ -1,5 +1,11 @@
 "use strict";
-// src/index.ts
+// handling uncaught exceptions--
+process.on("uncaughtException", (err) => {
+  console.log(`error: ${err.message}`);
+  console.log(`Uncaught exception: ${err.stack}`);
+  process.exit(1);
+});
+
 import dotenv from "dotenv";
 import app from "./app";
 
@@ -8,6 +14,16 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Accounting API server running on http://localhost:${PORT}`);
+});
+
+// unhandled promise rejection--
+process.on("unhandledRejection", (err) => {
+  console.log(`Error: ${err}`);
+  console.log(`Shuting down the server due to unhandled promise rejection!`);
+
+  server.close(() => {
+    process.exit(1);
+  });
 });

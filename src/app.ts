@@ -26,9 +26,6 @@ import subscriptionRoutes from "./modules/subscriptions/subscription.routes";
 import subscriptionPlanRoutes from "./modules/subscription_plans/subscription_plan.routes";
 import subscriptionDeliveryRoutes from "./modules/subscription_deliveries/subscription-delivery.routes";
 import { rateLimiter } from "./middlewares/rateLimiter";
-import notFound from "./middlewares/notFound";
-
-//
 
 dotenv.config();
 // Initialize the app
@@ -68,7 +65,12 @@ app.use("/api/subscription-plans", subscriptionPlanRoutes);
 app.use("/api/subscription-deliveries", subscriptionDeliveryRoutes);
 
 // API route not found
-app.use(notFound);
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({
+    success: false,
+    message: "API route not found",
+  });
+});
 // Basic Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
