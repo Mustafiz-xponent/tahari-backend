@@ -5,11 +5,19 @@
 
 import { Router } from "express";
 import * as WalletController from "./wallet.controller";
+import { authMiddleware } from "../../middlewares/auth";
 
 const router = Router();
 
 // Route to create a new wallet
 router.post("/", WalletController.createWallet);
+
+// Route to deposite wallet
+router.post(
+  "/deposit/initiate",
+  authMiddleware("CUSTOMER"),
+  WalletController.initiateWalletDeposit
+);
 
 // Route to get all wallets
 router.get("/", WalletController.getAllWallets);
@@ -22,5 +30,11 @@ router.put("/:id", WalletController.updateWallet);
 
 // Route to delete a wallet
 router.delete("/:id", WalletController.deleteWallet);
+
+// SSLCommerz callback routes
+router.post("/deposite/success", WalletController.handleSslCommerzSuccess);
+router.post("/deposite/fail", WalletController.handleSslCommerzFailure);
+router.post("/deposite/cancel", WalletController.handleSslCommerzCancel);
+router.post("/deposite/ipn", WalletController.handleSslCommerzIPN);
 
 export default router;

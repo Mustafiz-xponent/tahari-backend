@@ -191,7 +191,7 @@ export async function processSSLCommerzPayment(
       },
     });
 
-    // Initialize SSLCommerz payment using manual implementation
+    // Initialize SSLCommerz payment
     const sslcommerzResponse = await initializeSSLCommerzPayment({
       orderId: data.orderId,
       amount: order.totalAmount,
