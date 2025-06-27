@@ -1,16 +1,17 @@
 "use strict";
-// handling uncaught exceptions--
-process.on("uncaughtException", (err) => {
-  console.log(`error: ${err.message}`);
-  console.log(`Uncaught exception: ${err.stack}`);
-  process.exit(1);
-});
 
 import dotenv from "dotenv";
 import app from "./app";
 
 // Load environment variables
 dotenv.config();
+
+// handling uncaught exceptions--
+process.on("uncaughtException", (err) => {
+  console.log(`error: ${err.message}`);
+  console.log(`Uncaught exception: ${err.stack}`);
+  process.exit(1);
+});
 
 const PORT = process.env.PORT || 3000;
 
