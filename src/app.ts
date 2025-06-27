@@ -1,6 +1,9 @@
 import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import helmet from "helmet";
+import morgran from "morgan";
+import compression from "compression";
 
 // import routes
 // import adminRoutes from "../src/modules/admins/admins.routes";
@@ -22,6 +25,8 @@ import walletTransactionRoutes from "./modules/wallet_transactions/wallet_transa
 import subscriptionRoutes from "./modules/subscriptions/subscription.routes";
 import subscriptionPlanRoutes from "./modules/subscription_plans/subscription_plan.routes";
 import subscriptionDeliveryRoutes from "./modules/subscription_deliveries/subscription-delivery.routes";
+import { rateLimiter } from "./middlewares/rateLimiter";
+import notFound from "./middlewares/notFound";
 
 //
 
@@ -32,6 +37,10 @@ const app = express();
 // Core Middleware
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(helmet());
+app.use(morgran("dev"));
+app.use(compression());
+app.use(rateLimiter(100, 15 * 60 * 1000)); // 100 requests per 15 minutes
 
 // Global BigInt Serializer
 (BigInt.prototype as any).toJSON = function () {
@@ -58,6 +67,8 @@ app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/subscription-plans", subscriptionPlanRoutes);
 app.use("/api/subscription-deliveries", subscriptionDeliveryRoutes);
 
+// API route not found
+app.use(notFound);
 // Basic Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
