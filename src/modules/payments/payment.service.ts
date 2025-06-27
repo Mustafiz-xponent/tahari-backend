@@ -59,6 +59,8 @@ export async function createPayment(
     } else if (order.paymentMethod.toUpperCase() === "COD") {
       return await processCodPayment(data, order);
     } else {
+      // TODO: handle SSLCommerz payment
+      console.log("Handle payment via SSLCommerz");
       throw new Error("Invalid payment method");
     }
   } catch (error) {

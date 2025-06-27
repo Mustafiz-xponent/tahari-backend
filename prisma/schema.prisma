@@ -85,6 +85,11 @@ enum NotificationStatus {
   UNREAD
 }
 
+enum productUnitType {
+  GM
+  PCS
+}
+
 model User {
   userId       BigInt     @id @default(autoincrement())
   email        String?    @unique
@@ -170,7 +175,8 @@ model Product {
   productId                BigInt              @id @default(autoincrement())
   name                     String
   description              String?
-  price                    Decimal
+  unitType                 productUnitType     @default(GM) // GM = Gram , PCS = Piece 
+  price                    Decimal // unit price
   stockQuantity            Int                 @default(0)
   reorderLevel             Int                 @default(0)
   isSubscription           Boolean             @default(false)
