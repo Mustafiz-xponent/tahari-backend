@@ -42,7 +42,7 @@ export async function initiateDeposit({
   userId,
   amount,
 }: {
-  userId: bigint;
+  userId: number;
   amount: number;
 }): Promise<{ walletTransaction: WalletTransaction; redirectUrl: string }> {
   try {

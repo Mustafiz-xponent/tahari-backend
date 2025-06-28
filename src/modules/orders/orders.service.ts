@@ -168,15 +168,15 @@ export async function deleteOrder(orderId: BigInt): Promise<void> {
  * @returns An array of orders for the customer
  * @throws Error if the order is not found or deletion fails
  */
-export async function getOrdersByCustomerId({
-  customerId,
+export async function getCustomerOrders({
+  userId,
   page,
   limit,
   sort,
   status,
   skip,
 }: {
-  customerId: BigInt;
+  userId: BigInt;
   page: number;
   limit: number;
   sort: string;
@@ -185,7 +185,7 @@ export async function getOrdersByCustomerId({
 }): Promise<CustomerOrdersResult> {
   try {
     const customer = await prisma.customer.findUnique({
-      where: { customerId: Number(customerId) },
+      where: { userId: Number(userId) },
       select: { customerId: true },
     });
     if (!customer) {
@@ -194,12 +194,13 @@ export async function getOrdersByCustomerId({
     // Fetch all customer orders--
     const orders = await prisma.order.findMany({
       where: {
-        customerId: Number(customerId),
+        customerId: customer.customerId,
         ...(status ? { status: status as OrderStatus } : {}),
       },
       include: {
         orderItems: {
           select: {
+            quantity: true,
             product: true,
           },
         },
@@ -230,6 +231,7 @@ export async function getOrdersByCustomerId({
             return {
               ...item.product,
               accessibleImageUrls: accessibleUrls,
+              quantity: item.quantity,
             };
           })
         );
@@ -242,7 +244,7 @@ export async function getOrdersByCustomerId({
 
     const totalOrders = await prisma.order.count({
       where: {
-        customerId: Number(customerId),
+        customerId: customer.customerId,
         ...(status ? { status: status as OrderStatus } : {}),
       },
     });

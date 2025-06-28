@@ -94,7 +94,6 @@ export const getCustomerWalletTransactions = async (
   res: Response
 ): Promise<void> => {
   try {
-    const userId = BigInt(req?.user?.userId!);
     const page = Math.max(parseInt(req.query.page as string) || 1, 1);
     const limit = Math.min(
       Math.max(parseInt(req.query.limit as string) || 10, 1),
@@ -103,6 +102,9 @@ export const getCustomerWalletTransactions = async (
     const skip = (page - 1) * limit;
     const sort = req.query.sort === "asc" ? "asc" : "desc";
     const paginationParams = { page, limit, skip, sort };
+    if (!req.user?.userId) throw new Error("Please login to continue");
+    const userId = BigInt(req?.user?.userId!);
+
     const result = await walletTransactionService.getCustomerWalletTransactions(
       {
         userId,

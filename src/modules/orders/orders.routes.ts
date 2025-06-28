@@ -5,6 +5,7 @@
 
 import { Router } from "express";
 import * as OrderController from "./orders.controller";
+import { authMiddleware } from "../../middlewares/auth";
 
 const router = Router();
 
@@ -14,6 +15,13 @@ router.post("/", OrderController.createOrder);
 // Route to get all orders
 router.get("/", OrderController.getAllOrders);
 
+// Route to get orders for a specific customer
+router.get(
+  "/customer",
+  authMiddleware("CUSTOMER"),
+  OrderController.getCustomerOrders
+);
+
 // Route to get an order by ID
 router.get("/:id", OrderController.getOrderById);
 
@@ -22,8 +30,5 @@ router.put("/:id", OrderController.updateOrder);
 
 // Route to delete an order
 router.delete("/:id", OrderController.deleteOrder);
-
-// Route to get orders for a specific customer
-router.get("/customer/:customerId", OrderController.getOrdersByCustomerId);
 
 export default router;

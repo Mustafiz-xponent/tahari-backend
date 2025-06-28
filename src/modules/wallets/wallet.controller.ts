@@ -54,7 +54,7 @@ export const initiateWalletDeposit = async (
     }
 
     const depositData = await walletService.initiateDeposit({
-      userId: BigInt(userId!),
+      userId: Number(userId!),
       amount: parseFloat(amount),
     });
 

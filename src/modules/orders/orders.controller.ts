@@ -141,8 +141,8 @@ export const deleteOrder = async (
 /**
  * Get all customer orders
  */
-export const getOrdersByCustomerId = async (
-  req: Request<{ customerId: string }, {}, {}, OrdersQuery>,
+export const getCustomerOrders = async (
+  req: Request<{}, {}, {}, OrdersQuery>,
   res: Response
 ): Promise<void> => {
   try {
@@ -154,9 +154,13 @@ export const getOrdersByCustomerId = async (
     const skip = (page - 1) * limit;
     const sort = req.query.sort === "asc" ? "asc" : "desc";
     const status = req.query.status?.toUpperCase() as string | undefined;
-    const customerId = BigInt(req.params.customerId);
-    const result = await orderService.getOrdersByCustomerId({
-      customerId,
+
+    if (!req.user?.userId) throw new Error("Please login to continue");
+
+    const userId = BigInt(req.user?.userId!);
+
+    const result = await orderService.getCustomerOrders({
+      userId,
       page,
       limit,
       sort,

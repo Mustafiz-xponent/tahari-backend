@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    
     "target": "ES2020", // ✅ Enables BigInt support
     "types": ["node"],
     "resolveJsonModule": true,
@@ -13,12 +12,11 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./",
-    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "typeRoots": ["./src/types", "./node_modules/@types"],
     "paths": {
       "@/*": ["src/*"],
       "@/generated/*": ["generated/*"]
-    },
-    
+    }
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
