@@ -15,7 +15,11 @@ import { z } from "zod";
 const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Transaction ID must be a positive integer",
 });
-
+interface IPaginationQuery {
+  page?: string;
+  limit?: string;
+  sort?: "asc" | "desc";
+}
 /**
  * Create a new wallet transaction
  */
@@ -82,7 +86,47 @@ export const getWalletTransactionById = async (
     handleErrorResponse(error, res, "fetch wallet transaction");
   }
 };
+/**
+ * Get a customer wallet transactions
+ */
+export const getCustomerWalletTransactions = async (
+  req: Request<{}, {}, {}, IPaginationQuery>,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = BigInt(req?.user?.userId!);
+    const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+    const limit = Math.min(
+      Math.max(parseInt(req.query.limit as string) || 10, 1),
+      100
+    ); // Max 100 items per page
+    const skip = (page - 1) * limit;
+    const sort = req.query.sort === "asc" ? "asc" : "desc";
+    const paginationParams = { page, limit, skip, sort };
+    const result = await walletTransactionService.getCustomerWalletTransactions(
+      {
+        userId,
+        paginationParams,
+      }
+    );
 
+    res.json({
+      success: true,
+      message: "Wallet transactions fetched successfully",
+      data: result.transactions,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalCount,
+        itemsPerPage: limit,
+        hasNextPage: page < result.totalPages,
+        hasPreviousPage: page > 1,
+      },
+    });
+  } catch (error) {
+    handleErrorResponse(error, res, "fetch wallet transaction");
+  }
+};
 /**
  * Update a wallet transaction by ID
  */
