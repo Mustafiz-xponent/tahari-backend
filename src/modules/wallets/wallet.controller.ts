@@ -176,7 +176,10 @@ export const getWalletById = async (
 ): Promise<void> => {
   try {
     const walletId = walletIdSchema.parse(req.params.id);
-    const wallet = await walletService.getWalletById(walletId);
+    const wallet = await walletService.getWalletById({
+      walletId,
+      userId: BigInt(req?.user?.userId!),
+    });
     if (!wallet) {
       throw new Error("Wallet not found");
     }

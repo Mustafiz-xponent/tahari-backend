@@ -20,10 +20,10 @@ router.post(
 );
 
 // Route to get all wallets
-router.get("/", WalletController.getAllWallets);
+router.get("/", authMiddleware("ADMIN"), WalletController.getAllWallets);
 
 // Route to get a wallet by ID
-router.get("/:id", WalletController.getWalletById);
+router.get("/:id", authMiddleware("CUSTOMER"), WalletController.getWalletById);
 
 // Route to update a wallet's details
 router.put("/:id", WalletController.updateWallet);

@@ -42,12 +42,15 @@ export const authMiddleware = (
       });
 
       if (!user) {
-        res.status(403).json({ message: "Unauthorized" });
+        res.status(403).json({ succes: false, message: "Unauthorized" });
         return;
       }
 
       if (decoded.role !== role) {
-        res.status(403).json({ message: "Unauthorized" });
+        res.status(403).json({
+          success: false,
+          message: "You are not permitted to access this resource",
+        });
         return;
       }
 
