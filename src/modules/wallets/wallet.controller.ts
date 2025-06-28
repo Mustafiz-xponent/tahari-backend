@@ -79,15 +79,18 @@ export const handleSslCommerzSuccess = async (
     const result = await walletService.handleDepositeSuccess(req.body);
 
     if (result.success) {
-      res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
+      // res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
+      res.redirect("https://www.geeksforgeeks.org");
       console.log("PAYMENT COMPLETED");
     } else {
-      res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+      // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+      res.redirect("https://www.geeksforgeeks.org");
       console.log("PAYMENT FAILED");
     }
   } catch (error) {
     console.log("SUCCESS ERROR:", error);
-    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    res.redirect("https://www.geeksforgeeks.org");
     console.log("PAYMENT FAILED");
   }
 };
@@ -102,10 +105,12 @@ export const handleSslCommerzFailure = async (
   try {
     console.log("FAILURE WEBHOOK CALLED");
     await walletService.handleDepositeFailure(req.body);
-    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    res.redirect("https://www.geeksforgeeks.org");
     console.log("PAYMENT FAILED");
   } catch (error) {
-    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    res.redirect("https://www.geeksforgeeks.org");
     console.log("PAYMENT FAILED");
   }
 };
@@ -136,7 +141,7 @@ export const handleSslCommerzIPN = async (
 ): Promise<void> => {
   try {
     console.log("IPN WEBHOOK CALLED");
-    const result = await walletService.handleDepositeSuccess(req.body);
+    await walletService.handleDepositeSuccess(req.body);
     res.status(200).json({ message: "IPN received successfully" });
   } catch (error) {
     console.error("SSLCommerz IPN error:", error);

@@ -90,17 +90,11 @@ export async function handleDepositeSuccess(
     if (validation.status === "VALID") {
       // Extract wallet ID
       const tranId = validationData.tran_id;
-      const walletIdMatch = tranId.match(/WALLET(\d+)_/);
-      if (!walletIdMatch) {
-        throw new Error("Invalid wallet ID format");
-      }
-
-      const walletId = BigInt(walletIdMatch[1]);
 
       // Find the wallet transaction
       const walletTransaction = await prisma.walletTransaction.findFirst({
         where: {
-          walletId: walletId,
+          description: { contains: tranId },
           transactionStatus: "PENDING",
         },
         include: {
@@ -119,7 +113,7 @@ export async function handleDepositeSuccess(
           where: { transactionId: walletTransaction.transactionId },
           data: {
             transactionStatus: "COMPLETED",
-            description: `Trasaction completed by SSLCommerz. TranId: ${tranId}`,
+            description: `Trasaction completed by SSLCommerz. TransactionId: ${tranId}`,
           },
         });
         // Update wallet balance
@@ -129,6 +123,7 @@ export async function handleDepositeSuccess(
             balance: {
               increment: walletTransaction.amount,
             },
+            updatedAt: new Date(),
           },
         });
         return {
@@ -188,16 +183,11 @@ export async function handleDepositeFailure(failureData: any): Promise<void> {
   try {
     // Extract order ID and update payment status
     const tranId = failureData.tran_id;
-    const walletIdMatch = tranId.match(/WALLET(\d+)_/);
-    if (!walletIdMatch) {
-      throw new Error("Invalid transaction ID format");
-    }
 
-    const walletId = Number(walletIdMatch[1]);
     // Find and update the wallet transaction
     const walletTransaction = await prisma.walletTransaction.findFirst({
       where: {
-        walletId: Number(walletId),
+        description: { contains: tranId },
         transactionStatus: "PENDING",
       },
     });
@@ -207,7 +197,7 @@ export async function handleDepositeFailure(failureData: any): Promise<void> {
         where: { transactionId: walletTransaction.transactionId },
         data: {
           transactionStatus: "FAILED",
-          description: `Wallet deposite failed.`,
+          description: `Wallet deposite failed. TransactionId: ${tranId}`,
         },
       });
     }

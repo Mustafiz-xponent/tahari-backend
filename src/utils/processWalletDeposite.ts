@@ -34,7 +34,7 @@ export async function processSSLCommerzWalletDeposite(
         amount,
         transactionType: "DEPOSIT",
         transactionStatus: "PENDING",
-        description: `Wallet deposit of ${amount} BDT`,
+        description: `Wallet deposit of ${amount} BDT. Transaction ID: ${sslcommerzResponse.transactionId}`,
         walletId: customer.wallet.walletId,
       },
     });
