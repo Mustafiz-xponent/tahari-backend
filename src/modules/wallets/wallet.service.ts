@@ -8,7 +8,7 @@ import { Wallet, WalletTransaction } from "../../../generated/prisma/client";
 import { CreateWalletDto, UpdateWalletDto } from "./wallet.dto";
 import { getErrorMessage } from "../../utils/errorHandler";
 import { processSSLCommerzWalletDeposite } from "../../utils/processWalletDeposite";
-import axios from "axios";
+import { validateSSLCommerzPayment } from "../../utils/processPayment";
 
 /**
  * Create a new wallet
@@ -142,37 +142,6 @@ export async function handleDepositeSuccess(
     throw new Error(
       `SSLCommerz success handling failed: ${getErrorMessage(error)}`
     );
-  }
-}
-
-/**
- * Validate SSLCommerz payment
- */
-async function validateSSLCommerzPayment(validationData: any) {
-  try {
-    const isLive = process.env.NODE_ENV === "production";
-    const baseUrl = isLive
-      ? "https://securepay.sslcommerz.com"
-      : "https://sandbox.sslcommerz.com";
-
-    const validationParams = {
-      val_id: validationData.val_id,
-      store_id: process.env.SSLCOMMERZ_STORE_ID!,
-      store_passwd: process.env.SSLCOMMERZ_STORE_PASSWD!,
-      v: 1, // optional
-      format: "json", // optional: for JSON response instead of XML
-    };
-
-    const response = await axios.get(
-      `${baseUrl}/validator/api/validationserverAPI.php`,
-      {
-        params: validationParams,
-        timeout: 30000,
-      }
-    );
-    return response.data;
-  } catch (error) {
-    throw error;
   }
 }
 
