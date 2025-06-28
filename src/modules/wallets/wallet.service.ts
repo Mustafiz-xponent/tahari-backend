@@ -4,9 +4,11 @@
  */
 
 import prisma from "../../prisma-client/prismaClient";
-import { Wallet } from "../../../generated/prisma/client";
+import { Wallet, WalletTransaction } from "../../../generated/prisma/client";
 import { CreateWalletDto, UpdateWalletDto } from "./wallet.dto";
 import { getErrorMessage } from "../../utils/errorHandler";
+import { processSSLCommerzWalletDeposite } from "../../utils/processWalletDeposite";
+import axios from "axios";
 
 /**
  * Create a new wallet
@@ -36,6 +38,176 @@ export async function createWallet(data: CreateWalletDto): Promise<Wallet> {
   }
 }
 
+export async function initiateDeposit({
+  userId,
+  amount,
+}: {
+  userId: bigint;
+  amount: number;
+}): Promise<{ walletTransaction: WalletTransaction; redirectUrl: string }> {
+  try {
+    // Get customer details
+    const customer = await prisma.customer.findUnique({
+      where: { userId: Number(userId) },
+      include: {
+        user: true,
+        wallet: true,
+      },
+    });
+
+    if (!customer) {
+      throw new Error("Customer not found");
+    }
+
+    // Create or get wallet
+    let wallet = customer.wallet;
+    if (!wallet) {
+      wallet = await prisma.wallet.create({
+        data: {
+          customerId: customer.customerId,
+          balance: 0.0,
+        },
+      });
+    }
+
+    if (wallet) {
+      return await processSSLCommerzWalletDeposite(customer, amount);
+    } else {
+      throw new Error("Wallet not found");
+    }
+  } catch (error) {
+    throw new Error(`Failed to initiate deposit: ${getErrorMessage(error)}`);
+  }
+}
+
+export async function handleDepositeSuccess(
+  validationData: any
+): Promise<{ success: boolean; message: string }> {
+  try {
+    // Validate payment with SSLCommerz  implementation
+    const validation = await validateSSLCommerzPayment(validationData);
+
+    if (validation.status === "VALID") {
+      // Extract wallet ID
+      const tranId = validationData.tran_id;
+
+      // Find the wallet transaction
+      const walletTransaction = await prisma.walletTransaction.findFirst({
+        where: {
+          description: { contains: tranId },
+          transactionStatus: "PENDING",
+        },
+        include: {
+          wallet: true,
+        },
+      });
+
+      if (!walletTransaction) {
+        throw new Error("Wallet transaction not found");
+      }
+
+      // Update wallet and wallet trasaction
+      return await prisma.$transaction(async (tx) => {
+        // Update wallet transaction status
+        await tx.walletTransaction.update({
+          where: { transactionId: walletTransaction.transactionId },
+          data: {
+            transactionStatus: "COMPLETED",
+            description: `Trasaction completed by SSLCommerz. TransactionId: ${tranId}`,
+          },
+        });
+        // Update wallet balance
+        await tx.wallet.update({
+          where: { walletId: walletTransaction.walletId },
+          data: {
+            balance: {
+              increment: walletTransaction.amount,
+            },
+            updatedAt: new Date(),
+          },
+        });
+        return {
+          success: true,
+          message: "Wallet deposite completed successfully.",
+        };
+      });
+    } else {
+      throw new Error(
+        `Payment validation failed: ${
+          validation.failedreason || "Unknown validation error"
+        }`
+      );
+    }
+  } catch (error) {
+    throw new Error(
+      `SSLCommerz success handling failed: ${getErrorMessage(error)}`
+    );
+  }
+}
+
+/**
+ * Validate SSLCommerz payment
+ */
+async function validateSSLCommerzPayment(validationData: any) {
+  try {
+    const isLive = process.env.NODE_ENV === "production";
+    const baseUrl = isLive
+      ? "https://securepay.sslcommerz.com"
+      : "https://sandbox.sslcommerz.com";
+
+    const validationParams = {
+      val_id: validationData.val_id,
+      store_id: process.env.SSLCOMMERZ_STORE_ID!,
+      store_passwd: process.env.SSLCOMMERZ_STORE_PASSWD!,
+      v: 1, // optional
+      format: "json", // optional: for JSON response instead of XML
+    };
+
+    const response = await axios.get(
+      `${baseUrl}/validator/api/validationserverAPI.php`,
+      {
+        params: validationParams,
+        timeout: 30000,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Handle SSLCommerz payment failure
+ */
+export async function handleDepositeFailure(failureData: any): Promise<void> {
+  try {
+    // Extract order ID and update payment status
+    const tranId = failureData.tran_id;
+
+    // Find and update the wallet transaction
+    const walletTransaction = await prisma.walletTransaction.findFirst({
+      where: {
+        description: { contains: tranId },
+        transactionStatus: "PENDING",
+      },
+    });
+
+    if (walletTransaction) {
+      await prisma.walletTransaction.update({
+        where: { transactionId: walletTransaction.transactionId },
+        data: {
+          transactionStatus: "FAILED",
+          description: `Wallet deposite failed. TransactionId: ${tranId}`,
+        },
+      });
+    }
+  } catch (error) {
+    console.error("handleSSLCommerzFailure error:", error);
+    throw new Error(
+      `Failed to handle SSLCommerz payment: ${getErrorMessage(error)}`
+    );
+  }
+}
 /**
  * Retrieve all wallets
  * @returns An array of all wallets
@@ -56,11 +228,30 @@ export async function getAllWallets(): Promise<Wallet[]> {
  * @returns The wallet if found, or null if not found
  * @throws Error if the query fails
  */
-export async function getWalletById(walletId: BigInt): Promise<Wallet | null> {
+export async function getWalletById({
+  walletId,
+  userId,
+}: {
+  walletId: BigInt;
+  userId: bigint;
+}): Promise<Wallet | null> {
   try {
+    const customer = await prisma.customer.findUnique({
+      where: { userId: Number(userId) },
+      include: { wallet: true },
+    });
+    if (!customer) {
+      throw new Error("Customer not found");
+    }
+    if (customer.wallet?.walletId !== walletId) {
+      throw new Error("Wallet not found");
+    }
     const wallet = await prisma.wallet.findUnique({
       where: { walletId: Number(walletId) },
     });
+    if (!wallet) {
+      throw new Error("Wallet not found");
+    }
     return wallet;
   } catch (error) {
     throw new Error(`Failed to fetch wallet: ${getErrorMessage(error)}`);

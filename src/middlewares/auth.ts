@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
+import prisma from "../prisma-client/prismaClient";
 
 // Define the structure of your decoded JWT payload
 interface JwtPayload {
@@ -20,7 +21,11 @@ declare global {
 export const authMiddleware = (
   role: "CUSTOMER" | "ADMIN" | "SUPER_ADMIN" | "SUPPORT"
 ): RequestHandler => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
       res.status(401).json({ message: "No token provided" });
@@ -30,8 +35,22 @@ export const authMiddleware = (
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
 
+      const user = await prisma.user.findUnique({
+        where: {
+          userId: Number(decoded.userId),
+        },
+      });
+
+      if (!user) {
+        res.status(403).json({ succes: false, message: "Unauthorized" });
+        return;
+      }
+
       if (decoded.role !== role) {
-        res.status(403).json({ message: "Unauthorized" });
+        res.status(403).json({
+          success: false,
+          message: "You are not permitted to access this resource",
+        });
         return;
       }
 

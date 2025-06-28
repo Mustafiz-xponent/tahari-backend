@@ -4,7 +4,8 @@
  */
 
 import { Router } from "express";
-import * as WalletTransactionController from "./wallet_transaction.controller"
+import * as WalletTransactionController from "./wallet_transaction.controller";
+import { authMiddleware } from "../../middlewares/auth";
 
 const router = Router();
 
@@ -14,6 +15,12 @@ router.post("/", WalletTransactionController.createWalletTransaction);
 // Route to get all wallet transactions
 router.get("/", WalletTransactionController.getAllWalletTransactions);
 
+// Route to get customer wallet transactions
+router.get(
+  "/customer",
+  authMiddleware("CUSTOMER"),
+  WalletTransactionController.getCustomerWalletTransactions
+);
 // Route to get a wallet transaction by ID
 router.get("/:id", WalletTransactionController.getWalletTransactionById);
 

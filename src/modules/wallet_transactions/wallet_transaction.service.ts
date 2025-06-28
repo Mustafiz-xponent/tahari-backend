@@ -93,7 +93,61 @@ export async function getWalletTransactionById(
     );
   }
 }
+/**
+ * Retrieve a wallet transaction by its ID
+ * @param userId @param paginationParams - The ID of the wallet transaction
+ * @returns The wallet transaction
+ * @throws Error if the query fails
+ */
+export async function getCustomerWalletTransactions({
+  userId,
+  paginationParams,
+}: {
+  userId: bigint;
+  paginationParams: { page: number; limit: number; skip: number; sort: string };
+}): Promise<any> {
+  try {
+    const customer = await prisma.customer.findUnique({
+      where: { userId },
+      include: { wallet: true },
+    });
+    if (!customer) {
+      throw new Error("Customer not found");
+    }
 
+    const { page, limit, skip, sort } = paginationParams;
+
+    const transactions = await prisma.walletTransaction.findMany({
+      where: {
+        walletId: customer.wallet?.walletId,
+      },
+      take: limit,
+      skip: skip,
+      orderBy: {
+        createdAt: sort === "asc" ? "asc" : "desc",
+      },
+    });
+    if (!transactions) {
+      throw new Error("Wallet transactions not found");
+    }
+    const totalTransactions = await prisma.walletTransaction.count({
+      where: {
+        walletId: customer.wallet?.walletId,
+      },
+    });
+
+    return {
+      transactions,
+      currentPage: page,
+      totalPages: Math.ceil(totalTransactions / limit),
+      totalCount: totalTransactions,
+    };
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch wallet transaction: ${getErrorMessage(error)}`
+    );
+  }
+}
 /**
  * Update a wallet transaction by its ID
  * @param transactionId - The ID of the wallet transaction to update
