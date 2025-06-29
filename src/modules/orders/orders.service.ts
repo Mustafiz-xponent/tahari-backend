@@ -137,7 +137,6 @@ export async function updateOrder(
 ): Promise<Order> {
   try {
     return await prisma.$transaction(async (tx) => {
-      // 1. If changing customer, validate it exists
       if (data.customerId) {
         const customer = await tx.customer.findUnique({
           where: { customerId: data.customerId },
@@ -147,8 +146,18 @@ export async function updateOrder(
         }
       }
 
-      // 2. Update order
-      const order = await tx.order.update({
+      // Get current order status
+      const currentOrder = await tx.order.findUnique({
+        where: { orderId: Number(orderId) },
+        select: { status: true },
+      });
+
+      if (!currentOrder) {
+        throw new Error("Order not found");
+      }
+
+      // Update order
+      const updatedOrder = await tx.order.update({
         where: { orderId: Number(orderId) },
         data: {
           status: data.status,
@@ -165,18 +174,27 @@ export async function updateOrder(
         },
       });
 
-      // 3. Log tracking if status changed
-      if (data.status) {
-        await tx.orderTracking.create({
-          data: {
+      // Log only if status actually changed & not already tracked
+      if (data.status && data.status !== currentOrder.status) {
+        const alreadyTracked = await tx.orderTracking.findFirst({
+          where: {
             orderId: Number(orderId),
             status: data.status,
-            description: `Status updated to ${data.status}`,
           },
         });
+
+        if (!alreadyTracked) {
+          await tx.orderTracking.create({
+            data: {
+              orderId: Number(orderId),
+              status: data.status,
+              description: `Status updated to ${data.status}`,
+            },
+          });
+        }
       }
 
-      return order;
+      return updatedOrder;
     });
   } catch (error) {
     throw new Error(`Failed to update order: ${getErrorMessage(error)}`);
