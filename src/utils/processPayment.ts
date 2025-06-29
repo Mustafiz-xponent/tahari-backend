@@ -55,6 +55,7 @@ export async function processWalletPayment(
         paymentMethod: "WALLET",
         paymentStatus: "COMPLETED",
         orderId: Number(data.orderId),
+        transactionId: `ORDER_${data.orderId}_${Date.now()}`,
         walletTransactionId: walletTransaction.transactionId,
       },
     });
@@ -130,6 +131,7 @@ export async function processCodPayment(
         paymentMethod: "COD",
         paymentStatus: "PENDING",
         orderId: Number(data.orderId),
+        transactionId: `ORDER_${data.orderId}_${Date.now()}`,
       },
     });
 
