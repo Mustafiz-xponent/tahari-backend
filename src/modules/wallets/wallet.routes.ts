@@ -14,7 +14,7 @@ router.post("/", WalletController.createWallet);
 
 // Route to deposite wallet
 router.post(
-  "/deposit/initiate",
+  "/deposit",
   authMiddleware("CUSTOMER"),
   WalletController.initiateWalletDeposit
 );

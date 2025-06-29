@@ -64,6 +64,14 @@ app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/subscription-plans", subscriptionPlanRoutes);
 app.use("/api/subscription-deliveries", subscriptionDeliveryRoutes);
 
+// Health check route
+app.get("/health", (_req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: "Server is running",
+    timestamp: new Date().toISOString(),
+  });
+});
 // API route not found
 app.use((_req: Request, res: Response) => {
   res.status(404).json({
