@@ -14,8 +14,8 @@ router.post("/", OrderTrackingController.createOrderTracking);
 // Route to get all order tracking entries
 router.get("/", OrderTrackingController.getAllOrderTrackings);
 
-// Route to get an order tracking entry by ID
-router.get("/:id", OrderTrackingController.getOrderTrackingById);
+// Route to get order tracking entry by (***ORDER ID***)
+router.get("/:orderId", OrderTrackingController.getOrderTrackingsByOrderId);
 
 // Route to update an order tracking entry's details
 router.put("/:id", OrderTrackingController.updateOrderTracking);

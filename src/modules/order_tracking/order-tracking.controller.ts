@@ -12,8 +12,8 @@ import {
 import { handleErrorResponse } from "../../utils/errorResponseHandler";
 import { z } from "zod";
 
-const trackingIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
-  message: "Tracking ID must be a positive integer",
+const idSchema = z.coerce.bigint().refine((val) => val > 0n, {
+  message: "ID must be a positive integer",
 });
 
 /**
@@ -58,21 +58,21 @@ export const getAllOrderTrackings = async (
 /**
  * Get a single order tracking entry by ID
  */
-export const getOrderTrackingById = async (
+export const getOrderTrackingsByOrderId = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const trackingId = trackingIdSchema.parse(req.params.id);
-    const orderTracking = await orderTrackingService.getOrderTrackingById(
-      trackingId
+    const orderId = idSchema.parse(req.params.orderId);
+    const orderTracking = await orderTrackingService.getOrderTrackingsByOrderId(
+      orderId
     );
     if (!orderTracking) {
       throw new Error("Order tracking not found");
     }
     res.json({
       success: true,
-      message: "Order tracking fetched successfully",
+      message: "Order trackings fetched successfully",
       data: orderTracking,
     });
   } catch (error) {
@@ -88,7 +88,7 @@ export const updateOrderTracking = async (
   res: Response
 ): Promise<void> => {
   try {
-    const trackingId = trackingIdSchema.parse(req.params.id);
+    const trackingId = idSchema.parse(req.params.id);
     const data = zUpdateOrderTrackingDto.parse(req.body);
     const updated = await orderTrackingService.updateOrderTracking(
       trackingId,
@@ -112,7 +112,7 @@ export const deleteOrderTracking = async (
   res: Response
 ): Promise<void> => {
   try {
-    const trackingId = trackingIdSchema.parse(req.params.id);
+    const trackingId = idSchema.parse(req.params.id);
     await orderTrackingService.deleteOrderTracking(trackingId);
     res.json({
       success: true,

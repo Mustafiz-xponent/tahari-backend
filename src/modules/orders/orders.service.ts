@@ -136,33 +136,48 @@ export async function updateOrder(
   data: UpdateOrderDto
 ): Promise<Order> {
   try {
-    // Validate customerId existence if provided
-    if (data.customerId) {
-      const customer = await prisma.customer.findUnique({
-        where: { customerId: data.customerId },
-      });
-      if (!customer) {
-        throw new Error("Customer not found");
+    return await prisma.$transaction(async (tx) => {
+      // 1. If changing customer, validate it exists
+      if (data.customerId) {
+        const customer = await tx.customer.findUnique({
+          where: { customerId: data.customerId },
+        });
+        if (!customer) {
+          throw new Error("Customer not found");
+        }
       }
-    }
 
-    const order = await prisma.order.update({
-      where: { orderId: Number(orderId) },
-      data: {
-        status: data.status,
-        totalAmount: data.totalAmount,
-        paymentMethod: data.paymentMethod,
-        paymentStatus: data.paymentStatus,
-        shippingAddress: data.shippingAddress,
-        customerId: data.customerId,
-        isSubscription: data.isSubscription,
-        isPreorder: data.isPreorder,
-        preorderDeliveryDate: data.preorderDeliveryDate
-          ? new Date(data.preorderDeliveryDate)
-          : undefined,
-      },
+      // 2. Update order
+      const order = await tx.order.update({
+        where: { orderId: Number(orderId) },
+        data: {
+          status: data.status,
+          totalAmount: data.totalAmount,
+          paymentMethod: data.paymentMethod,
+          paymentStatus: data.paymentStatus,
+          shippingAddress: data.shippingAddress,
+          customerId: data.customerId,
+          isSubscription: data.isSubscription,
+          isPreorder: data.isPreorder,
+          preorderDeliveryDate: data.preorderDeliveryDate
+            ? new Date(data.preorderDeliveryDate)
+            : undefined,
+        },
+      });
+
+      // 3. Log tracking if status changed
+      if (data.status) {
+        await tx.orderTracking.create({
+          data: {
+            orderId: Number(orderId),
+            status: data.status,
+            description: `Status updated to ${data.status}`,
+          },
+        });
+      }
+
+      return order;
     });
-    return order;
   } catch (error) {
     throw new Error(`Failed to update order: ${getErrorMessage(error)}`);
   }

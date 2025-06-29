@@ -55,14 +55,15 @@ export async function getAllOrderTrackings(): Promise<OrderTracking[]> {
 }
 
 /**
- * Retrieve an order tracking entry by its ID
+ * Retrieve an order trackings entry by order ID
  */
-export async function getOrderTrackingById(
-  trackingId: BigInt
-): Promise<OrderTracking | null> {
+export async function getOrderTrackingsByOrderId(
+  orderId: BigInt
+): Promise<OrderTracking[] | null> {
   try {
-    const orderTracking = await prisma.orderTracking.findUnique({
-      where: { trackingId: Number(trackingId) },
+    const orderTracking = await prisma.orderTracking.findMany({
+      where: { orderId: Number(orderId) },
+      orderBy: { createdAt: "asc" },
     });
     return orderTracking;
   } catch (error) {
