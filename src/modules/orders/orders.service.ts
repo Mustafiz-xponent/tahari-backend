@@ -84,7 +84,7 @@ export async function getAllOrders(): Promise<Order[]> {
  * @returns The order if found, or null if not found
  * @throws Error if the query fails
  */
-export async function getOrderById(orderId: BigInt): Promise<Order | null> {
+export async function getOrderById(orderId: BigInt) {
   try {
     const order = await prisma.order.findUnique({
       where: { orderId: Number(orderId) },
@@ -97,7 +97,28 @@ export async function getOrderById(orderId: BigInt): Promise<Order | null> {
         customer: true,
       },
     });
-    return order;
+    if (!order) {
+      throw new Error("Order not found");
+    }
+    const updatedOrderItems = await Promise.all(
+      order.orderItems.map(async (item) => {
+        const accessibleUrls =
+          item.product.imageUrls.length > 0
+            ? await getBatchAccessibleImageUrls(
+                item.product.imageUrls,
+                item.product.isPrivateImages,
+                300
+              )
+            : [];
+
+        return {
+          ...item.product,
+          quantity: item.quantity,
+          accessibleImageUrls: accessibleUrls,
+        };
+      })
+    );
+    return { ...order, orderItems: updatedOrderItems };
   } catch (error) {
     throw new Error(`Failed to fetch order: ${getErrorMessage(error)}`);
   }
@@ -223,7 +244,7 @@ export async function getCustomerOrders({
               item.product.imageUrls.length > 0
                 ? await getBatchAccessibleImageUrls(
                     item.product.imageUrls,
-                    true,
+                    item.product.isPrivateImages,
                     300
                   )
                 : [];
