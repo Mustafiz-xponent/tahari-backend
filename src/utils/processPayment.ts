@@ -370,23 +370,20 @@ export async function validateSSLCommerzPayment(validationData: any) {
       : "https://sandbox.sslcommerz.com";
 
     const validationParams = {
+      val_id: validationData.val_id,
       store_id: process.env.SSLCOMMERZ_STORE_ID!,
       store_passwd: process.env.SSLCOMMERZ_STORE_PASSWD!,
-      val_id: validationData.val_id,
+      v: 1, // optional
+      format: "json", // optional: for JSON response instead of XML
     };
 
-    const response = await axios.post(
+    const response = await axios.get(
       `${baseUrl}/validator/api/validationserverAPI.php`,
-      new URLSearchParams(validationParams).toString(),
       {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Accept: "application/json",
-        },
+        params: validationParams,
         timeout: 30000,
       }
     );
-
     return response.data;
   } catch (error) {
     throw error;

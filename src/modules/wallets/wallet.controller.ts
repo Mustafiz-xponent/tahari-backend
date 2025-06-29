@@ -77,17 +77,18 @@ export const handleSslCommerzSuccess = async (
   try {
     console.log("SUCCESS WEBHOOK CALLED");
     const result = await walletService.handleDepositeSuccess(req.body);
-
     if (result.success) {
-      res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
+      // res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
+      res.redirect("https://www.kalerkantho.com/");
       console.log("PAYMENT COMPLETED");
     } else {
-      res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+      // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+      res.redirect("https://www.kalerkantho.com/");
       console.log("PAYMENT FAILED");
     }
   } catch (error) {
-    console.log("SUCCESS ERROR:", error);
-    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    res.redirect("https://www.kalerkantho.com/");
     console.log("PAYMENT FAILED");
   }
 };
@@ -102,10 +103,12 @@ export const handleSslCommerzFailure = async (
   try {
     console.log("FAILURE WEBHOOK CALLED");
     await walletService.handleDepositeFailure(req.body);
-    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    res.redirect("https://www.kalerkantho.com/");
     console.log("PAYMENT FAILED");
   } catch (error) {
-    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    // res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
+    res.redirect("https://www.kalerkantho.com/");
     console.log("PAYMENT FAILED");
   }
 };

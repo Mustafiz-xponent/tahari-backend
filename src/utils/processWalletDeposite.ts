@@ -118,6 +118,7 @@ async function initializeSSLCommerzPayment(data: {
         timeout: 30000, // 30 seconds timeout
       }
     );
+
     // Check if the response is successful
     if (response.data.status === "SUCCESS") {
       return {

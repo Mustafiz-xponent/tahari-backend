@@ -8,7 +8,7 @@ const bangladeshPhoneValidator = z
   .string()
   .regex(
     /^\+8801[3-9]\d{8}$/,
-    "Must be a valid Bangladesh phone number (+8801XXXXXXXXX)"
+    "Must be a valid Bangladeshi phone number (+8801XXXXXXXXX)"
   );
 
 /**
