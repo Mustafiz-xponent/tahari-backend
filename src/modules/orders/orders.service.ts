@@ -237,6 +237,7 @@ export async function getCustomerOrders({
         );
         return {
           ...order,
+          totalAmount: order.totalAmount,
           orderItems: updatedOrderItems,
         };
       })
