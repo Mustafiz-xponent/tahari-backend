@@ -5,7 +5,7 @@
 
 import { Router } from "express";
 import * as CustomerController from "./customer.controller";
-import { authMiddleware } from "../../../middlewares/auth";
+import { authMiddleware, authorizeRoles } from "../../../middlewares/auth";
 
 const router = Router();
 
@@ -24,14 +24,16 @@ router.post("/verify-otp", CustomerController.verifyCustomerOtp);
 // Route to update customer profile by ID
 router.put(
   "/:id",
-  authMiddleware("CUSTOMER"),
+  authMiddleware,
+  authorizeRoles("CUSTOMER"),
   CustomerController.updateCustomerProfile
 );
 
 // Route to get customer by ID
 router.get(
   "/:id",
-  authMiddleware("CUSTOMER"),
+  authMiddleware,
+  authorizeRoles("CUSTOMER"),
   CustomerController.getCustomerById
 );
 

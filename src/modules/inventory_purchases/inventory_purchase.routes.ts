@@ -5,14 +5,15 @@
 
 import { Router } from "express";
 import * as InventoryPurchaseController from "./inventory_purchase.controller";
-import { authMiddleware } from "../../middlewares/auth";
+import { authMiddleware, authorizeRoles } from "../../middlewares/auth";
 
 const router = Router();
 
 // Route to create a new inventory purchase
 router.post(
   "/",
-  authMiddleware("ADMIN"),
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
   InventoryPurchaseController.createInventoryPurchase
 );
 
@@ -25,14 +26,16 @@ router.get("/:id", InventoryPurchaseController.getInventoryPurchaseById);
 // Route to update an inventory purchase's details
 router.put(
   "/:id",
-  authMiddleware("ADMIN"),
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
   InventoryPurchaseController.updateInventoryPurchase
 );
 
 // Route to delete an inventory purchase
 router.delete(
   "/:id",
-  authMiddleware("ADMIN"),
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
   InventoryPurchaseController.deleteInventoryPurchase
 );
 

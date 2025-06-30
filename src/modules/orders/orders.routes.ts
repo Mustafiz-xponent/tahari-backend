@@ -5,7 +5,7 @@
 
 import { Router } from "express";
 import * as OrderController from "./orders.controller";
-import { authMiddleware } from "../../middlewares/auth";
+import { authMiddleware, authorizeRoles } from "../../middlewares/auth";
 
 const router = Router();
 
@@ -18,7 +18,8 @@ router.get("/", OrderController.getAllOrders);
 // Route to get orders for a specific customer
 router.get(
   "/customer",
-  authMiddleware("CUSTOMER"),
+  authMiddleware,
+  authorizeRoles("CUSTOMER"),
   OrderController.getCustomerOrders
 );
 

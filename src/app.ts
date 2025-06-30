@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import helmet from "helmet";
@@ -26,6 +26,7 @@ import subscriptionRoutes from "./modules/subscriptions/subscription.routes";
 import subscriptionPlanRoutes from "./modules/subscription_plans/subscription_plan.routes";
 import subscriptionDeliveryRoutes from "./modules/subscription_deliveries/subscription-delivery.routes";
 import { rateLimiter } from "./middlewares/rateLimiter";
+import { globalErrorHandler } from "./middlewares/errorHandler";
 
 dotenv.config();
 // Initialize the app
@@ -80,9 +81,6 @@ app.use((_req: Request, res: Response) => {
   });
 });
 // Basic Error Handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: "Something went wrong!" });
-});
+app.use(globalErrorHandler);
 
 export default app;

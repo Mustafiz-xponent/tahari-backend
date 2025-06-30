@@ -1,15 +1,10 @@
 // src/types/express/index.d.ts
-
-import { Request } from "express";
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        userId: string;
-        email: string;
-        role: "CUSTOMER" | "ADMIN" | "SUPER_ADMIN";
-      };
-    }
+import { JwtPayload } from "jsonwebtoken";
+import { User } from "./generated/prisma/client";
+declare module "express-serve-static-core" {
+  // namespace Express {
+  interface Request {
+    user?: JwtPayload | User;
   }
+  // }
 }

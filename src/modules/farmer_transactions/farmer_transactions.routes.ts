@@ -5,14 +5,15 @@
 
 import { Router } from "express";
 import * as FarmerTransactionController from "./farmer_transactions.controller";
-import { authMiddleware } from "../../middlewares/auth";
+import { authMiddleware, authorizeRoles } from "../../middlewares/auth";
 
 const router = Router();
 
 // Route to create a new farmer transaction
 router.post(
   "/",
-  authMiddleware("ADMIN"),
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
   FarmerTransactionController.createFarmerTransaction
 );
 
@@ -25,14 +26,16 @@ router.get("/:id", FarmerTransactionController.getFarmerTransactionById);
 // Route to update a farmer transaction's details
 router.put(
   "/:id",
-  authMiddleware("ADMIN"),
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
   FarmerTransactionController.updateFarmerTransaction
 );
 
 // Route to delete a farmer transaction
 router.delete(
   "/:id",
-  authMiddleware("ADMIN"),
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
   FarmerTransactionController.deleteFarmerTransaction
 );
 

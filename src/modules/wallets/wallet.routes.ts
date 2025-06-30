@@ -5,7 +5,7 @@
 
 import { Router } from "express";
 import * as WalletController from "./wallet.controller";
-import { authMiddleware } from "../../middlewares/auth";
+import { authMiddleware, authorizeRoles } from "../../middlewares/auth";
 
 const router = Router();
 
@@ -15,21 +15,33 @@ router.post("/", WalletController.createWallet);
 // Route to deposite wallet
 router.post(
   "/deposit",
-  authMiddleware("CUSTOMER"),
+  authMiddleware,
+  authorizeRoles("CUSTOMER"),
   WalletController.initiateWalletDeposit
 );
 
 // Route to get all wallets
-router.get("/", authMiddleware("ADMIN"), WalletController.getAllWallets);
+router.get(
+  "/",
+  authMiddleware,
+  authorizeRoles("ADMIN"),
+  WalletController.getAllWallets
+);
 
 // Route to get wallets for a specific customer
 router.get(
   "/balance",
-  authMiddleware("CUSTOMER"),
+  authMiddleware,
+  authorizeRoles("CUSTOMER"),
   WalletController.getCustomerWalletBalanace
 );
 // Route to get a wallet by ID
-router.get("/:id", authMiddleware("ADMIN"), WalletController.getWalletById);
+router.get(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN"),
+  WalletController.getWalletById
+);
 
 // Route to update a wallet's details
 router.put("/:id", WalletController.updateWallet);

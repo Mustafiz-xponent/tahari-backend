@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import { authMiddleware } from "../../../middlewares/auth";
+import { authMiddleware, authorizeRoles } from "../../../middlewares/auth";
 import * as AdminController from "./admin.controller";
 
 const router = Router();
@@ -12,7 +12,8 @@ const router = Router();
 // Route to create a new admin (super admin only)
 router.post(
   "/create",
-  authMiddleware("SUPER_ADMIN"),
+  authMiddleware,
+  authorizeRoles("SUPER_ADMIN", "ADMIN"),
   AdminController.createAdmin
 );
 
@@ -22,7 +23,8 @@ router.post("/login", AdminController.loginAdmin);
 // Route to delete an admin by superadmin
 router.delete(
   "/:id",
-  authMiddleware("SUPER_ADMIN"),
+  authMiddleware,
+  authorizeRoles("SUPER_ADMIN", "ADMIN"),
   AdminController.deleteAdmin
 );
 

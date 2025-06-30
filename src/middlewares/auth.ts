@@ -1,63 +1,53 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import prisma from "../prisma-client/prismaClient";
+import { UserRole } from "../../generated/prisma/client";
+import { status } from "http-status";
+import asyncHandler from "../utils/asyncHandler";
 
-// Define the structure of your decoded JWT payload
-interface JwtPayload {
-  userId: string;
-  email: string;
-  role: "CUSTOMER" | "ADMIN" | "SUPER_ADMIN";
-}
-
-// Extend the Express Request interface to include the user property
-declare global {
-  namespace Express {
-    interface Request {
-      user?: JwtPayload;
-    }
-  }
-}
-
-export const authMiddleware = (
-  role: "CUSTOMER" | "ADMIN" | "SUPER_ADMIN" | "SUPPORT"
-): RequestHandler => {
-  return async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+// Auth middleware check if user is authenticated
+export const authMiddleware: RequestHandler = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
-      res.status(401).json({ message: "No token provided" });
+      res.status(status.UNAUTHORIZED).json({ message: "No token provided" });
+      return;
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        userId: Number(decoded.userId),
+      },
+    });
+
+    if (!user) {
+      res.status(status.UNAUTHORIZED).json({
+        succes: false,
+        message: "User no longer exists. Please login again.",
+      });
       return;
     }
 
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    req.user = user;
+    console.log("USER", req.user);
+    next();
+  }
+);
 
-      const user = await prisma.user.findUnique({
-        where: {
-          userId: Number(decoded.userId),
-        },
+/*
+ ** Check if user has the required role to access the resource. eg:authorizeRoles("role1", "role2")
+ ** @param roles: List of roles that are allowed to access the resource
+ */
+export const authorizeRoles = (...roles: UserRole[]): RequestHandler => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user?.role as UserRole)) {
+      res.status(403).json({
+        success: false,
+        message: "You are not permitted to access this resource",
       });
-
-      if (!user) {
-        res.status(403).json({ succes: false, message: "Unauthorized" });
-        return;
-      }
-
-      if (decoded.role !== role) {
-        res.status(403).json({
-          success: false,
-          message: "You are not permitted to access this resource",
-        });
-        return;
-      }
-
-      req.user = decoded;
-      next();
-    } catch (error) {
-      res.status(401).json({ message: "Invalid token" });
+      return;
     }
+    next();
   };
 };
