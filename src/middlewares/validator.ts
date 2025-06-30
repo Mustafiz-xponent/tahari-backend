@@ -25,7 +25,6 @@ const validator = (schemas: Schemas) => {
           errors.body = bodyResult.error.errors.map((err) => ({
             field: err.path.join("."),
             message: err.message,
-            code: err.code,
           }));
         } else {
           req.body = bodyResult.data; // Use parsed/transformed data
@@ -39,7 +38,6 @@ const validator = (schemas: Schemas) => {
           errors.query = queryResult.error.errors.map((err) => ({
             field: err.path.join("."),
             message: err.message,
-            code: err.code,
           }));
         } else {
           req.query = queryResult.data; // Use parsed/transformed data
@@ -53,7 +51,6 @@ const validator = (schemas: Schemas) => {
           errors.params = paramsResult.error.errors.map((err) => ({
             field: err.path.join("."),
             message: err.message,
-            code: err.code,
           }));
         } else {
           req.params = paramsResult.data; // Use parsed/transformed data
@@ -64,7 +61,7 @@ const validator = (schemas: Schemas) => {
       if (Object.keys(errors).length > 0) {
         return res.status(status.BAD_REQUEST).json({
           success: false,
-          message: "Validation failed",
+          message: "VALIDATION FAILED",
           errors: errors,
         });
       }
@@ -72,8 +69,6 @@ const validator = (schemas: Schemas) => {
       // If all validations pass, continue to next middleware
       next();
     } catch (error) {
-      // Handle unexpected errors
-      console.error("Validation middleware error:", error);
       return res.status(status.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Internal server error during validation",

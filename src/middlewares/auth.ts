@@ -30,7 +30,6 @@ export const authMiddleware: RequestHandler = asyncHandler(
     }
 
     req.user = user;
-    console.log("USER", req.user);
     next();
   }
 );

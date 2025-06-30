@@ -8,22 +8,7 @@ import {
 } from "@prisma/client/runtime/library";
 
 import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
-
-export class AppError extends Error {
-  statusCode: number;
-  isOperational: boolean;
-
-  constructor(
-    message: string,
-    statusCode = httpStatus.INTERNAL_SERVER_ERROR as number
-  ) {
-    super(message);
-    this.statusCode = statusCode;
-    this.isOperational = true;
-
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
+import { AppError } from "../utils/appError";
 
 const handlePrismaError = (error: unknown): AppError => {
   let message = "Database operation failed";
