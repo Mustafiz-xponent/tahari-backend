@@ -15,10 +15,12 @@ import { z } from "zod";
 const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Transaction ID must be a positive integer",
 });
-interface IPaginationQuery {
+interface ICustomerTransactionQuery {
   page?: string;
   limit?: string;
   sort?: "asc" | "desc";
+  transactionStatus?: string;
+  transactionType?: string;
 }
 /**
  * Create a new wallet transaction
@@ -90,7 +92,7 @@ export const getWalletTransactionById = async (
  * Get a customer wallet transactions
  */
 export const getCustomerWalletTransactions = async (
-  req: Request<{}, {}, {}, IPaginationQuery>,
+  req: Request<{}, {}, {}, ICustomerTransactionQuery>,
   res: Response
 ): Promise<void> => {
   try {
@@ -101,7 +103,10 @@ export const getCustomerWalletTransactions = async (
     ); // Max 100 items per page
     const skip = (page - 1) * limit;
     const sort = req.query.sort === "asc" ? "asc" : "desc";
+    const transactionStatus = req.query.transactionStatus?.toUpperCase();
+    const transactionType = req.query.transactionType?.toUpperCase();
     const paginationParams = { page, limit, skip, sort };
+    const filterParams = { transactionStatus, transactionType };
     if (!req.user?.userId) throw new Error("Please login to continue");
     const userId = BigInt(req?.user?.userId!);
 
@@ -109,6 +114,7 @@ export const getCustomerWalletTransactions = async (
       {
         userId,
         paginationParams,
+        filterParams,
       }
     );
 

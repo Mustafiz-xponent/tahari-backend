@@ -95,16 +95,18 @@ export async function getWalletTransactionById(
 }
 /**
  * Retrieve a wallet transaction by its ID
- * @param userId @param paginationParams - The ID of the wallet transaction
+ * @param userId @param paginationParams @param filterParams
  * @returns The wallet transaction
  * @throws Error if the query fails
  */
 export async function getCustomerWalletTransactions({
   userId,
   paginationParams,
+  filterParams,
 }: {
   userId: bigint;
   paginationParams: { page: number; limit: number; skip: number; sort: string };
+  filterParams: { transactionStatus?: string; transactionType?: string };
 }): Promise<any> {
   try {
     const customer = await prisma.customer.findUnique({
@@ -116,11 +118,16 @@ export async function getCustomerWalletTransactions({
     }
 
     const { page, limit, skip, sort } = paginationParams;
+    const { transactionStatus, transactionType } = filterParams;
+
+    const whereClause: any = {
+      walletId: customer.wallet?.walletId,
+    };
+    if (transactionStatus) whereClause.transactionStatus = transactionStatus;
+    if (transactionType) whereClause.transactionType = transactionType;
 
     const transactions = await prisma.walletTransaction.findMany({
-      where: {
-        walletId: customer.wallet?.walletId,
-      },
+      where: whereClause,
       take: limit,
       skip: skip,
       orderBy: {
@@ -131,9 +138,7 @@ export async function getCustomerWalletTransactions({
       throw new Error("Wallet transactions not found");
     }
     const totalTransactions = await prisma.walletTransaction.count({
-      where: {
-        walletId: customer.wallet?.walletId,
-      },
+      where: whereClause,
     });
 
     return {
