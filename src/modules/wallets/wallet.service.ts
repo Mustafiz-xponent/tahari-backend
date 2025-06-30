@@ -190,20 +190,15 @@ export async function getAllWallets(): Promise<Wallet[]> {
     throw new Error(`Failed to fetch wallets: ${getErrorMessage(error)}`);
   }
 }
-
 /**
  * Retrieve a wallet by its ID
- * @param walletId - The ID of the wallet
+ * @param userId - The ID of the user
  * @returns The wallet if found, or null if not found
  * @throws Error if the query fails
  */
-export async function getWalletById({
-  walletId,
-  userId,
-}: {
-  walletId: BigInt;
-  userId: bigint;
-}): Promise<Wallet | null> {
+export async function getCustomerWalletBalanace(
+  userId: BigInt
+): Promise<Wallet | null> {
   try {
     const customer = await prisma.customer.findUnique({
       where: { userId: Number(userId) },
@@ -212,14 +207,39 @@ export async function getWalletById({
     if (!customer) {
       throw new Error("Customer not found");
     }
-    if (customer.wallet?.walletId !== walletId) {
+    const wallet = await prisma.wallet.findUnique({
+      where: { walletId: customer.wallet?.walletId },
+    });
+    if (!wallet) {
       throw new Error("Wallet not found");
     }
+
+    return wallet;
+  } catch (error) {
+    throw new Error(`Failed to fetch wallet: ${getErrorMessage(error)}`);
+  }
+}
+
+/**
+ * Retrieve a wallet by its ID
+ * @param walletId - The ID of the wallet
+ * @returns The wallet if found, or null if not found
+ * @throws Error if the query fails
+ */
+export async function getWalletById(walletId: BigInt): Promise<Wallet | null> {
+  try {
     const wallet = await prisma.wallet.findUnique({
       where: { walletId: Number(walletId) },
     });
     if (!wallet) {
       throw new Error("Wallet not found");
+    }
+    const customer = await prisma.customer.findUnique({
+      where: { userId: wallet?.customerId },
+      include: { wallet: true },
+    });
+    if (!customer) {
+      throw new Error("Customer not found");
     }
     return wallet;
   } catch (error) {

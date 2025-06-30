@@ -161,6 +161,29 @@ export const getAllWallets = async (
 };
 
 /**
+ * Get a customer wallet balance
+ */
+export const getCustomerWalletBalanace = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const wallet = await walletService.getCustomerWalletBalanace(
+      BigInt(req?.user?.userId!)
+    );
+    if (!wallet) {
+      throw new Error("Wallet not found");
+    }
+    res.json({
+      success: true,
+      message: "Wallet fetched successfully",
+      data: wallet,
+    });
+  } catch (error) {
+    handleErrorResponse(error, res, "fetch wallet");
+  }
+};
+/**
  * Get a single wallet by ID
  */
 export const getWalletById = async (
@@ -169,10 +192,7 @@ export const getWalletById = async (
 ): Promise<void> => {
   try {
     const walletId = walletIdSchema.parse(req.params.id);
-    const wallet = await walletService.getWalletById({
-      walletId,
-      userId: BigInt(req?.user?.userId!),
-    });
+    const wallet = await walletService.getWalletById(walletId);
     if (!wallet) {
       throw new Error("Wallet not found");
     }
