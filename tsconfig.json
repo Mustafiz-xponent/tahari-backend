@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020", // ✅ Enables BigInt support
-    "types": ["node"],
+    "types": ["node", "jest"],
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "module": "commonjs",
