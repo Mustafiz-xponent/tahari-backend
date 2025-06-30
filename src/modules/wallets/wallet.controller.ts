@@ -58,7 +58,7 @@ export const initiateWalletDeposit = async (
       amount: parseFloat(amount),
     });
 
-    res.json({
+    res.status(200).json({
       success: true,
       message: "Deposit initiated successfully",
       data: depositData,
