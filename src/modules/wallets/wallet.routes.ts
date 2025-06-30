@@ -22,7 +22,7 @@ router.post(
 // Route to get all wallets
 router.get("/", authMiddleware("ADMIN"), WalletController.getAllWallets);
 
-// Route to get a wallet by ID
+// Route to get wallets for a specific customer
 router.get(
   "/balance",
   authMiddleware("CUSTOMER"),
