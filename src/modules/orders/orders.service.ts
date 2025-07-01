@@ -24,30 +24,43 @@ interface CustomerOrdersResult {
  */
 export async function createOrder(data: CreateOrderDto): Promise<Order> {
   try {
-    // Validate customerId existence
-    const customer = await prisma.customer.findUnique({
-      where: { customerId: data.customerId },
-    });
-    if (!customer) {
-      throw new Error("Customer not found");
-    }
+    return await prisma.$transaction(async (tx) => {
+      //  Validate customer
+      const customer = await tx.customer.findUnique({
+        where: { customerId: data.customerId },
+      });
+      if (!customer) {
+        throw new Error("Customer not found");
+      }
 
-    const order = await prisma.order.create({
-      data: {
-        status: data.status,
-        totalAmount: data.totalAmount,
-        paymentMethod: data.paymentMethod,
-        paymentStatus: data.paymentStatus,
-        shippingAddress: data.shippingAddress,
-        customerId: data.customerId,
-        isSubscription: data.isSubscription ?? false,
-        isPreorder: data.isPreorder ?? false,
-        preorderDeliveryDate: data.preorderDeliveryDate
-          ? new Date(data.preorderDeliveryDate)
-          : undefined,
-      },
+      //  Create order
+      const order = await tx.order.create({
+        data: {
+          status: data.status,
+          totalAmount: data.totalAmount,
+          paymentMethod: data.paymentMethod,
+          paymentStatus: data.paymentStatus,
+          shippingAddress: data.shippingAddress,
+          customerId: data.customerId,
+          isSubscription: data.isSubscription ?? false,
+          isPreorder: data.isPreorder ?? false,
+          preorderDeliveryDate: data.preorderDeliveryDate
+            ? new Date(data.preorderDeliveryDate)
+            : undefined,
+        },
+      });
+
+      // Create initial tracking entry
+      await tx.orderTracking.create({
+        data: {
+          orderId: Number(order.orderId),
+          status: "PENDING",
+          description: "Order created and payment pending for Cash on Delivery",
+        },
+      });
+
+      return order;
     });
-    return order;
   } catch (error) {
     throw new Error(`Failed to create order: ${getErrorMessage(error)}`);
   }
@@ -178,28 +191,30 @@ export async function updateOrder(
             : undefined,
         },
       });
-      const orderStatusFlow: OrderStatus[] = [
-        "PENDING",
-        "CONFIRMED",
-        "PROCESSING",
-        "SHIPPED",
-        "DELIVERED",
-      ];
-      const currentIndex = orderStatusFlow.indexOf(currentOrder.status);
-      const newIndex = orderStatusFlow.indexOf(data.status!);
-      // if Backward status move detected--
-      if (newIndex < currentIndex) {
-        // Delete any forward tracking records
-        await tx.orderTracking.deleteMany({
-          where: {
-            orderId: Number(orderId),
-            status: {
-              in: orderStatusFlow.filter(
-                (status) => orderStatusFlow.indexOf(status) > newIndex
-              ),
+      if (data.status) {
+        const orderStatusFlow: OrderStatus[] = [
+          "PENDING",
+          "CONFIRMED",
+          "PROCESSING",
+          "SHIPPED",
+          "DELIVERED",
+        ];
+        const currentStatusIndex = orderStatusFlow.indexOf(currentOrder.status);
+        const newStatusIndex = orderStatusFlow.indexOf(data.status!);
+        // if Backward status move detected--
+        if (newStatusIndex < currentStatusIndex) {
+          // Delete any forward tracking records
+          await tx.orderTracking.deleteMany({
+            where: {
+              orderId: Number(orderId),
+              status: {
+                in: orderStatusFlow.filter(
+                  (status) => orderStatusFlow.indexOf(status) > newStatusIndex
+                ),
+              },
             },
-          },
-        });
+          });
+        }
       }
       // Log only if status actually changed & not already tracked
       if (data.status && data.status !== currentOrder.status) {

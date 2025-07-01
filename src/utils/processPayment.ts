@@ -117,7 +117,7 @@ export async function processCodPayment(
       where: {
         orderId: Number(data.orderId),
       },
-    }); 
+    });
 
     if (existingPayment) {
       throw new Error(
@@ -148,8 +148,9 @@ export async function processCodPayment(
     await tx.orderTracking.create({
       data: {
         orderId: Number(data.orderId),
-        status: "PENDING",
-        description: "Order created and payment pending for Cash on Delivery",
+        status: "CONFIRMED",
+        description:
+          "Order created and confirmed. payment pending for Cash on Delivery",
       },
     });
 
