@@ -117,7 +117,7 @@ export async function processCodPayment(
       where: {
         orderId: Number(data.orderId),
       },
-    });
+    }); 
 
     if (existingPayment) {
       throw new Error(

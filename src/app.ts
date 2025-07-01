@@ -80,7 +80,7 @@ app.use((_req: Request, res: Response) => {
     message: "API route not found",
   });
 });
-// Basic Error Handler
+// Global error handler
 app.use(globalErrorHandler);
 
 export default app;

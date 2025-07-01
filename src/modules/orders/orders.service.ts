@@ -149,7 +149,12 @@ export async function updateOrder(
       // Get current order status
       const currentOrder = await tx.order.findUnique({
         where: { orderId: Number(orderId) },
-        select: { status: true },
+        select: {
+          status: true,
+          paymentStatus: true,
+          paymentMethod: true,
+          orderItems: true,
+        },
       });
 
       if (!currentOrder) {
@@ -173,7 +178,29 @@ export async function updateOrder(
             : undefined,
         },
       });
-
+      const orderStatusFlow: OrderStatus[] = [
+        "PENDING",
+        "CONFIRMED",
+        "PROCESSING",
+        "SHIPPED",
+        "DELIVERED",
+      ];
+      const currentIndex = orderStatusFlow.indexOf(currentOrder.status);
+      const newIndex = orderStatusFlow.indexOf(data.status!);
+      // if Backward status move detected--
+      if (newIndex < currentIndex) {
+        // Delete any forward tracking records
+        await tx.orderTracking.deleteMany({
+          where: {
+            orderId: Number(orderId),
+            status: {
+              in: orderStatusFlow.filter(
+                (status) => orderStatusFlow.indexOf(status) > newIndex
+              ),
+            },
+          },
+        });
+      }
       // Log only if status actually changed & not already tracked
       if (data.status && data.status !== currentOrder.status) {
         const alreadyTracked = await tx.orderTracking.findFirst({
@@ -192,6 +219,49 @@ export async function updateOrder(
             },
           });
         }
+      }
+      //  If payment status changed to COMPLETED AND payment method is COD → do stock ops
+      if (
+        data.paymentStatus === "COMPLETED" &&
+        currentOrder.paymentMethod === "COD"
+      ) {
+        for (const item of currentOrder.orderItems) {
+          // Decrement stock
+          await tx.product.update({
+            where: { productId: item.productId },
+            data: {
+              stockQuantity: {
+                decrement: item.quantity,
+              },
+            },
+          });
+
+          // Create stock transaction
+          await tx.stockTransaction.create({
+            data: {
+              quantity: item.quantity,
+              transactionType: "OUT",
+              productId: item.productId,
+              orderId: Number(orderId),
+              description: `Stock reduced for Order #${orderId}`,
+            },
+          });
+        }
+        // update payment record
+        await tx.payment.updateMany({
+          where: { orderId: Number(orderId), paymentMethod: "COD" },
+          data: {
+            paymentStatus: "PENDING",
+          },
+        });
+        // Also track the order update
+        await tx.orderTracking.create({
+          data: {
+            orderId: Number(orderId),
+            status: "CONFIRMED",
+            description: "Order confirmed and payment completed via COD",
+          },
+        });
       }
 
       return updatedOrder;
