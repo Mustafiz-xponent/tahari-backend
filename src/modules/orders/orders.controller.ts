@@ -3,7 +3,7 @@
  * Handles HTTP requests and responses for order-related endpoints.
  */
 
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import * as orderService from "./orders.service";
 import { zCreateOrderDto, zUpdateOrderDto } from "./orders.dto";
 import { handleErrorResponse } from "../../utils/errorResponseHandler";
@@ -153,7 +153,12 @@ export const getCustomerOrders = async (
     ); // Max 100 items per page
     const skip = (page - 1) * limit;
     const sort = req.query.sort === "asc" ? "asc" : "desc";
-    const status = req.query.status?.toUpperCase() as string | undefined;
+    const status = req.query.status as string | undefined;
+    const statusArray = status
+      ? Array.isArray(status)
+        ? status.map((s) => s.toUpperCase())
+        : status.split(",").map((s) => s.toUpperCase())
+      : [];
 
     if (!req.user?.userId) throw new Error("Please login to continue");
 
@@ -164,7 +169,7 @@ export const getCustomerOrders = async (
       page,
       limit,
       sort,
-      status,
+      statusArray,
       skip,
     });
 

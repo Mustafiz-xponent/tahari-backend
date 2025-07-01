@@ -321,14 +321,14 @@ export async function getCustomerOrders({
   page,
   limit,
   sort,
-  status,
+  statusArray,
   skip,
 }: {
   userId: BigInt;
   page: number;
   limit: number;
   sort: string;
-  status: string | undefined;
+  statusArray: string[];
   skip: number;
 }): Promise<CustomerOrdersResult> {
   try {
@@ -343,7 +343,9 @@ export async function getCustomerOrders({
     const orders = await prisma.order.findMany({
       where: {
         customerId: customer.customerId,
-        ...(status ? { status: status as OrderStatus } : {}),
+        ...(statusArray.length > 0 && {
+          status: { in: statusArray as OrderStatus[] },
+        }),
       },
       include: {
         orderItems: {
@@ -394,7 +396,9 @@ export async function getCustomerOrders({
     const totalOrders = await prisma.order.count({
       where: {
         customerId: customer.customerId,
-        ...(status ? { status: status as OrderStatus } : {}),
+        ...(statusArray.length > 0 && {
+          status: { in: statusArray as OrderStatus[] },
+        }),
       },
     });
 
