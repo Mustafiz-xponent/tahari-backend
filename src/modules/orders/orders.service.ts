@@ -200,7 +200,16 @@ export async function updateOrder(
           "DELIVERED",
         ];
         const currentStatusIndex = orderStatusFlow.indexOf(currentOrder.status);
-        const newStatusIndex = orderStatusFlow.indexOf(data.status!);
+        const newStatusIndex = orderStatusFlow.indexOf(data.status);
+
+        if (data.status === currentOrder.status) {
+          throw new Error(`Order is already ${currentOrder.status}`);
+        }
+        if (newStatusIndex > currentStatusIndex + 1) {
+          throw new Error(
+            `Invalid status transition: Cannot skip status levels from ${currentOrder.status} to ${data.status}`
+          );
+        }
         // if Backward status move detected--
         if (newStatusIndex < currentStatusIndex) {
           // Delete any forward tracking records

@@ -177,7 +177,7 @@ model Product {
   description              String?
   unitType                 productUnitType     @default(GM) // GM = Gram , PCS = Piece 
   price                    Decimal // unit price
-  stockQuantity            Int                 @default(0)
+  stockQuantity            Int                 @default(0) // Stock stored in units matching unitType
   reorderLevel             Int                 @default(0)
   isSubscription           Boolean             @default(false)
   isPreorder               Boolean             @default(false)
@@ -358,14 +358,15 @@ model Order {
 
 // Order items to store individual products in an order
 model OrderItem {
-  orderItemId BigInt  @id @default(autoincrement())
+  orderItemId BigInt          @id @default(autoincrement())
   quantity    Int
   unitPrice   Decimal
+  unitType    productUnitType @default(GM)
   subtotal    Decimal
   orderId     BigInt
   productId   BigInt
-  order       Order   @relation(fields: [orderId], references: [orderId])
-  product     Product @relation(fields: [productId], references: [productId])
+  order       Order           @relation(fields: [orderId], references: [orderId])
+  product     Product         @relation(fields: [productId], references: [productId])
 
   @@index([orderId])
   @@index([productId])
