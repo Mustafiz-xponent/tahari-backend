@@ -3,6 +3,7 @@
  * Updated to handle image uploads with product operations
  */
 
+import { ProductUnitType } from "@/generated/prisma/client";
 import { z } from "zod";
 
 /**
@@ -18,10 +19,13 @@ export const productNameSchema = z
  * Validates all required fields necessary for creation.
  * Images are handled separately through file upload.
  */
+
 export const zCreateProductDto = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
-  price: z.coerce.number().positive("Price must be positive"),
+  unitPrice: z.coerce.number().positive("Unit price must be positive"),
+  unitType: z.nativeEnum(ProductUnitType),
+  packageSize: z.coerce.number().positive("Package size must be positive"),
   stockQuantity: z.coerce
     .number()
     .int()
@@ -34,27 +38,23 @@ export const zCreateProductDto = z.object({
     .optional(),
   isSubscription: z
     .union([z.boolean(), z.string()])
-    .transform((val) => {
-      if (typeof val === "string") {
-        return val.toLowerCase() === "true";
-      }
-      return val;
-    })
+    .transform((val) =>
+      typeof val === "string" ? val.toLowerCase() === "true" : val
+    )
     .optional(),
   isPreorder: z
     .union([z.boolean(), z.string()])
-    .transform((val) => {
-      if (typeof val === "string") {
-        return val.toLowerCase() === "true";
-      }
-      return val;
-    })
+    .transform((val) =>
+      typeof val === "string" ? val.toLowerCase() === "true" : val
+    )
     .optional(),
   preorderAvailabilityDate: z
     .string()
-    .datetime()
-    .optional()
-    .transform((val) => (val ? new Date(val) : undefined)),
+    .refine((val) => !val || !isNaN(Date.parse(val)), {
+      message: "Invalid date format",
+    })
+    .transform((val) => (val ? new Date(val) : undefined))
+    .optional(),
   categoryId: z
     .union([z.string(), z.number()])
     .transform((val) => BigInt(val))
@@ -83,7 +83,15 @@ export type CreateProductDto = z.infer<typeof zCreateProductDto>;
 export const zUpdateProductDto = z.object({
   name: z.string().min(1, "Name is required").optional(),
   description: z.string().optional(),
-  price: z.coerce.number().positive("Price must be positive").optional(),
+  unitPrice: z.coerce
+    .number()
+    .positive("Unit price must be positive")
+    .optional(),
+  unitType: z.nativeEnum(ProductUnitType).optional(),
+  packageSize: z.coerce
+    .number()
+    .positive("Package size must be positive")
+    .optional(),
   stockQuantity: z.coerce
     .number()
     .int()
