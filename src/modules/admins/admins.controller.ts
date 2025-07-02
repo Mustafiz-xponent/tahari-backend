@@ -4,32 +4,30 @@ import * as adminService from "./admins.service";
 import { CreateAdminDto, UpdateAdminDto } from "./admins.dto";
 import { getErrorMessage } from "../../utils/errorHandler";
 
-export const createAdmin = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const data: CreateAdminDto = req.body;
-    console.log("✅ Received admin data:", data);
+// export const createAdmin = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const data: CreateAdminDto = req.body;
+//     console.log("✅ Received admin data:", data);
 
-    const admin = await adminService.createAdmin(data);
-    // Convert BigInt fields (like adminId) to string
-    const adminSafe = {
-      ...admin,
-      adminId: admin.adminId.toString(), // convert BigInt to string
-    };
+//     const admin = await adminService.createAdmin(data);
+//     // Convert BigInt fields (like adminId) to string
+//     const adminSafe = {
+//       ...admin,
+//       adminId: admin.adminId.toString(), // convert BigInt to string
+//     };
 
-  
-
-    res.status(201).json({
-      message: "Admin created successfully",
-      data: adminSafe,
-    });
-  } catch (error) {
-    console.error("Create admin error:", error);
-    res.status(500).json({ error: getErrorMessage(error) });
-  }
-};
+//     res.status(201).json({
+//       message: "Admin created successfully",
+//       data: adminSafe,
+//     });
+//   } catch (error) {
+//     console.error("Create admin error:", error);
+//     res.status(500).json({ error: getErrorMessage(error) });
+//   }
+// };
 
 export const getAllAdmins = async (
   _req: Request,

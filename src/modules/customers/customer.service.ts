@@ -15,26 +15,26 @@ import bcrypt from "bcrypt";
  * @returns The created customer
  * @throws Error if the customer cannot be created (e.g., duplicate email or firebaseUid)
  */
-export async function createCustomer(
-  data: CreateCustomerDto
-): Promise<Customer> {
-  try {
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-    const customer = await prisma.customer.create({
-      data: {
-        firebaseUid: data.firebaseUid,
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        address: data.address,
-        passwordHash: hashedPassword,
-      },
-    });
-    return customer;
-  } catch (error) {
-    throw new Error(`Failed to create customer: ${getErrorMessage(error)}`);
-  }
-}
+// export async function createCustomer(
+//   data: CreateCustomerDto
+// ): Promise<Customer> {
+//   try {
+//     const hashedPassword = await bcrypt.hash(data.password, 10);
+//     const customer = await prisma.customer.create({
+//       data: {
+//         firebaseUid: data.firebaseUid,
+//         name: data.name,
+//         email: data.email,
+//         phone: data.phone,
+//         address: data.address,
+//         passwordHash: hashedPassword,
+//       },
+//     });
+//     return customer;
+//   } catch (error) {
+//     throw new Error(`Failed to create customer: ${getErrorMessage(error)}`);
+//   }
+// }
 
 /**
  * Retrieve all customers

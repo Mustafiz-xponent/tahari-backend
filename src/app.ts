@@ -7,26 +7,26 @@ import compression from "compression";
 
 // import routes
 // import adminRoutes from "../src/modules/admins/admins.routes";
-import customerUserRoutes from "../src/modules/auth/customer/customer.routes";
-import adminUserRoutes from "../src/modules/auth/admin/admin.routes";
-import farmerRoutes from "../src/modules/farmers/farmers.routes";
-import categoryRoutes from "../src/modules/categories/category.routes";
-import productRoutes from "../src/modules/products/product.routes";
-import inventoryPurchaseRoutes from "../src/modules/inventory_purchases/inventory_purchase.routes";
-import farmerTransactionRoutes from "./modules/farmer_transactions/farmer_transactions.routes";
-import farmerPaymentRoutes from "./modules/farmer_payments/farmer_payment.routes";
-import stockTransactionRoutes from "./modules/stock_transactions/stock_transaction.routes";
-import orderRoutes from "./modules/orders/orders.routes";
-import orderItemRoutes from "./modules/order_items/order-item.route";
-import orderTrackingRoutes from "./modules/order_tracking/order-tracking.routes";
-import paymentRoutes from "./modules/payments/payment.routes";
-import walletRoutes from "./modules/wallets/wallet.routes";
-import walletTransactionRoutes from "./modules/wallet_transactions/wallet_transaction.routes";
-import subscriptionRoutes from "./modules/subscriptions/subscription.routes";
-import subscriptionPlanRoutes from "./modules/subscription_plans/subscription_plan.routes";
-import subscriptionDeliveryRoutes from "./modules/subscription_deliveries/subscription-delivery.routes";
-import { rateLimiter } from "./middlewares/rateLimiter";
-import { globalErrorHandler } from "./middlewares/errorHandler";
+import customerUserRoutes from "@/modules/auth/customer/customer.routes";
+import adminUserRoutes from "@/modules/auth/admin/admin.routes";
+import farmerRoutes from "@/modules/farmers/farmers.routes";
+import categoryRoutes from "@/modules/categories/category.routes";
+import productRoutes from "@/modules/products/product.routes";
+import inventoryPurchaseRoutes from "@/modules/inventory_purchases/inventory_purchase.routes";
+import farmerTransactionRoutes from "@/modules/farmer_transactions/farmer_transactions.routes";
+import farmerPaymentRoutes from "@/modules/farmer_payments/farmer_payment.routes";
+import stockTransactionRoutes from "@/modules/stock_transactions/stock_transaction.routes";
+import orderRoutes from "@/modules/orders/orders.routes";
+import orderItemRoutes from "@/modules/order_items/order-item.route";
+import orderTrackingRoutes from "@/modules/order_tracking/order-tracking.routes";
+import paymentRoutes from "@/modules/payments/payment.routes";
+import walletRoutes from "@/modules/wallets/wallet.routes";
+import walletTransactionRoutes from "@/modules/wallet_transactions/wallet_transaction.routes";
+import subscriptionRoutes from "@/modules/subscriptions/subscription.routes";
+import subscriptionPlanRoutes from "@/modules/subscription_plans/subscription_plan.routes";
+import subscriptionDeliveryRoutes from "@/modules/subscription_deliveries/subscription-delivery.routes";
+import { rateLimiter } from "@/middlewares/rateLimiter";
+import { globalErrorHandler } from "@/middlewares/errorHandler";
 
 dotenv.config();
 // Initialize the app
@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(morgran("dev"));
 app.use(compression());
-app.use(rateLimiter(100, 15 * 60 * 1000)); // 100 requests per 15 minutes
+app.use(rateLimiter(1000, 15 * 60 * 1000)); // 1000 requests per 15 minutes for dev
 
 // Global BigInt Serializer
 (BigInt.prototype as any).toJSON = function () {

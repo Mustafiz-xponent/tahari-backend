@@ -9,7 +9,7 @@ import * as CustomerController from "./customer.controller";
 const router = Router();
 
 // Route to create a new customer
-router.post("/", CustomerController.createCustomer);
+// router.post("/", CustomerController.createCustomer);
 
 // Route to get all customers
 router.get("/", CustomerController.getAllCustomers);

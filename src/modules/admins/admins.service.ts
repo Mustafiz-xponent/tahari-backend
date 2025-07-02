@@ -38,48 +38,48 @@ import bcrypt from "bcrypt";
 //   }
 // };
 
-export const createAdmin = async (data: CreateAdminDto): Promise<Admin> => {
-  const saltRounds = 10;
+// export const createAdmin = async (data: CreateAdminDto): Promise<Admin> => {
+//   const saltRounds = 10;
 
-  try {
-    if (!data.password || data.password.length < 6) {
-      throw new Error("Password must be at least 6 characters long");
-    }
+//   try {
+//     if (!data.password || data.password.length < 6) {
+//       throw new Error("Password must be at least 6 characters long");
+//     }
 
-    const passwordHash = await bcrypt.hash(data.password, saltRounds);
+//     const passwordHash = await bcrypt.hash(data.password, saltRounds);
 
-    // First create the User
-    const user = await prisma.user.create({
-      data: {
-        email: data.email,
-        name: data.name,
-        phone: data.phone,
-        address: data.address,
-        passwordHash,
-        role: data.role || "ADMIN", // Default to ADMIN if not provided
-        status: data.status || "ACTIVE", // Default to ACTIVE if not provided
-      },
-    });
+//     // First create the User
+//     const user = await prisma.user.create({
+//       data: {
+//         email: data.email,
+//         name: data.name,
+//         phone: data.phone,
+//         address: data.address,
+//         passwordHash,
+//         role: data.role || "ADMIN", // Default to ADMIN if not provided
+//         status: data.status || "ACTIVE", // Default to ACTIVE if not provided
+//       },
+//     });
 
-    // Then create the Admin linked to that User
-    const admin = await prisma.admin.create({
-      data: {
-        user: {
-          connect: { userId: user.userId },
-        },
-      },
-      // include: {
-      //   user: true,
-      // },
-    });
+//     // Then create the Admin linked to that User
+//     const admin = await prisma.admin.create({
+//       data: {
+//         user: {
+//           connect: { userId: user.userId },
+//         },
+//       },
+//       // include: {
+//       //   user: true,
+//       // },
+//     });
 
-    console.log("Admin created successfully");
-    return admin;
-  } catch (err: any) {
-    console.error("Error creating admin:", err);
-    throw new Error("Failed to create admin: " + err.message);
-  }
-};
+//     console.log("Admin created successfully");
+//     return admin;
+//   } catch (err: any) {
+//     console.error("Error creating admin:", err);
+//     throw new Error("Failed to create admin: " + err.message);
+//   }
+// };
 
 export const getAllAdmins = async (): Promise<Admin[]> => {
   return prisma.admin.findMany();
