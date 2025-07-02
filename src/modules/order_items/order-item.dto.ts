@@ -4,6 +4,7 @@
  * You can also use these types with validation libraries like Zod or Joi if needed.
  */
 
+import { ProductUnitType } from "@/generated/prisma/client";
 import { z } from "zod";
 
 // Id validation
@@ -30,6 +31,8 @@ export const zCreateOrderItemDto = z
     productId: idSchema,
     quantity: z.number().int().positive(),
     unitPrice: z.number().nonnegative(),
+    unitType: z.nativeEnum(ProductUnitType),
+    packageSize: z.number().positive(),
     subtotal: z.number().nonnegative(),
   })
   .refine(subtotalValidation);
@@ -53,6 +56,8 @@ export const zCreateOrderItemsDto = z.object({
           productId: idSchema,
           quantity: z.number().int().positive(),
           unitPrice: z.number().nonnegative(),
+          unitType: z.nativeEnum(ProductUnitType),
+          packageSize: z.number().positive(),
           subtotal: z.number().nonnegative(),
         })
         .refine(subtotalValidation)
@@ -113,6 +118,11 @@ export const zUpdateOrderItemDto = z
     unitPrice: z
       .number()
       .nonnegative("Unit price must be non-negative")
+      .optional(),
+    unitType: z.nativeEnum(ProductUnitType).optional(),
+    packageSize: z
+      .number()
+      .positive("Package size must be positive")
       .optional(),
     subtotal: z
       .number()

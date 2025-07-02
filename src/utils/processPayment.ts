@@ -83,7 +83,7 @@ export async function processWalletPayment(
         where: { productId: item.productId },
         data: {
           stockQuantity: {
-            decrement: item.quantity,
+            decrement: item.quantity * item.packageSize,
           },
         },
       });
@@ -91,7 +91,7 @@ export async function processWalletPayment(
       // Create stock transaction record
       await tx.stockTransaction.create({
         data: {
-          quantity: item.quantity,
+          quantity: item.quantity * item.packageSize,
           transactionType: "OUT",
           productId: item.productId,
           orderId: Number(data.orderId),

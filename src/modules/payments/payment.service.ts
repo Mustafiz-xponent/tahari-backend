@@ -147,14 +147,14 @@ export async function handleSSLCommerzSuccess(
             where: { productId: item.productId },
             data: {
               stockQuantity: {
-                decrement: item.quantity,
+                decrement: item.quantity * item.packageSize,
               },
             },
           });
 
           await tx.stockTransaction.create({
             data: {
-              quantity: item.quantity,
+              quantity: item.quantity * item.packageSize,
               transactionType: "OUT",
               productId: item.productId,
               orderId,
