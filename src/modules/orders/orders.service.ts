@@ -255,7 +255,7 @@ export async function updateOrder(
             where: { productId: item.productId },
             data: {
               stockQuantity: {
-                decrement: item.quantity,
+                decrement: item.quantity * item.packageSize,
               },
             },
           });
@@ -263,7 +263,7 @@ export async function updateOrder(
           // Create stock transaction
           await tx.stockTransaction.create({
             data: {
-              quantity: item.quantity,
+              quantity: item.quantity * item.packageSize,
               transactionType: "OUT",
               productId: item.productId,
               orderId: Number(orderId),

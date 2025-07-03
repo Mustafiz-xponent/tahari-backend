@@ -54,7 +54,10 @@ export async function createProduct(
       data: {
         name: data.name,
         description: data.description,
-        price: data.price,
+        price: data.unitPrice * data.packageSize,
+        unitPrice: data.unitPrice,
+        unitType: data.unitType,
+        packageSize: data.packageSize,
         stockQuantity: data.stockQuantity ?? 0,
         reorderLevel: data.reorderLevel ?? 0,
         isSubscription: data.isSubscription ?? false,
@@ -356,6 +359,9 @@ export async function updateProduct(
       select: {
         imageUrls: true,
         isPrivateImages: true,
+        price: true,
+        unitPrice: true,
+        packageSize: true,
       },
     });
 
@@ -401,14 +407,28 @@ export async function updateProduct(
         // Continue with update without new images
       }
     }
-
+    function calculateDisplayPrice(
+      unitPrice: number,
+      packageSize: number
+    ): number {
+      return unitPrice * packageSize;
+    }
+    const displayPrice = calculateDisplayPrice(
+      data.unitPrice
+        ? Number(data.unitPrice)
+        : Number(currentProduct.unitPrice),
+      data.packageSize ? data.packageSize : currentProduct.packageSize
+    );
     // Update the product
     const product = await prisma.product.update({
       where: { productId: Number(productId) },
       data: {
         name: data.name,
         description: data.description,
-        price: data.price,
+        price: displayPrice,
+        unitPrice: data.unitPrice,
+        unitType: data.unitType,
+        packageSize: data.packageSize,
         stockQuantity: data.stockQuantity,
         reorderLevel: data.reorderLevel,
         isSubscription: data.isSubscription,
