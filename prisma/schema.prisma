@@ -97,6 +97,11 @@ enum ProductUnitType {
   DOZEN
 }
 
+enum DiscountType {
+  PERCENTAGE
+  FLAT
+}
+
 model User {
   userId       BigInt     @id @default(autoincrement())
   email        String?    @unique
@@ -203,6 +208,8 @@ model Product {
   stockTransactions        StockTransaction[]
   subscriptionPlans        SubscriptionPlan[]
   orderItems               OrderItem[]
+  // deal                     Deal?               @relation(fields: [dealId], references: [dealId])
+  // dealId                   BigInt?
 
   @@index([farmerId])
   @@index([categoryId])
@@ -476,3 +483,34 @@ model Notification {
 
   @@index([notificationId])
 }
+
+// model Deal {
+//   dealId        BigInt       @id @default(autoincrement())
+//   title         String
+//   description   String? // Optional description for the deal
+//   discountType  DiscountType // PERCENTAGE or FLAT
+//   discountValue Decimal // e.g. 10% or 50 BDT off
+//   startDate     DateTime
+//   endDate       DateTime
+
+//   isActive Boolean @default(true)
+//   isGlobal Boolean @default(false) // True = applies to all products
+
+//   createdAt DateTime  @default(now())
+//   updatedAt DateTime  @updatedAt
+//   Product   Product[]
+
+//   @@index([startDate, endDate])
+// }
+
+// model DealProduct {
+//   id        BigInt  @id @default(autoincrement())
+//   dealId    BigInt
+//   productId BigInt
+//   deal      Deal    @relation(fields: [dealId], references: [dealId], onDelete: Cascade)
+//   product   Product @relation(fields: [productId], references: [productId], onDelete: Cascade)
+
+//   @@unique([dealId, productId])
+//   @@index([dealId])
+//   @@index([productId])
+// }
