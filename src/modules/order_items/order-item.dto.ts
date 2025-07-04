@@ -17,8 +17,13 @@ const subtotalValidation = (data: {
   quantity: number;
   unitPrice: number;
   subtotal: number;
+  packageSize: number;
 }) => {
-  return Math.abs(data.subtotal - data.quantity * data.unitPrice) < 0.01; // Allow small floating-point errors
+  return (
+    Math.abs(
+      data.subtotal - data.quantity * data.unitPrice * data.packageSize
+    ) < 0.01
+  ); // Allow small floating-point errors
 };
 
 /**
@@ -32,7 +37,7 @@ export const zCreateOrderItemDto = z
     quantity: z.number().int().positive(),
     unitPrice: z.number().nonnegative(),
     unitType: z.nativeEnum(ProductUnitType),
-    packageSize: z.number().positive(),
+    packageSize: z.coerce.number().positive("Package size must be positive"),
     subtotal: z.number().nonnegative(),
   })
   .refine(subtotalValidation);
@@ -57,7 +62,9 @@ export const zCreateOrderItemsDto = z.object({
           quantity: z.number().int().positive(),
           unitPrice: z.number().nonnegative(),
           unitType: z.nativeEnum(ProductUnitType),
-          packageSize: z.number().positive(),
+          packageSize: z.coerce
+            .number()
+            .positive("Package size must be positive"),
           subtotal: z.number().nonnegative(),
         })
         .refine(subtotalValidation)
@@ -148,18 +155,20 @@ export const zUpdateOrderItemDto = z
       if (
         data.quantity !== undefined &&
         data.unitPrice !== undefined &&
-        data.subtotal !== undefined
+        data.subtotal !== undefined &&
+        data.packageSize !== undefined
       ) {
         return subtotalValidation({
           quantity: data.quantity,
           unitPrice: data.unitPrice,
+          packageSize: data.packageSize,
           subtotal: data.subtotal,
         });
       }
       return true;
     },
     {
-      message: "Subtotal must equal quantity * unitPrice",
+      message: "Subtotal must equal quantity * unitPrice * packageSize",
       path: ["subtotal"],
     }
   );

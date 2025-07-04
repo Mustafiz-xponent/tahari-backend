@@ -116,6 +116,8 @@ export async function createOrderItems(data: CreateOrderItemsDto) {
         data: {
           orderId: Number(orderId),
           productId: Number(item.productId),
+          unitType: item.unitType,
+          packageSize: item.packageSize,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
           subtotal: item.subtotal,
