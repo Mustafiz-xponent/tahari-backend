@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import * as MessageController from "./message.controller";
+import * as MessageController from "@/modules/messages/message.controller";
 
 const router = Router();
 

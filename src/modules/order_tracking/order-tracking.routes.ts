@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import * as OrderTrackingController from "./order-tracking.controller";
+import * as OrderTrackingController from "@/modules/order_tracking/order-tracking.controller";
 
 const router = Router();
 

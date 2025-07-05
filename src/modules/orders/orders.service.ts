@@ -3,11 +3,11 @@
  * Contains business logic and database interactions for orders.
  */
 
-import prisma from "../../prisma-client/prismaClient";
-import { Order, OrderStatus } from "../../../generated/prisma/client";
-import { CreateOrderDto, UpdateOrderDto } from "./orders.dto";
-import { getErrorMessage } from "../../utils/errorHandler";
-import { getBatchAccessibleImageUrls } from "../../utils/fileUpload/s3Aws";
+import prisma from "@/prisma-client/prismaClient";
+import { Order, OrderStatus } from "@/generated/prisma/client";
+import { CreateOrderDto, UpdateOrderDto } from "@/modules/orders/orders.dto";
+import { getErrorMessage } from "@/utils/errorHandler";
+import { getBatchAccessibleImageUrls } from "@/utils/fileUpload/s3Aws";
 
 interface CustomerOrdersResult {
   orders: Order[];

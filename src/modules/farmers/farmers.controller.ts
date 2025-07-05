@@ -1,7 +1,10 @@
 // src/modules/farmers/farmers.controller.ts
 import { Request, Response } from "express";
-import * as farmerService from "./farmers.service";
-import { zCreateFarmerDto, zUpdateFarmerDto } from "./farmer.dto";
+import * as farmerService from "@/modules/farmers/farmers.service";
+import {
+  zCreateFarmerDto,
+  zUpdateFarmerDto,
+} from "@/modules/farmers/farmer.dto";
 import { ZodError, z } from "zod";
 
 const farmerIdSchema = z.coerce.bigint().refine((val) => val > 0n, {

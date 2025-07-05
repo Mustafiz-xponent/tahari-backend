@@ -7,13 +7,13 @@
 
 import { Request, Response } from "express";
 import { z } from "zod";
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import {
   zCreateStockTransactionArrayDto,
   zCreateStockTransactionDto,
   zUpdateStockTransactionDto,
-} from "./stock_transaction.dto";
-import * as stockTransactionService from "./stock_transaction.service";
+} from "@/modules/stock_transactions/stock_transaction.dto";
+import * as stockTransactionService from "@/modules/stock_transactions/stock_transaction.service";
 
 const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Transaction ID must be a positive integer",

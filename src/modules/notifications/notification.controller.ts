@@ -4,11 +4,11 @@
  */
 
 import { Request, Response } from "express";
-import * as notificationService from "./notification.service";
+import * as notificationService from "@/modules/notifications/notification.service";
 import {
   zCreateNotificationDto,
   zUpdateNotificationDto,
-} from "./notification.dto";
+} from "@/modules/notifications/notification.dto";
 import { ZodError, z } from "zod";
 
 const notificationIdSchema = z.coerce.bigint().refine((val) => val > 0n, {

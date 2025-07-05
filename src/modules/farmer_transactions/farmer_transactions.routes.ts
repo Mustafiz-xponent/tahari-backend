@@ -4,8 +4,8 @@
  */
 
 import { Router } from "express";
-import * as FarmerTransactionController from "./farmer_transactions.controller";
-import { authMiddleware, authorizeRoles } from "../../middlewares/auth";
+import * as FarmerTransactionController from "@/modules/farmer_transactions/farmer_transactions.controller";
+import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 
 const router = Router();
 

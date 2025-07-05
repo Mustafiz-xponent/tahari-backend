@@ -1,7 +1,7 @@
 "use strict";
 
 import dotenv from "dotenv";
-import app from "./app";
+import app from "@/app";
 
 // Load environment variables
 dotenv.config();

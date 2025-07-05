@@ -4,9 +4,12 @@
  */
 
 import { Request, Response } from "express";
-import * as walletService from "./wallet.service";
-import { zCreateWalletDto, zUpdateWalletDto } from "./wallet.dto";
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import * as walletService from "@/modules/wallets/wallet.service";
+import {
+  zCreateWalletDto,
+  zUpdateWalletDto,
+} from "@/modules/wallets/wallet.dto";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 
 const walletIdSchema = z.coerce.bigint().refine((val) => val > 0n, {

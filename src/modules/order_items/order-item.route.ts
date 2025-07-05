@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import * as OrderItemController from "./order-item.controller";
+import * as OrderItemController from "@/modules/order_items/order-item.controller";
 
 const router = Router();
 

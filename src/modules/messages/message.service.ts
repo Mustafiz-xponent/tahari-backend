@@ -3,9 +3,12 @@
  * Contains business logic and database interactions for messages.
  */
 
-import prisma from "../../prisma-client/prismaClient";
-import { Message } from "../../../generated/prisma/client";
-import { CreateMessageDto, UpdateMessageDto } from "./message.dto";
+import prisma from "@/prisma-client/prismaClient";
+import { Message } from "@/generated/prisma/client";
+import {
+  CreateMessageDto,
+  UpdateMessageDto,
+} from "@/modules/messages/message.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 
 /**

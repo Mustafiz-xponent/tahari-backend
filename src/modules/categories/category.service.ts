@@ -2,19 +2,22 @@
  * Service layer for Category entity operations.
  * Contains business logic and database interactions for categories.
  */
-import { getErrorMessage } from "../../utils/errorHandler";
-import prisma from "../../prisma-client/prismaClient";
+import { getErrorMessage } from "@/utils/errorHandler";
+import prisma from "@/prisma-client/prismaClient";
 import { Category, Product } from "@/generated/prisma/client";
-import { UpdateCategoryDto, CreateCategoryDto } from "./category.dto";
+import {
+  UpdateCategoryDto,
+  CreateCategoryDto,
+} from "@/modules/categories/category.dto";
 import {
   getBatchAccessibleImageUrls,
   processProductsWithAccessibleUrls,
-} from "../../utils/fileUpload/s3Aws";
+} from "@/utils/fileUpload/s3Aws";
 import {
   uploadFileToS3,
   getAccessibleImageUrl,
-} from "../../utils/fileUpload/s3Aws";
-import { multerFileToFileObject } from "../../utils/fileUpload/configMulterUpload";
+} from "@/utils/fileUpload/s3Aws";
+import { multerFileToFileObject } from "@/utils/fileUpload/configMulterUpload";
 
 export interface ProductWithAccessibleImages extends Product {
   accessibleImageUrls: string[];

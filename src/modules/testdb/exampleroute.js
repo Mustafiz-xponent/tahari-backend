@@ -3,7 +3,7 @@ import {
   verifyToken,
   restrictToAdminRole,
   restrictToCustomer,
-} from "../middleware/authMiddleware";
+} from "@/middleware/authMiddleware";
 import { AdminRole } from "@prisma/client";
 
 const router = Router();

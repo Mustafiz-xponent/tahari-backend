@@ -8,7 +8,7 @@ import {
 } from "@prisma/client/runtime/library";
 
 import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
-import { AppError } from "../utils/appError";
+import { AppError } from "@/utils/appError";
 
 const handlePrismaError = (error: unknown): AppError => {
   let message = "Database operation failed";

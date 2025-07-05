@@ -3,9 +3,12 @@
  * Handles HTTP requests and responses for admin authentication endpoints.
  */
 import { Request, Response } from "express";
-import { handleErrorResponse } from "../../../utils/errorResponseHandler";
-import { zAdminLoginDto, zCreateAdminDto } from "./admin.dto";
-import * as adminService from "./admin.service";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
+import {
+  zAdminLoginDto,
+  zCreateAdminDto,
+} from "@/modules/auth/admin/admin.dto";
+import * as adminService from "@/modules/auth/admin/admin.service";
 import { z } from "zod";
 
 const adminIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
@@ -19,7 +22,7 @@ export const createAdmin = async (req: Request, res: Response) => {
   try {
     const data = zCreateAdminDto.parse(req.body);
     const { user } = await adminService.createAdmin(data);
-    res.status(201).json({ 
+    res.status(201).json({
       success: true,
       message: "Admin created successfully",
       data: { user },

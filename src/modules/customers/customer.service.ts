@@ -3,9 +3,12 @@
  * Contains business logic and database interactions for customers.
  */
 
-import prisma from "../../prisma-client/prismaClient";
-import { Customer } from "../../../generated/prisma/client";
-import { CreateCustomerDto, UpdateCustomerDto } from "./customer.dto";
+import prisma from "@/prisma-client/prismaClient";
+import { Customer } from "@/generated/prisma/client";
+import {
+  CreateCustomerDto,
+  UpdateCustomerDto,
+} from "@/modules/customers/customer.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import bcrypt from "bcrypt";
 

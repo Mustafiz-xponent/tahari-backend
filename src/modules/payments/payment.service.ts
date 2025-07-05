@@ -2,16 +2,19 @@
  * Service layer for Payment entity operations.
  * Contains business logic and database interactions for payments.
  */
-import prisma from "../../prisma-client/prismaClient";
-import { Payment } from "../../../generated/prisma/client";
-import { CreatePaymentDto, UpdatePaymentDto } from "./payment.dto";
-import { getErrorMessage } from "../../utils/errorHandler";
+import prisma from "@/prisma-client/prismaClient";
+import { Payment } from "@/generated/prisma/client";
+import {
+  CreatePaymentDto,
+  UpdatePaymentDto,
+} from "@/modules/payments/payment.dto";
+import { getErrorMessage } from "@/utils/errorHandler";
 import {
   processWalletPayment,
   processSSLCommerzPayment,
   processCodPayment,
   validateSSLCommerzPayment,
-} from "../../utils/processPayment";
+} from "@/utils/processPayment";
 
 /**
  * create order payment through wallet or SSLCommerz

@@ -5,13 +5,13 @@
  * Contains business logic and database interactions for inventory purchases.
  */
 
-import prisma from "../../prisma-client/prismaClient";
-import { InventoryPurchase } from "../../../generated/prisma/client";
+import prisma from "@/prisma-client/prismaClient";
+import { InventoryPurchase } from "@/generated/prisma/client";
 import {
   CreateInventoryPurchaseDto,
   UpdateInventoryPurchaseDto,
-} from "./inventory-purchase.dto";
-import { getErrorMessage } from "../../utils/errorHandler";
+} from "@/modules/inventory_purchases/inventory-purchase.dto";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 /**
  * Create a new inventory purchase

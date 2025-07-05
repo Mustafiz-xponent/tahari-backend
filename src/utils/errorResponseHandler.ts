@@ -29,7 +29,7 @@
 //   });
 // }
 
-import { Prisma } from "../../generated/prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import { Response } from "express";
 import { ZodError } from "zod";
 

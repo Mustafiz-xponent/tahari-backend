@@ -4,13 +4,13 @@
  */
 
 import { Request, Response } from "express";
-import * as inventoryPurchaseService from "./inventory_purchase.service";
+import * as inventoryPurchaseService from "@/modules/inventory_purchases/inventory_purchase.service";
 import {
   zCreateInventoryPurchaseDto,
   zUpdateInventoryPurchaseDto,
-} from "./inventory-purchase.dto";
+} from "@/modules/inventory_purchases/inventory-purchase.dto";
 import { z } from "zod";
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 
 const purchaseIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Purchase ID must be a positive integer",

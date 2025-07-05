@@ -3,11 +3,11 @@
  * Handles admin creation by super admins and login.
  */
 import bcrypt from "bcrypt";
-import { User } from "../../../../generated/prisma/client";
-import prisma from "../../../prisma-client/prismaClient";
-import { generateAuthToken } from "../../../utils/authToken";
-import { getErrorMessage } from "../../../utils/errorHandler";
-import { AdminLoginDto, CreateAdminDto } from "./admin.dto";
+import { User } from "@/generated/prisma/client";
+import prisma from "@/prisma-client/prismaClient";
+import { generateAuthToken } from "@/utils/authToken";
+import { getErrorMessage } from "@/utils/errorHandler";
+import { AdminLoginDto, CreateAdminDto } from "@/modules/auth/admin/admin.dto";
 
 const SALT_ROUNDS = 10;
 

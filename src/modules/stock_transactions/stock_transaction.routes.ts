@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import * as StockTransactionController from "./stock_transaction.controller";
+import * as StockTransactionController from "@/modules/stock_transactions/stock_transaction.controller";
 
 const router = Router();
 

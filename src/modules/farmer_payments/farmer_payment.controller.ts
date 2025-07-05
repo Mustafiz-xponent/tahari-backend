@@ -6,13 +6,13 @@
  */
 
 import { Request, Response } from "express";
-import * as farmerPaymentService from "./farmer_payment.service";
+import * as farmerPaymentService from "@/modules/farmer_payments/farmer_payment.service";
 import {
   zCreateFarmerPaymentDto,
   zUpdateFarmerPaymentDto,
-} from "./farmer_payment.dto";
+} from "@/modules/farmer_payments/farmer_payment.dto";
 import { z } from "zod";
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 
 const paymentIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Payment ID must be a positive integer",

@@ -1,8 +1,8 @@
 //src/modules/admins/admins.controller.ts
 import { Request, Response } from "express";
-import * as adminService from "./admins.service";
-import { CreateAdminDto, UpdateAdminDto } from "./admins.dto";
-import { getErrorMessage } from "../../utils/errorHandler";
+import * as adminService from "@/modules/admins/admins.service";
+import { CreateAdminDto, UpdateAdminDto } from "@/modules/admins/admins.dto";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 // export const createAdmin = async (
 //   req: Request,

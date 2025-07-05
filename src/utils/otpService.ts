@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import prisma from "../prisma-client/prismaClient";
+import prisma from "@/prisma-client/prismaClient";
 import axios from "axios";
 
 const OTP_EXPIRY_MINUTES = 5;

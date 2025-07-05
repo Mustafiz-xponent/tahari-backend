@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import * as PaymentController from "./payment.controller";
+import * as PaymentController from "@/modules/payments/payment.controller";
 
 const router = Router();
 

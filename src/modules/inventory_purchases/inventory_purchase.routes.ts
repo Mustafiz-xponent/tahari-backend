@@ -4,8 +4,8 @@
  */
 
 import { Router } from "express";
-import * as InventoryPurchaseController from "./inventory_purchase.controller";
-import { authMiddleware, authorizeRoles } from "../../middlewares/auth";
+import * as InventoryPurchaseController from "@/modules/inventory_purchases/inventory_purchase.controller";
+import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 
 const router = Router();
 

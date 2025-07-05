@@ -3,13 +3,13 @@
  * Handles HTTP requests and responses for farmer transaction-related endpoints.
  */
 import { Request, Response } from "express";
-import * as farmerTransactionService from "./farmer_transactions.service";
+import * as farmerTransactionService from "@/modules/farmer_transactions/farmer_transactions.service";
 import {
   zCreateFarmerTransactionDto,
   zUpdateFarmerTransactionDto,
-} from "./farmer_transactions.dto";
+} from "@/modules/farmer_transactions/farmer_transactions.dto";
 
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 
 const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {

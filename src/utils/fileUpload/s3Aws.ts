@@ -10,7 +10,7 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Product } from "../../../generated/prisma/client";
+import { Product } from "@/generated/prisma/client";
 
 // Configure AWS S3 client
 const s3Client = new S3Client({

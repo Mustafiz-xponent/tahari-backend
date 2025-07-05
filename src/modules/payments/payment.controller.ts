@@ -4,9 +4,12 @@
  */
 
 import { Request, Response } from "express";
-import * as paymentService from "./payment.service";
-import { zCreatePaymentDto, zUpdatePaymentDto } from "./payment.dto";
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import * as paymentService from "@/modules/payments/payment.service";
+import {
+  zCreatePaymentDto,
+  zUpdatePaymentDto,
+} from "@/modules/payments/payment.dto";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 
 const paymentIdSchema = z.coerce.bigint().refine((val) => val > 0n, {

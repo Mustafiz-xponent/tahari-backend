@@ -4,8 +4,8 @@
  */
 
 import { Router } from "express";
-import { authMiddleware, authorizeRoles } from "../../../middlewares/auth";
-import * as AdminController from "./admin.controller";
+import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
+import * as AdminController from "@/modules/auth/admin/admin.controller";
 
 const router = Router();
 

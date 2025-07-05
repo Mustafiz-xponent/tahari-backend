@@ -4,8 +4,11 @@
  */
 
 import { Request, Response } from "express";
-import * as messageService from "./message.service";
-import { zCreateMessageDto, zUpdateMessageDto } from "./message.dto";
+import * as messageService from "@/modules/messages/message.service";
+import {
+  zCreateMessageDto,
+  zUpdateMessageDto,
+} from "@/modules/messages/message.dto";
 import { ZodError, z } from "zod";
 
 const messageIdSchema = z.coerce.bigint().refine((val) => val > 0n, {

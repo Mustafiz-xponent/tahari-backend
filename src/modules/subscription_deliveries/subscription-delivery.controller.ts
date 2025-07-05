@@ -4,12 +4,12 @@
  */
 
 import { Request, Response } from "express";
-import * as subscriptionDeliveryService from "./subscription-delivery.service";
+import * as subscriptionDeliveryService from "@/modules/subscription_deliveries/subscription-delivery.service";
 import {
   zCreateSubscriptionDeliveryDto,
   zUpdateSubscriptionDeliveryDto,
-} from "./subscription-delivery.dto";
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+} from "@/modules/subscription_deliveries/subscription-delivery.dto";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 
 const deliveryIdSchema = z.coerce.bigint().refine((val) => val > 0n, {

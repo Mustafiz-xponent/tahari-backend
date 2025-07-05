@@ -3,13 +3,13 @@
  * Contains business logic and database interactions for subscription deliveries.
  */
 
-import prisma from "../../prisma-client/prismaClient";
-import { SubscriptionDelivery } from "../../../generated/prisma/client";
+import prisma from "@/prisma-client/prismaClient";
+import { SubscriptionDelivery } from "@/generated/prisma/client";
 import {
   CreateSubscriptionDeliveryDto,
   UpdateSubscriptionDeliveryDto,
-} from "./subscription-delivery.dto";
-import { getErrorMessage } from "../../utils/errorHandler";
+} from "@/modules/subscription_deliveries/subscription-delivery.dto";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 /**
  * Create a new subscription delivery

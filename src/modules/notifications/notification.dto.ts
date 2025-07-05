@@ -5,14 +5,14 @@
 
 import { z } from "zod";
 
-const notificationStatusEnum = z.enum(["unread", "read"]);
+const notificationStatusEnum = z.enum(["UNREAD", "READ"]);
 
 /**
  * Zod schema for creating a new notification.
  */
 export const zCreateNotificationDto = z.object({
   message: z.string().min(1, "Message is required"),
-  status: notificationStatusEnum.default("unread"),
+  status: notificationStatusEnum.default("UNREAD"),
 });
 
 /**

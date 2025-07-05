@@ -4,18 +4,18 @@
  */
 
 import bcrypt from "bcrypt";
-import { User } from "../../../../generated/prisma/client";
-import prisma from "../../../prisma-client/prismaClient";
-import { generateAuthToken } from "../../../utils/authToken";
-import { getErrorMessage } from "../../../utils/errorHandler";
-import { sendOtp, verifyOtp } from "../../../utils/otpService";
+import { User } from "@/generated/prisma/client";
+import prisma from "@/prisma-client/prismaClient";
+import { generateAuthToken } from "@/utils/authToken";
+import { getErrorMessage } from "@/utils/errorHandler";
+import { sendOtp, verifyOtp } from "@/utils/otpService";
 import {
   CustomerLoginDto,
   CustomerOtpLoginDto,
   CustomerRegisterDto,
   CustomerUpdateProfileDto,
   CustomerVerifyOtpDto,
-} from "./customer.dto";
+} from "@/modules/auth/customer/customer.dto";
 
 /**
  * Register new customer with phone number

@@ -3,13 +3,13 @@
  * Contains business logic and database interactions for subscriptions.
  */
 
-import prisma from "../../prisma-client/prismaClient";
-import { Subscription } from "../../../generated/prisma/client";
+import prisma from "@/prisma-client/prismaClient";
+import { Subscription } from "@/generated/prisma/client";
 import {
   CreateSubscriptionDto,
   UpdateSubscriptionDto,
-} from "./subscription.dto";
-import { getErrorMessage } from "../../utils/errorHandler";
+} from "@/modules/subscriptions/subscription.dto";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 /**
  * Create a new subscription

@@ -4,8 +4,8 @@
  */
 
 import { Router } from "express";
-import * as ProductController from "./product.controller";
-import { authMiddleware, authorizeRoles } from "../../middlewares/auth";
+import * as ProductController from "@/modules/products/product.controller";
+import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 
 const router = Router();
 

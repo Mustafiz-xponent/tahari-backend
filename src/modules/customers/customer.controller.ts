@@ -4,8 +4,8 @@
  */
 
 import { Request, Response } from "express";
-import * as customerService from "./customer.service";
-import { zCreateCustomerDto, zUpdateCustomerDto } from "./customer.dto";
+import * as customerService from "@/modules/customers/customer.service";
+import { zUpdateCustomerDto } from "@/modules/customers/customer.dto";
 import { ZodError, z } from "zod";
 
 const customerIdSchema = z.coerce.bigint().refine((val) => val > 0n, {

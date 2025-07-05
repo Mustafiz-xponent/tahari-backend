@@ -4,8 +4,8 @@
  */
 
 import { Router } from "express";
-import * as WalletTransactionController from "./wallet_transaction.controller";
-import { authMiddleware, authorizeRoles } from "../../middlewares/auth";
+import * as WalletTransactionController from "@/modules/wallet_transactions/wallet_transaction.controller";
+import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 
 const router = Router();
 

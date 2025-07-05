@@ -1,6 +1,6 @@
-import prisma from "../prisma-client/prismaClient";
+import prisma from "@/prisma-client/prismaClient";
 import axios from "axios";
-import { getErrorMessage } from "../utils/errorHandler";
+import { getErrorMessage } from "@/utils/errorHandler";
 import { WalletTransaction } from "@/generated/prisma/client";
 
 /**

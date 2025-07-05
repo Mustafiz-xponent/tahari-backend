@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import * as NotificationController from "./notification.controller";
+import * as NotificationController from "@/modules/notifications/notification.controller";
 
 const router = Router();
 

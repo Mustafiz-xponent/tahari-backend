@@ -3,9 +3,9 @@
  * Updated to handle image uploads with product creation and updates.
  */
 
-import { Product } from "../../../generated/prisma/client";
-import prisma from "../../prisma-client/prismaClient";
-import { getErrorMessage } from "../../utils/errorHandler";
+import { Product } from "@/generated/prisma/client";
+import prisma from "@/prisma-client/prismaClient";
+import { getErrorMessage } from "@/utils/errorHandler";
 import {
   deleteMultipleFilesFromS3,
   extractS3KeyFromUrl,
@@ -13,8 +13,11 @@ import {
   processProductsWithAccessibleUrls,
   replaceProductImages,
   uploadProductImages,
-} from "../../utils/fileUpload/s3Aws";
-import { CreateProductDto, UpdateProductDto } from "./product.dto";
+} from "@/utils/fileUpload/s3Aws";
+import {
+  CreateProductDto,
+  UpdateProductDto,
+} from "@/modules/products/product.dto";
 
 // Add interface for product with accessible URLs
 interface ProductWithAccessibleImages extends Omit<Product, "imageUrls"> {

@@ -6,7 +6,7 @@ import morgran from "morgan";
 import compression from "compression";
 
 // import routes
-// import adminRoutes from "../src/modules/admins/admins.routes";
+// import adminRoutes from "@/modules/admins/admins.routes";
 import customerUserRoutes from "@/modules/auth/customer/customer.routes";
 import adminUserRoutes from "@/modules/auth/admin/admin.routes";
 import farmerRoutes from "@/modules/farmers/farmers.routes";

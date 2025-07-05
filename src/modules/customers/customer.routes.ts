@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import * as CustomerController from "./customer.controller";
+import * as CustomerController from "@/modules/customers/customer.controller";
 
 const router = Router();
 

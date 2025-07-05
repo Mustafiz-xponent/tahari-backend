@@ -3,12 +3,12 @@
  * Contains business logic and database interactions for wallets.
  */
 
-import prisma from "../../prisma-client/prismaClient";
-import { Wallet, WalletTransaction } from "../../../generated/prisma/client";
-import { CreateWalletDto, UpdateWalletDto } from "./wallet.dto";
-import { getErrorMessage } from "../../utils/errorHandler";
-import { processSSLCommerzWalletDeposite } from "../../utils/processWalletDeposite";
-import { validateSSLCommerzPayment } from "../../utils/processPayment";
+import prisma from "@/prisma-client/prismaClient";
+import { Wallet, WalletTransaction } from "@/generated/prisma/client";
+import { CreateWalletDto, UpdateWalletDto } from "@/modules/wallets/wallet.dto";
+import { getErrorMessage } from "@/utils/errorHandler";
+import { processSSLCommerzWalletDeposite } from "@/utils/processWalletDeposite";
+import { validateSSLCommerzPayment } from "@/utils/processPayment";
 
 /**
  * Create a new wallet

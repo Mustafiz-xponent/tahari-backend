@@ -3,7 +3,7 @@
  * Handles HTTP requests and responses for customer authentication endpoints.
  */
 import { Request, Response } from "express";
-import { handleErrorResponse } from "../../../utils/errorResponseHandler";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import {
   zCustomerIdParam,
   zCustomerLoginDto,
@@ -11,9 +11,8 @@ import {
   zCustomerRegisterDto,
   zCustomerUpdateProfileDto,
   zCustomerVerifyOtpDto,
-} from "./customer.dto";
-import * as customerService from "./customer.service";
-import { z } from "zod";
+} from "@/modules/auth/customer/customer.dto";
+import * as customerService from "@/modules/auth/customer/customer.service";
 
 /**
  * Register a customer

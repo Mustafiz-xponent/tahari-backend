@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import * as FarmerPaymentController from "./farmer_payment.controller";
+import * as FarmerPaymentController from "@/modules/farmer_payments/farmer_payment.controller";
 
 const router = Router();
 

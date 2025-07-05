@@ -5,14 +5,14 @@
 
 import { Request, Response } from "express";
 import { z } from "zod";
-import { upload } from "../../utils/fileUpload/configMulterUpload";
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import { upload } from "@/utils/fileUpload/configMulterUpload";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import {
   productNameSchema,
   zCreateProductDto,
   zUpdateProductDto,
-} from "./product.dto";
-import * as productService from "./product.service";
+} from "@/modules/products/product.dto";
+import * as productService from "@/modules/products/product.service";
 
 const productIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Product ID must be a positive integer",

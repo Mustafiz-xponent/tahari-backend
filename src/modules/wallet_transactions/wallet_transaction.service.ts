@@ -3,13 +3,13 @@
  * Contains business logic and database interactions for wallet transactions.
  */
 
-import prisma from "../../prisma-client/prismaClient";
-import { WalletTransaction } from "../../../generated/prisma/client";
+import prisma from "@/prisma-client/prismaClient";
+import { WalletTransaction } from "@/generated/prisma/client";
 import {
   CreateWalletTransactionDto,
   UpdateWalletTransactionDto,
-} from "./wallet_transaction.dto";
-import { getErrorMessage } from "../../utils/errorHandler";
+} from "@/modules/wallet_transactions/wallet_transaction.dto";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 /**
  * Create a new wallet transaction

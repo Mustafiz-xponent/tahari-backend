@@ -4,13 +4,13 @@
  */
 
 import { Request, Response } from "express";
-import * as orderItemService from "./order-item.service";
+import * as orderItemService from "@/modules/order_items/order-item.service";
 import {
   zCreateOrderItemDto,
   zCreateOrderItemsDto,
   zUpdateOrderItemDto,
-} from "./order-item.dto";
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+} from "@/modules/order_items/order-item.dto";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 
 const orderItemIdSchema = z.coerce.bigint().refine((val) => val > 0n, {

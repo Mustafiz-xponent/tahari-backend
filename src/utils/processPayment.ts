@@ -1,7 +1,7 @@
 import { CreatePaymentDto } from "@/modules/payments/payment.dto";
-import prisma from "../prisma-client/prismaClient";
-import { Payment } from "../../generated/prisma/client";
-import { getErrorMessage } from "./errorHandler";
+import prisma from "@/prisma-client/prismaClient";
+import { Payment } from "@/generated/prisma/client";
+import { getErrorMessage } from "@/utils/errorHandler";
 import axios from "axios";
 
 export interface PaymentResult {

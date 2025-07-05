@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import * as SubscriptionDeliveryController from "./subscription-delivery.controller";
+import * as SubscriptionDeliveryController from "@/modules/subscription_deliveries/subscription-delivery.controller";
 
 const router = Router();
 

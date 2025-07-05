@@ -4,12 +4,12 @@
  */
 
 import { Request, Response } from "express";
-import * as subscriptionPlanService from "./subscription_plan.service";
+import * as subscriptionPlanService from "@/modules/subscription_plans/subscription_plan.service";
 import {
   zCreateSubscriptionPlanDto,
   zUpdateSubscriptionPlanDto,
-} from "./subscription_plan.dto";
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+} from "@/modules/subscription_plans/subscription_plan.dto";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 
 const planIdSchema = z.coerce.bigint().refine((val) => val > 0n, {

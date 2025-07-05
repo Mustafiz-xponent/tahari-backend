@@ -4,9 +4,9 @@
  */
 
 import { NextFunction, Request, Response } from "express";
-import * as orderService from "./orders.service";
-import { zCreateOrderDto, zUpdateOrderDto } from "./orders.dto";
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+import * as orderService from "@/modules/orders/orders.service";
+import { zCreateOrderDto, zUpdateOrderDto } from "@/modules/orders/orders.dto";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import { OrderStatus } from "@/generated/prisma/client";
 

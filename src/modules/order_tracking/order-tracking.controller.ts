@@ -4,12 +4,12 @@
  */
 
 import { Request, Response } from "express";
-import * as orderTrackingService from "./order-tracking.service";
+import * as orderTrackingService from "@/modules/order_tracking/order-tracking.service";
 import {
   zCreateOrderTrackingDto,
   zUpdateOrderTrackingDto,
-} from "./order-tracking.dto";
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+} from "@/modules/order_tracking/order-tracking.dto";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 
 const idSchema = z.coerce.bigint().refine((val) => val > 0n, {

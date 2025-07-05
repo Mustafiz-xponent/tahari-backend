@@ -3,13 +3,13 @@
  * Contains business logic and database interactions for farmer transactions.
  */
 
-import prisma from "../../prisma-client/prismaClient";
-import { FarmerTransaction } from "../../../generated/prisma/client";
+import prisma from "@/prisma-client/prismaClient";
+import { FarmerTransaction } from "@/generated/prisma/client";
 import {
   CreateFarmerTransactionDto,
   UpdateFarmerTransactionDto,
-} from "./farmer_transactions.dto";
-import { getErrorMessage } from "../../utils/errorHandler";
+} from "@/modules/farmer_transactions/farmer_transactions.dto";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 /**
  * Create a new farmer transaction

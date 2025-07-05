@@ -3,13 +3,13 @@
  * Contains business logic and database interactions for order tracking entries.
  */
 
-import prisma from "../../prisma-client/prismaClient";
-import { OrderTracking } from "../../../generated/prisma/client";
+import prisma from "@/prisma-client/prismaClient";
+import { OrderTracking } from "@/generated/prisma/client";
 import {
   CreateOrderTrackingDto,
   UpdateOrderTrackingDto,
-} from "./order-tracking.dto";
-import { getErrorMessage } from "../../utils/errorHandler";
+} from "@/modules/order_tracking/order-tracking.dto";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 /**
  * Create a new order tracking entry

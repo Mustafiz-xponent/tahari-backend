@@ -5,13 +5,13 @@
  * Contains business logic and database interactions for farmer payments.
  */
 
-import prisma from "../../prisma-client/prismaClient";
-import { FarmerPayment } from "../../../generated/prisma/client";
+import prisma from "@/prisma-client/prismaClient";
+import { FarmerPayment } from "@/generated/prisma/client";
 import {
   CreateFarmerPaymentDto,
   UpdateFarmerPaymentDto,
-} from "./farmer_payment.dto";
-import { getErrorMessage } from "../../utils/errorHandler";
+} from "@/modules/farmer_payments/farmer_payment.dto";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 /**
  * Create a new farmer payment

@@ -4,12 +4,12 @@
  */
 
 import { Request, Response } from "express";
-import * as walletTransactionService from "./wallet_transaction.service";
+import * as walletTransactionService from "@/modules/wallet_transactions/wallet_transaction.service";
 import {
   zCreateWalletTransactionDto,
   zUpdateWalletTransactionDto,
-} from "./wallet_transaction.dto";
-import { handleErrorResponse } from "../../utils/errorResponseHandler";
+} from "@/modules/wallet_transactions/wallet_transaction.dto";
+import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 
 const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {

@@ -1,9 +1,9 @@
 // src/tests/e2e/admins.e2e.test.ts
 import request from "supertest";
-import { AdminRole, AdminStatus } from "../../../generated/prisma/client";
+import { AdminRole, AdminStatus } from "@/generated/prisma/client";
 import { number } from "zod";
-import app from "../../app";
-import prisma from "../../prisma-client/prismaClient";
+import app from "@/app";
+import prisma from "@/prisma-client/prismaClient";
 
 describe("Admin API", () => {
   let createdAdminId = number;

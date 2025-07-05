@@ -1,6 +1,4 @@
-import { PrismaClient } from "../../generated/prisma/client";
-
- 
+import { PrismaClient } from "@/generated/prisma/client";
 
 const isTest = process.env.NODE_ENV === "test";
 
@@ -15,5 +13,3 @@ const prisma = new PrismaClient({
 });
 
 export default prisma;
-
- 

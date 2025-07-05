@@ -3,12 +3,12 @@
  * Contains business logic and database interactions for notifications.
  */
 
-import prisma from "../../prisma-client/prismaClient";
-import { Notification } from "../../../generated/prisma/client";
+import prisma from "@/prisma-client/prismaClient";
+import { Notification } from "@/generated/prisma/client";
 import {
   CreateNotificationDto,
   UpdateNotificationDto,
-} from "./notification.dto";
+} from "@/modules/notifications/notification.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 
 /**

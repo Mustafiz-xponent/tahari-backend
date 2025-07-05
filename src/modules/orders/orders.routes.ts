@@ -4,8 +4,8 @@
  */
 
 import { Router } from "express";
-import * as OrderController from "./orders.controller";
-import { authMiddleware, authorizeRoles } from "../../middlewares/auth";
+import * as OrderController from "@/modules/orders/orders.controller";
+import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 
 const router = Router();
 

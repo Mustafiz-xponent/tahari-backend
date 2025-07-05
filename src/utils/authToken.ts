@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { User } from "../../generated/prisma/client";
+import { User } from "@/generated/prisma/client";
 
 const JWT_EXPIRY = "1d";
 
