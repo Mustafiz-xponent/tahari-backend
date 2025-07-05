@@ -18,6 +18,7 @@ import {
   CreateProductDto,
   UpdateProductDto,
 } from "@/modules/products/product.dto";
+import logger from "@/utils/logger";
 
 // Add interface for product with accessible URLs
 interface ProductWithAccessibleImages extends Omit<Product, "imageUrls"> {
@@ -484,7 +485,7 @@ export async function deleteProduct(productId: BigInt): Promise<void> {
         // Run cleanup in background
         deleteMultipleFilesFromS3(s3Keys, product.isPrivateImages || false)
           .then(() => {
-            console.log("✅ Successfully deleted S3 files:", s3Keys);
+            logger.info("✅ Successfully deleted S3 files:", s3Keys);
           })
           .catch((error) => {
             console.error(

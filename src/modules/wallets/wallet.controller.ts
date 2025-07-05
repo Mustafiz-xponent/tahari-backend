@@ -78,18 +78,14 @@ export const handleSslCommerzSuccess = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log("SUCCESS WEBHOOK CALLED");
     const result = await walletService.handleDepositeSuccess(req.body);
     if (result.success) {
       res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
-      console.log("PAYMENT COMPLETED");
     } else {
       res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-      console.log("PAYMENT FAILED");
     }
   } catch (error) {
     res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-    console.log("PAYMENT FAILED");
   }
 };
 
@@ -101,13 +97,10 @@ export const handleSslCommerzFailure = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log("FAILURE WEBHOOK CALLED");
     await walletService.handleDepositeFailure(req.body);
     res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-    console.log("PAYMENT FAILED");
   } catch (error) {
     res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-    console.log("PAYMENT FAILED");
   }
 };
 /**
@@ -118,13 +111,10 @@ export const handleSslCommerzCancel = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log("CANCEL WEBHOOK CALLED");
     await walletService.handleDepositeFailure(req.body);
     res.redirect(`${process.env.PAYMENT_CANCEL_DEEP_LINK}`);
-    console.log("PAYMENT CANCELLED");
   } catch (error) {
     res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-    console.log("PAYMENT CANCELLED");
   }
 };
 
@@ -136,11 +126,9 @@ export const handleSslCommerzIPN = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log("IPN WEBHOOK CALLED");
     await walletService.handleDepositeSuccess(req.body);
     res.status(200).json({ message: "IPN received successfully" });
   } catch (error) {
-    console.error("SSLCommerz IPN error:", error);
     res.status(200).json({ message: "IPN received successfully" });
   }
 };

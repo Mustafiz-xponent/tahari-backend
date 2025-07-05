@@ -11,6 +11,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Product } from "@/generated/prisma/client";
+import logger from "@/utils/logger";
 
 // Configure AWS S3 client
 const s3Client = new S3Client({
@@ -88,7 +89,7 @@ export async function uploadFileToS3(
 
   try {
     const result = await s3Client.send(new PutObjectCommand(uploadParams));
-    console.log("File uploaded successfully:", result);
+    logger.info(`File uploaded to S3: ${result}`);
 
     // Generate appropriate URL based on bucket type
     let fileUrl: string;
@@ -200,7 +201,7 @@ export async function deleteFileFromS3(
         Key: s3Key,
       })
     );
-    console.log("File deleted successfully:", s3Key);
+    logger.info(`File deleted from S3: ${s3Key}`);
     return true;
   } catch (error) {
     console.error("Error deleting file from S3:", error);

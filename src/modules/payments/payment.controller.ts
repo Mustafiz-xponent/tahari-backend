@@ -43,20 +43,15 @@ export const handleSSLCommerzSuccess = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log("SUCCESS WEBHOOK CALLED");
     const result = await paymentService.handleSSLCommerzSuccess(req.body);
 
     if (result.success) {
       res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
-      console.log("PAYMENT COMPLETED");
     } else {
       res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-      console.log("PAYMENT FAILED");
     }
   } catch (error) {
-    console.log("SUCCESS ERROR:", error);
     res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-    console.log("PAYMENT FAILED");
   }
 };
 
@@ -68,13 +63,10 @@ export const handleSSLCommerzFailure = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log("FAILURE WEBHOOK CALLED");
     await paymentService.handleSSLCommerzFailure(req.body);
     res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-    console.log("PAYMENT FAILED");
   } catch (error) {
     res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-    console.log("PAYMENT FAILED");
   }
 };
 /**
@@ -85,13 +77,10 @@ export const handleSSLCommerzCancel = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log("CANCEL WEBHOOK CALLED");
     await paymentService.handleSSLCommerzFailure(req.body);
     res.redirect(`${process.env.PAYMENT_CANCEL_DEEP_LINK}`);
-    console.log("PAYMENT CANCELLED");
   } catch (error) {
     res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-    console.log("PAYMENT CANCELLED");
   }
 };
 
@@ -103,11 +92,9 @@ export const handleSSLCommerzIPN = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log("IPN WEBHOOK CALLED");
-    const result = await paymentService.handleSSLCommerzSuccess(req.body);
+    await paymentService.handleSSLCommerzSuccess(req.body);
     res.status(200).json({ message: "IPN received successfully" });
   } catch (error) {
-    console.error("SSLCommerz IPN error:", error);
     res.status(200).json({ message: "IPN received successfully" });
   }
 };

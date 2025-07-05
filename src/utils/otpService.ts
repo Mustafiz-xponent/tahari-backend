@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import prisma from "@/prisma-client/prismaClient";
 import axios from "axios";
+import logger from "@/utils/logger";
 
 const OTP_EXPIRY_MINUTES = 5;
 const SALT_ROUNDS = 10;
@@ -43,8 +44,7 @@ async function sendSms(phone: string, message: string): Promise<void> {
       `Failed to send SMS: ${response.data?.msg || "Unknown error"}`
     );
   }
-
-  console.log("SMS sent successfully:", response.data);
+  logger.info("SMS sent successfully:", response.data);
 }
 
 /**
@@ -58,8 +58,7 @@ export async function sendOtp(phone: string): Promise<void> {
   await prisma.otp.create({
     data: { phone, otpHash, expiresAt },
   });
-
-  console.log(`OTP for ${phone}: ${otp}`);
+  logger.info(`OTP for ${phone}: ${otp}`);
 
   // Send SMS with OTP
   const message = `Your OTP is ${otp}. Valid for ${OTP_EXPIRY_MINUTES} minutes.`;

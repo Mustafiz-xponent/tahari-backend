@@ -16,6 +16,7 @@ import {
   CustomerUpdateProfileDto,
   CustomerVerifyOtpDto,
 } from "@/modules/auth/customer/customer.dto";
+import logger from "@/utils/logger";
 
 /**
  * Register new customer with phone number
@@ -123,7 +124,7 @@ export async function verifyCustomerOtp(
     where: { phone: data.phone, expiresAt: { gt: new Date() } },
     orderBy: { createdAt: "desc" },
   });
-  console.log("OTP record:", otpRecord);
+  logger.info("OTP record:", otpRecord);
 
   if (!otpRecord || otpRecord.expiresAt < new Date()) {
     throw new Error("Invalid or expired OTP");
@@ -169,7 +170,7 @@ export async function verifyCustomerOtp(
       },
     },
   });
-  console.log(user);
+
   await prisma.otp.deleteMany({
     where: { phone: data.phone },
   });
