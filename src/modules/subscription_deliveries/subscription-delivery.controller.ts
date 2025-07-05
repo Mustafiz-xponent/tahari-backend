@@ -11,6 +11,7 @@ import {
 } from "@/modules/subscription_deliveries/subscription-delivery.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
+import httpStatus from "http-status";
 
 const deliveryIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Delivery ID must be a positive integer",
@@ -27,7 +28,7 @@ export const createSubscriptionDelivery = async (
     const data = zCreateSubscriptionDeliveryDto.parse(req.body);
     const subscriptionDelivery =
       await subscriptionDeliveryService.createSubscriptionDelivery(data);
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
       message: "Subscription delivery created successfully",
       data: subscriptionDelivery,

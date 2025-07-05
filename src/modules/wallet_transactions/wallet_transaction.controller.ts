@@ -11,6 +11,7 @@ import {
 } from "@/modules/wallet_transactions/wallet_transaction.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
+import httpStatus from "http-status";
 
 const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Transaction ID must be a positive integer",
@@ -34,7 +35,7 @@ export const createWalletTransaction = async (
     const transaction = await walletTransactionService.createWalletTransaction(
       data
     );
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
       message: "Wallet transaction created successfully",
       data: transaction,

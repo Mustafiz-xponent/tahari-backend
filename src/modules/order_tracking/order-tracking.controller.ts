@@ -11,6 +11,7 @@ import {
 } from "@/modules/order_tracking/order-tracking.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
+import httpStatus from "http-status";
 
 const idSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "ID must be a positive integer",
@@ -26,7 +27,7 @@ export const createOrderTracking = async (
   try {
     const data = zCreateOrderTrackingDto.parse(req.body);
     const orderTracking = await orderTrackingService.createOrderTracking(data);
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
       message: "Order tracking created successfully",
       data: orderTracking,

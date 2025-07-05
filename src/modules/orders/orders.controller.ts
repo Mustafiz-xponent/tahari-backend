@@ -9,6 +9,7 @@ import { zCreateOrderDto, zUpdateOrderDto } from "@/modules/orders/orders.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import { OrderStatus } from "@/generated/prisma/client";
+import httpStatus from "http-status";
 
 const orderIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Order ID must be a positive integer",
@@ -24,7 +25,7 @@ export const createOrder = async (
   try {
     const data = zCreateOrderDto.parse(req.body);
     const order = await orderService.createOrder(data);
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
       message: "Order created successfully",
       data: order,
@@ -173,7 +174,7 @@ export const getCustomerOrders = async (
       skip,
     });
 
-    res.status(200).json({
+    res.status(httpStatus.OK).json({
       success: true,
       message: "Customer orders fetched successfully",
       data: result.orders,

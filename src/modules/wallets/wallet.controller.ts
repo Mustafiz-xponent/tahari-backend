@@ -11,6 +11,7 @@ import {
 } from "@/modules/wallets/wallet.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
+import httpStatus from "http-status";
 
 const walletIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Wallet ID must be a positive integer",
@@ -26,7 +27,7 @@ export const createWallet = async (
   try {
     const data = zCreateWalletDto.parse(req.body);
     const wallet = await walletService.createWallet(data);
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
       message: "Wallet created successfully",
       data: wallet,
@@ -49,7 +50,7 @@ export const initiateWalletDeposit = async (
 
     // Validation
     if (!amount || amount <= 0) {
-      res.status(400).json({
+      res.status(httpStatus.BAD_REQUEST).json({
         success: false,
         message: "Valid amount are required",
       });
@@ -61,7 +62,7 @@ export const initiateWalletDeposit = async (
       amount: parseFloat(amount),
     });
 
-    res.status(200).json({
+    res.status(httpStatus.OK).json({
       success: true,
       message: "Deposit initiated successfully",
       data: depositData,
@@ -127,9 +128,11 @@ export const handleSslCommerzIPN = async (
 ): Promise<void> => {
   try {
     await walletService.handleDepositeSuccess(req.body);
-    res.status(200).json({ message: "IPN received successfully" });
+    res.status(httpStatus.OK).json({ message: "IPN received successfully" });
   } catch (error) {
-    res.status(200).json({ message: "IPN received successfully" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "IPN failed" });
   }
 };
 /**

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import morgran from "morgan";
 import compression from "compression";
+import httpStatus from "http-status";
 
 // import routes
 // import adminRoutes from "@/modules/admins/admins.routes";
@@ -67,7 +68,7 @@ app.use("/api/subscription-deliveries", subscriptionDeliveryRoutes);
 
 // Health check route
 app.get("/health", (_req: Request, res: Response) => {
-  res.status(200).json({
+  res.status(httpStatus.OK).json({
     success: true,
     message: "Server is running",
     timestamp: new Date().toISOString(),
@@ -75,7 +76,7 @@ app.get("/health", (_req: Request, res: Response) => {
 });
 // API route not found
 app.use((_req: Request, res: Response) => {
-  res.status(404).json({
+  res.status(httpStatus.NOT_FOUND).json({
     success: false,
     message: "API route not found",
   });

@@ -13,6 +13,7 @@ import {
   zUpdateProductDto,
 } from "@/modules/products/product.dto";
 import * as productService from "@/modules/products/product.service";
+import httpStatus from "http-status";
 
 const productIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Product ID must be a positive integer",
@@ -55,7 +56,7 @@ export const createProduct = [
         imageFiles,
         true
       );
-      res.status(201).json({
+      res.status(httpStatus.CREATED).json({
         success: true,
         message: "Product created successfully",
         data: product,
@@ -101,7 +102,7 @@ export const getAllProducts = async (
 
     // Validate pagination parameters
     if (page < 1) {
-      res.status(400).json({
+      res.status(httpStatus.BAD_REQUEST).json({
         success: false,
         message: "Page number must be greater than 0",
       });
@@ -109,7 +110,7 @@ export const getAllProducts = async (
     }
 
     if (limit < 1) {
-      res.status(400).json({
+      res.status(httpStatus.BAD_REQUEST).json({
         success: false,
         message: "Limit must be greater than 0",
       });
@@ -166,7 +167,7 @@ export const getProductByName = async (
     );
 
     if (!product) {
-      res.status(404).json({
+      res.status(httpStatus.NOT_FOUND).json({
         success: false,
         message: "Product not found",
       });
@@ -198,7 +199,7 @@ export const getProductById = async (
       includeRelations
     );
     if (!product) {
-      res.status(404).json({
+      res.status(httpStatus.NOT_FOUND).json({
         success: false,
         message: "Product not found",
       });

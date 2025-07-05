@@ -11,6 +11,7 @@ import {
 } from "@/modules/payments/payment.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
+import httpStatus from "http-status";
 
 const paymentIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Payment ID must be a positive integer",
@@ -26,7 +27,7 @@ export const createPayment = async (
   try {
     const data = zCreatePaymentDto.parse(req.body);
     const payment = await paymentService.createPayment(data);
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
       message: "Payment created successfully",
       data: payment,
@@ -93,9 +94,11 @@ export const handleSSLCommerzIPN = async (
 ): Promise<void> => {
   try {
     await paymentService.handleSSLCommerzSuccess(req.body);
-    res.status(200).json({ message: "IPN received successfully" });
+    res.status(httpStatus.OK).json({ message: "IPN received successfully" });
   } catch (error) {
-    res.status(200).json({ message: "IPN received successfully" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "IPN failed" });
   }
 };
 

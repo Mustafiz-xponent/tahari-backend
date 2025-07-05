@@ -14,7 +14,7 @@ import {
   zUpdateStockTransactionDto,
 } from "@/modules/stock_transactions/stock_transaction.dto";
 import * as stockTransactionService from "@/modules/stock_transactions/stock_transaction.service";
-
+import httpStatus from "http-status";
 const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Transaction ID must be a positive integer",
 });
@@ -54,7 +54,7 @@ export const createStockTransaction = async (
       data
     );
 
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
       message: `${transactions.length} stock transaction${
         transactions.length > 1 ? "s" : ""

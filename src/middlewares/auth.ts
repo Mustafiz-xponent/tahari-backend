@@ -42,7 +42,7 @@ export const authMiddleware: RequestHandler = async (
 export const authorizeRoles = (...roles: UserRole[]): RequestHandler => {
   return (req, res, next) => {
     if (!roles.includes(req.user?.role as UserRole)) {
-      res.status(403).json({
+      res.status(status.FORBIDDEN).json({
         success: false,
         message: "You are not permitted to access this resource",
       });

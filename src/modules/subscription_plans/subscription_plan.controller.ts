@@ -11,7 +11,7 @@ import {
 } from "@/modules/subscription_plans/subscription_plan.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
-
+import httpStatus from "http-status";
 const planIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Plan ID must be a positive integer",
 });
@@ -26,7 +26,7 @@ export const createSubscriptionPlan = async (
   try {
     const data = zCreateSubscriptionPlanDto.parse(req.body);
     const plan = await subscriptionPlanService.createSubscriptionPlan(data);
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
       message: "Subscription plan created successfully",
       data: plan,

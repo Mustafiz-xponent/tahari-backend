@@ -32,6 +32,7 @@
 import { Prisma } from "@/generated/prisma/client";
 import { Response } from "express";
 import { ZodError } from "zod";
+import httpStatus from "http-status";
 
 /**
  * Handle error response with enhanced Prisma error handling
@@ -46,7 +47,7 @@ export function handleErrorResponse(
 
   // Handle Zod validation errors
   if (error instanceof ZodError) {
-    res.status(400).json({
+    res.status(httpStatus.BAD_REQUEST).json({
       success: false,
       message: "Validation error",
       errors: error.flatten(),
@@ -59,14 +60,14 @@ export function handleErrorResponse(
     switch (error.code) {
       case "P2001": // Record does not exist
       case "P2025": // Record to update/delete not found
-        res.status(404).json({
+        res.status(httpStatus.NOT_FOUND).json({
           success: false,
           message: "Resource not found",
           error: error.message,
         });
         break;
       case "P2002": // Unique constraint failed
-        res.status(409).json({
+        res.status(httpStatus.CONFLICT).json({
           success: false,
           message: "Unique constraint violation",
           error: error.message,
@@ -74,7 +75,7 @@ export function handleErrorResponse(
         });
         break;
       case "P2003": // Foreign key constraint failed
-        res.status(409).json({
+        res.status(httpStatus.CONFLICT).json({
           success: false,
           message: "Foreign key constraint violation",
           error: error.message,
@@ -82,21 +83,21 @@ export function handleErrorResponse(
         });
         break;
       case "P2004": // Constraint failed
-        res.status(409).json({
+        res.status(httpStatus.CONFLICT).json({
           success: false,
           message: "Constraint violation",
           error: error.message,
         });
         break;
       case "P2014": // Required relation violation
-        res.status(400).json({
+        res.status(httpStatus.BAD_REQUEST).json({
           success: false,
           message: "Invalid relation data",
           error: error.message,
         });
         break;
       default:
-        res.status(500).json({
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
           success: false,
           message: "Database operation failed",
           error: error.message,
@@ -107,7 +108,7 @@ export function handleErrorResponse(
 
   // Handle Prisma validation errors
   if (error instanceof Prisma.PrismaClientValidationError) {
-    res.status(400).json({
+    res.status(httpStatus.BAD_REQUEST).json({
       success: false,
       message: "Invalid data provided",
       error: error.message,
@@ -117,7 +118,7 @@ export function handleErrorResponse(
 
   // Handle Prisma initialization errors
   if (error instanceof Prisma.PrismaClientInitializationError) {
-    res.status(500).json({
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Database connection error",
       error: error.message,
@@ -127,7 +128,7 @@ export function handleErrorResponse(
 
   // Handle Prisma RustPanic errors (rare but possible)
   if (error instanceof Prisma.PrismaClientRustPanicError) {
-    res.status(500).json({
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Critical database error",
       error: "Internal server error",
@@ -137,7 +138,7 @@ export function handleErrorResponse(
 
   // Handle Prisma unknown request errors
   if (error instanceof Prisma.PrismaClientUnknownRequestError) {
-    res.status(500).json({
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Unknown database error",
       error: error.message,
@@ -154,7 +155,7 @@ export function handleErrorResponse(
       errorMessage.includes("prisma") &&
       errorMessage.toLowerCase().includes("not found")
     ) {
-      res.status(404).json({
+      res.status(httpStatus.NOT_FOUND).json({
         success: false,
         message: "Resource not found",
         error: errorMessage,
@@ -166,7 +167,7 @@ export function handleErrorResponse(
       errorMessage.includes("prisma") &&
       errorMessage.toLowerCase().includes("unique constraint")
     ) {
-      res.status(409).json({
+      res.status(httpStatus.CONFLICT).json({
         success: false,
         message: "Duplicate entry",
         error: errorMessage,
@@ -176,8 +177,8 @@ export function handleErrorResponse(
 
     // Default status code based on error message
     const statusCode = errorMessage.toLowerCase().includes("not found")
-      ? 404
-      : 500;
+      ? httpStatus.NOT_FOUND
+      : httpStatus.INTERNAL_SERVER_ERROR;
 
     res.status(statusCode).json({
       success: false,
@@ -188,7 +189,7 @@ export function handleErrorResponse(
   }
 
   // Fallback for any other error types
-  res.status(500).json({
+  res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
     success: false,
     message: "An unexpected error occurred",
   });
