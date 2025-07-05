@@ -1,3 +1,4 @@
+import httpStatus from "http-status";
 /**
  * Controller layer for Notification entity operations.
  * Handles HTTP requests and responses for notification-related endpoints.
@@ -30,11 +31,13 @@ export const createNotification = async (
       .json({ message: "Notification created successfully", notification });
   } catch (error) {
     if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
+      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
     console.error("Error creating notification:", error);
-    res.status(500).json({ message: "Failed to create notification" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to create notification" });
   }
 };
 
@@ -50,7 +53,9 @@ export const getAllNotifications = async (
     res.json(notifications);
   } catch (error) {
     console.error("Error fetching notifications:", error);
-    res.status(500).json({ message: "Failed to fetch notifications" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to fetch notifications" });
   }
 };
 
@@ -67,17 +72,21 @@ export const getNotificationById = async (
       notificationId
     );
     if (!notification) {
-      res.status(404).json({ message: "Notification not found" });
+      res
+        .status(httpStatus.NOT_FOUND)
+        .json({ message: "Notification not found" });
       return;
     }
     res.json(notification);
   } catch (error) {
     if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
+      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
     console.error("Error fetching notification:", error);
-    res.status(500).json({ message: "Failed to fetch notification" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to fetch notification" });
   }
 };
 
@@ -101,11 +110,13 @@ export const updateNotification = async (
     });
   } catch (error) {
     if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
+      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
     console.error("Error updating notification:", error);
-    res.status(500).json({ message: "Failed to update notification" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to update notification" });
   }
 };
 
@@ -122,10 +133,12 @@ export const deleteNotification = async (
     res.json({ message: "Notification deleted successfully" });
   } catch (error) {
     if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
+      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
     console.error("Error deleting notification:", error);
-    res.status(500).json({ message: "Failed to delete notification" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to delete notification" });
   }
 };

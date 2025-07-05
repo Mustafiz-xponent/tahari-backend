@@ -53,7 +53,9 @@ export const getAllMessages = async (
     res.json(messages);
   } catch (error) {
     console.error("Error fetching messages:", error);
-    res.status(500).json({ message: "Failed to fetch messages" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to fetch messages" });
   }
 };
 
@@ -68,17 +70,19 @@ export const getMessageById = async (
     const messageId = messageIdSchema.parse(req.params.id);
     const message = await messageService.getMessageById(messageId);
     if (!message) {
-      res.status(404).json({ message: "Message not found" });
+      res.status(httpStatus.NOT_FOUND).json({ message: "Message not found" });
       return;
     }
     res.json(message);
   } catch (error) {
     if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
+      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
     console.error("Error fetching message:", error);
-    res.status(500).json({ message: "Failed to fetch message" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to fetch message" });
   }
 };
 
@@ -96,11 +100,13 @@ export const updateMessage = async (
     res.json({ message: "Message updated successfully", data: updated });
   } catch (error) {
     if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
+      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
     console.error("Error updating message:", error);
-    res.status(500).json({ message: "Failed to update message" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to update message" });
   }
 };
 
@@ -117,10 +123,10 @@ export const deleteMessage = async (
     res.json({ message: "Message deleted successfully" });
   } catch (error) {
     if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
+      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
     console.error("Error deleting message:", error);
-    res.status(500).json({ message: "Failed to delete message" });
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Failed to delete message" });
   }
 };

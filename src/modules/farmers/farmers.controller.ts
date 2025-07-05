@@ -49,7 +49,9 @@ export const getAllFarmers = async (
     res.json(farmers);
   } catch (error) {
     console.error("Error fetching farmers:", error);
-    res.status(500).json({ message: "Failed to fetch farmers" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to fetch farmers" });
   }
 };
 
@@ -64,13 +66,15 @@ export const getFarmerById = async (
     const farmerId = BigInt(req.params.id);
     const farmer = await farmerService.getFarmerById(farmerId);
     if (!farmer) {
-      res.status(404).json({ message: "Farmer not found" });
+      res.status(httpStatus.NOT_FOUND).json({ message: "Farmer not found" });
       return;
     }
     res.json(farmer);
   } catch (error) {
     console.error("Error fetching farmer:", error);
-    res.status(500).json({ message: "Failed to fetch farmer" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to fetch farmer" });
   }
 };
 
@@ -88,11 +92,13 @@ export const updateFarmer = async (
     res.json({ message: "Farmer updated successfully", farmer: updated });
   } catch (error) {
     if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
+      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
     console.error("Error updating farmer:", error);
-    res.status(500).json({ message: "Failed to update farmer" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to update farmer" });
   }
 };
 
@@ -109,6 +115,8 @@ export const deleteFarmer = async (
     res.json({ message: "Farmer deleted successfully" });
   } catch (error) {
     console.error("Error deleting farmer:", error);
-    res.status(500).json({ message: "Failed to delete farmer" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to delete farmer" });
   }
 };

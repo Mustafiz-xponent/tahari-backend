@@ -129,7 +129,7 @@ export const getCategoryById = async (
     );
 
     if (!category) {
-      res.status(404).json({
+      res.status(httpStatus.NOT_FOUND).json({
         success: false,
         message: "Category not found",
       });

@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import * as adminService from "@/modules/admins/admins.service";
 import { CreateAdminDto, UpdateAdminDto } from "@/modules/admins/admins.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
+import httpStatus from "http-status";
 
 // export const createAdmin = async (
 //   req: Request,
@@ -35,9 +36,11 @@ export const getAllAdmins = async (
 ): Promise<void> => {
   try {
     const admins = await adminService.getAllAdmins();
-    res.status(200).json(admins);
+    res.status(httpStatus.OK).json(admins);
   } catch (error) {
-    res.status(500).json({ error: getErrorMessage(error) });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: getErrorMessage(error) });
   }
 };
 
@@ -49,11 +52,13 @@ export const getAdminById = async (
     const id = BigInt(req.params.id);
     const admin = await adminService.getAdminById(id);
     if (!admin) {
-      res.status(404).json({ message: "Admin not found" });
+      res.status(httpStatus.NOT_FOUND).json({ message: "Admin not found" });
     }
-    res.status(200).json(admin);
+    res.status(httpStatus.OK).json(admin);
   } catch (error) {
-    res.status(500).json({ error: getErrorMessage(error) });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: getErrorMessage(error) });
   }
 };
 
@@ -65,9 +70,11 @@ export const updateAdmin = async (
     const id = BigInt(req.params.id);
     const data: UpdateAdminDto = req.body;
     const updated = await adminService.updateAdmin(id, data);
-    res.status(200).json(updated);
+    res.status(httpStatus.OK).json(updated);
   } catch (error) {
-    res.status(500).json({ error: getErrorMessage(error) });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: getErrorMessage(error) });
   }
 };
 
@@ -78,8 +85,10 @@ export const deleteAdmin = async (
   try {
     const id = BigInt(req.params.id);
     const deleted = await adminService.deleteAdmin(id);
-    res.status(200).json(deleted);
+    res.status(httpStatus.OK).json(deleted);
   } catch (error) {
-    res.status(500).json({ error: getErrorMessage(error) });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: getErrorMessage(error) });
   }
 };
