@@ -11,6 +11,7 @@ import {
 } from "@/modules/inventory_purchases/inventory-purchase.dto";
 import { z } from "zod";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
+import httpStatus from "http-status";
 
 const purchaseIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Purchase ID must be a positive integer",
@@ -28,7 +29,7 @@ export const createInventoryPurchase = async (
     const purchase = await inventoryPurchaseService.createInventoryPurchase(
       data
     );
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
       message: "Inventory purchase created successfully",
       data: purchase,

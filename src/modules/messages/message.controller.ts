@@ -10,6 +10,7 @@ import {
   zUpdateMessageDto,
 } from "@/modules/messages/message.dto";
 import { ZodError, z } from "zod";
+import httpStatus from "http-status";
 
 const messageIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Message ID must be a positive integer",
@@ -25,14 +26,18 @@ export const createMessage = async (
   try {
     const data = zCreateMessageDto.parse(req.body);
     const _message = await messageService.createMessage(data);
-    res.status(201).json({ message: "Message created successfully", _message });
+    res
+      .status(httpStatus.CREATED)
+      .json({ message: "Message created successfully", _message });
   } catch (error) {
     if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
+      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
     console.error("Error creating message:", error);
-    res.status(500).json({ message: "Failed to create message" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to create message" });
   }
 };
 

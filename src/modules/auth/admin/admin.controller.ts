@@ -10,6 +10,7 @@ import {
 } from "@/modules/auth/admin/admin.dto";
 import * as adminService from "@/modules/auth/admin/admin.service";
 import { z } from "zod";
+import httpStatus from "http-status";
 
 const adminIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Admin ID must be a positive integer",
@@ -22,7 +23,7 @@ export const createAdmin = async (req: Request, res: Response) => {
   try {
     const data = zCreateAdminDto.parse(req.body);
     const { user } = await adminService.createAdmin(data);
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
       message: "Admin created successfully",
       data: { user },

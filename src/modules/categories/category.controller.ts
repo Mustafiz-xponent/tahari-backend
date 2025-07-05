@@ -12,6 +12,7 @@ import {
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import { upload } from "@/utils/fileUpload/configMulterUpload";
+import httpStatus from "http-status";
 const categoryIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Category ID must be a positive integer",
 });
@@ -30,7 +31,7 @@ export const createCategory = [
         data,
         file,
       });
-      res.status(201).json({
+      res.status(httpStatus.CREATED).json({
         success: true,
         message: "Category created successfully",
         data: category,

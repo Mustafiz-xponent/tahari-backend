@@ -13,6 +13,7 @@ import {
   zCustomerVerifyOtpDto,
 } from "@/modules/auth/customer/customer.dto";
 import * as customerService from "@/modules/auth/customer/customer.service";
+import httpStatus from "http-status";
 
 /**
  * Register a customer
@@ -21,7 +22,7 @@ export const registerCustomer = async (req: Request, res: Response) => {
   try {
     const data = zCustomerRegisterDto.parse(req.body);
     await customerService.registerCustomer(data);
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
       message: "Registration successful. OTP sent to your phone.",
     });

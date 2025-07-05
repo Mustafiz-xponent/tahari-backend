@@ -9,6 +9,7 @@ import {
 
 import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import { AppError } from "@/utils/appError";
+import logger from "@/utils/logger";
 
 const handlePrismaError = (error: unknown): AppError => {
   let message = "Database operation failed";
@@ -91,7 +92,7 @@ const sendErrorProd = (err: AppError, res: Response) => {
       },
     });
   } else {
-    console.error("UNEXPECTED ERROR 💥", err);
+    logger.error("UNEXPECTED ERROR 💥", err);
     res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
       error: {

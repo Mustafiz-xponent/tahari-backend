@@ -6,6 +6,7 @@ import {
   zUpdateFarmerDto,
 } from "@/modules/farmers/farmer.dto";
 import { ZodError, z } from "zod";
+import httpStatus from "http-status";
 
 const farmerIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Farmer ID must be a positive integer",
@@ -21,14 +22,18 @@ export const createFarmer = async (
   try {
     const data = zCreateFarmerDto.parse(req.body);
     const farmer = await farmerService.createFarmer(data);
-    res.status(201).json({ message: "Farmer created successfully", farmer });
+    res
+      .status(httpStatus.CREATED)
+      .json({ message: "Farmer created successfully", farmer });
   } catch (error) {
     if (error instanceof ZodError) {
-      res.status(400).json({ errors: error.flatten() });
+      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
     console.error("Error creating farmer:", error);
-    res.status(500).json({ message: "Failed to create farmer" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to create farmer" });
   }
 };
 

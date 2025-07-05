@@ -13,6 +13,7 @@ import {
 } from "@/modules/farmer_payments/farmer_payment.dto";
 import { z } from "zod";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
+import httpStatus from "http-status";
 
 const paymentIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Payment ID must be a positive integer",
@@ -28,7 +29,7 @@ export const createFarmerPayment = async (
   try {
     const data = zCreateFarmerPaymentDto.parse(req.body);
     const payment = await farmerPaymentService.createFarmerPayment(data);
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
       success: true,
       message: "Farmer payment created successfully",
       data: payment,

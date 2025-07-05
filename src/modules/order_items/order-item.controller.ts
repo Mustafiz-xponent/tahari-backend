@@ -12,6 +12,7 @@ import {
 } from "@/modules/order_items/order-item.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
+import httpStatus from "http-status";
 
 const orderItemIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Order Item ID must be a positive integer",
@@ -43,7 +44,7 @@ export const createOrderItem = async (req: Request, res: Response) => {
     if (req.body.items && Array.isArray(req.body.items)) {
       const data = zCreateOrderItemsDto.parse(req.body);
       const items = await orderItemService.createOrderItems(data);
-      res.status(201).json({
+      res.status(httpStatus.CREATED).json({
         success: true,
         message: `Created ${items.length} order items`,
         data: items,
@@ -53,7 +54,7 @@ export const createOrderItem = async (req: Request, res: Response) => {
     else {
       const data = zCreateOrderItemDto.parse(req.body);
       const item = await orderItemService.createOrderItem(data);
-      res.status(201).json({
+      res.status(httpStatus.CREATED).json({
         success: true,
         message: "Order item created successfully",
         data: item,
