@@ -6,3 +6,8 @@ declare module "express-serve-static-core" {
     user?: JwtPayload | User;
   }
 }
+declare module "socket.io" {
+  interface Socket {
+    user?: IUser | string;
+  }
+}

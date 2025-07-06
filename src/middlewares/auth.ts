@@ -3,6 +3,8 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import prisma from "@/prisma-client/prismaClient";
 import { UserRole } from "@/generated/prisma/client";
 import { status } from "http-status";
+import { User } from "@/generated/prisma/client";
+import { Socket } from "socket.io";
 
 // Auth middleware check if user is authenticated
 export const authMiddleware: RequestHandler = async (
@@ -50,4 +52,34 @@ export const authorizeRoles = (...roles: UserRole[]): RequestHandler => {
     }
     next();
   };
+};
+
+// Middleware to authenticate JWT for WebSocket connections
+export const authenticateSocket = async (
+  socket: Socket,
+  next: (err?: Error) => void
+) => {
+  try {
+    const token = socket.handshake.auth.token;
+    if (!token) {
+      throw new Error("Please login to access this resource.");
+    }
+
+    const decodedData = jwt.verify(
+      token,
+      process.env.JWT_SECRET!
+    ) as JwtPayload;
+    const user = await prisma.user.findUnique({
+      where: {
+        userId: Number(decodedData.userId),
+      },
+    });
+    if (!user) {
+      throw new Error("Please login to access this resource.");
+    }
+    socket.user = user as User;
+    next();
+  } catch (err: any) {
+    return next(err as Error);
+  }
 };

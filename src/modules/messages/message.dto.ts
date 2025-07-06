@@ -43,3 +43,21 @@ export const zUpdateMessageDto = z.object({
  * TypeScript type inferred from update schema.
  */
 export type UpdateMessageDto = z.infer<typeof zUpdateMessageDto>;
+
+/**
+ * Zod schema for creating a new message.
+ */
+export const zSendMessageDto = {
+  body: z.object({
+    message: z.string().min(1, "Message is required"),
+    receiverId: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Receiver ID must be a positive integer",
+      })
+      .optional(),
+  }),
+};
+
+export type SendMessageDto = z.infer<typeof zSendMessageDto.body>;

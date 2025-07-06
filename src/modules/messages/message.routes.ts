@@ -5,6 +5,9 @@
 
 import { Router } from "express";
 import * as MessageController from "@/modules/messages/message.controller";
+import validator from "@/middlewares/validator";
+import { zSendMessageDto } from "@/modules/messages/message.dto";
+import { authMiddleware } from "@/middlewares/auth";
 
 const router = Router();
 
@@ -12,7 +15,7 @@ const router = Router();
 router.post("/", MessageController.createMessage);
 
 // Route to get all messages
-router.get("/", MessageController.getAllMessages);
+router.get("/", authMiddleware, MessageController.getAllMessages);
 
 // Route to get a message by ID
 router.get("/:id", MessageController.getMessageById);
@@ -22,5 +25,13 @@ router.put("/:id", MessageController.updateMessage);
 
 // Route to delete a message
 router.delete("/:id", MessageController.deleteMessage);
+
+// Route to send message
+router.post(
+  "/send",
+  authMiddleware,
+  validator(zSendMessageDto),
+  MessageController.sendMessage
+);
 
 export default router;

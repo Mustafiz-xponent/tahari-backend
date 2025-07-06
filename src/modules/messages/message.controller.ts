@@ -11,6 +11,13 @@ import {
 } from "@/modules/messages/message.dto";
 import { ZodError, z } from "zod";
 import httpStatus from "http-status";
+import {
+  getOnlineSupportSockets,
+  getReceiverSocketId,
+  io,
+} from "@/utils/socket";
+import { UserRole } from "@/generated/prisma/client";
+import prisma from "@/prisma-client/prismaClient";
 
 const messageIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Message ID must be a positive integer",
@@ -45,12 +52,20 @@ export const createMessage = async (
  * Get all messages
  */
 export const getAllMessages = async (
-  _req: Request,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const messages = await messageService.getAllMessages();
-    res.json(messages);
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
+    console.log(userId, userRole);
+
+    const messages = await messageService.getAllMessages(userId, userRole);
+    res.status(httpStatus.OK).json({
+      success: true,
+      message: "Messages fetched successfully",
+      data: messages,
+    });
   } catch (error) {
     console.error("Error fetching messages:", error);
     res
@@ -127,6 +142,33 @@ export const deleteMessage = async (
       return;
     }
     console.error("Error deleting message:", error);
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Failed to delete message" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to delete message" });
+  }
+};
+
+export const sendMessage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { message, receiverId } = req.body;
+    const senderId = req.user?.userId;
+    const senderRole = req.user?.role;
+
+    const result = await messageService.sendMessage({
+      message,
+      receiverId,
+      senderId,
+      senderRole,
+    });
+
+    res.status(httpStatus.CREATED).json({
+      message: "Message sent successfully",
+      data: result.data,
+    });
+  } catch (error) {
+    throw error;
   }
 };
