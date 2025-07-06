@@ -8,6 +8,17 @@ type Schemas = {
   params?: ZodSchema;
 };
 
+/**
+ * Express middleware to validate request body, query, and params against
+ * provided Zod schemas. If validation passes, the request object is updated
+ * with the parsed data. If validation fails, a 400 Bad Request response is
+ * sent with detailed error messages.
+ *
+ * @param {Schemas} schemas - An object containing Zod schemas for 'body',
+ * 'query', and 'params'. Each schema is optional.
+ * @returns {RequestHandler} - An Express request handler middleware.
+ */
+
 const validator = (schemas: Schemas): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const errors: Array<{ location: string; field: string; message: string }> =
