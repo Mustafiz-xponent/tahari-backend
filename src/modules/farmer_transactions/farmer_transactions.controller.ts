@@ -78,7 +78,7 @@ export const getFarmerTransactionById = async (
       transactionId
     );
     if (!transaction) {
-      res.status(404).json({
+      res.status(httpStatus.NOT_FOUND).json({
         success: false,
         message: "Farmer transaction not found",
       });

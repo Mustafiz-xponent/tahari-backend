@@ -61,7 +61,7 @@ export const deleteAdmin = async (
     const adminId = adminIdSchema.parse(req.params.id);
     await adminService.deleteAdmin(adminId, req.user?.userId);
 
-    res.status(200).json({
+    res.status(httpStatus.OK).json({
       success: true,
       message: "Admin deleted successfully",
     });
