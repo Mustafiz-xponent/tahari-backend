@@ -58,9 +58,13 @@ export const getAllMessages = async (
   try {
     const userId = req.user?.userId;
     const userRole = req.user?.role;
-    console.log(userId, userRole);
+    const receiverId = req.query?.receiverId as string;
 
-    const messages = await messageService.getAllMessages(userId, userRole);
+    const messages = await messageService.getAllMessages(
+      userId,
+      userRole,
+      receiverId
+    );
     res.status(httpStatus.OK).json({
       success: true,
       message: "Messages fetched successfully",

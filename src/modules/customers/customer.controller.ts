@@ -43,15 +43,12 @@ export const getAllCustomers = async (
   _req: Request,
   res: Response
 ): Promise<void> => {
-  try {
-    const customers = await customerService.getAllCustomers();
-    res.json(customers);
-  } catch (error) {
-    console.error("Error fetching customers:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to fetch customers" });
-  }
+  const customers = await customerService.getAllCustomers();
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: "Customers fetched successfully",
+    data: customers,
+  });
 };
 
 /**

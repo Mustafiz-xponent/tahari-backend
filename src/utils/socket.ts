@@ -26,7 +26,7 @@ export function getReceiverSocketId(userId: string): string | null {
 // Helper to get all online support staff socket IDs
 export function getOnlineSupportSockets(): string[] {
   const supportSockets: string[] = [];
-  onlineUsers.forEach((userData, userId) => {
+  onlineUsers.forEach((userData) => {
     if (
       userData.role === UserRole.SUPPORT ||
       userData.role === UserRole.ADMIN ||

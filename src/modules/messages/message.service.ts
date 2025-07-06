@@ -48,7 +48,8 @@ export async function createMessage(data: CreateMessageDto): Promise<Message> {
  */
 export async function getAllMessages(
   userId: bigint | number,
-  userRole: UserRole
+  userRole: UserRole,
+  receiverId?: string
 ): Promise<Message[]> {
   try {
     if (userRole === UserRole.CUSTOMER) {
@@ -56,28 +57,37 @@ export async function getAllMessages(
         where: {
           OR: [{ senderId: BigInt(userId) }, { receiverId: BigInt(userId) }],
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: "asc" },
         include: {
           sender: true,
           receiver: true,
         },
       });
     }
-    // TODO:
-    return prisma.message.findMany({
-      where: {
-        OR: [
-          { receiverId: null }, // customer broadcasts (if receiverId is nullable!)
-          { senderId: BigInt(userId) }, // messages this support/admin sent
-          { receiverId: BigInt(userId) }, // rare support-to-support messages
-        ],
-      },
-      orderBy: { createdAt: "desc" },
-      include: {
-        sender: true,
-        receiver: true,
-      },
-    });
+
+    if (
+      receiverId &&
+      (userRole === UserRole.SUPPORT ||
+        userRole === UserRole.ADMIN ||
+        userRole === UserRole.SUPER_ADMIN)
+    ) {
+      return prisma.message.findMany({
+        where: {
+          OR: [
+            { receiverId: null }, // support broadcasts
+            {
+              OR: [
+                { senderId: BigInt(receiverId) },
+                { receiverId: BigInt(receiverId) },
+              ],
+            },
+          ],
+        },
+        orderBy: { createdAt: "asc" },
+        include: { sender: true, receiver: true },
+      });
+    }
+    return [];
   } catch (error) {
     throw new Error(`Failed to fetch messages: ${getErrorMessage(error)}`);
   }
