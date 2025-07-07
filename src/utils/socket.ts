@@ -47,7 +47,7 @@ io.use(authenticateSocket);
 
 io.on("connection", async (socket) => {
   const user = socket.user as User;
-  logger.info(`User connected: ${user.phone} (${user.userId})`);
+  logger.info(`User connected: ${user.phone} (${user.userId}): ${socket.id}`);
 
   // Add user to online list with role
   onlineUsers.set(String(user.userId), {
@@ -59,7 +59,9 @@ io.on("connection", async (socket) => {
   io.emit("onlineUsers", getAllOnlineUsers());
 
   socket.on("disconnect", () => {
-    logger.info(`User disconnected: ${user.phone} (${user.userId})`);
+    logger.info(
+      `User disconnected: ${user.phone} (${user.userId}): ${socket.id}`
+    );
     onlineUsers.delete(String(user.userId));
     io.emit("onlineUsers", getAllOnlineUsers());
   });

@@ -15,7 +15,6 @@ import {
   getReceiverSocketId,
   io,
 } from "@/utils/socket";
-import httpStatus from "http-status";
 
 /**
  * Create a new message
@@ -74,13 +73,8 @@ export async function getAllMessages(
       return prisma.message.findMany({
         where: {
           OR: [
-            { receiverId: null }, // support broadcasts
-            {
-              OR: [
-                { senderId: BigInt(receiverId) },
-                { receiverId: BigInt(receiverId) },
-              ],
-            },
+            { senderId: BigInt(receiverId) },
+            { receiverId: BigInt(receiverId) },
           ],
         },
         orderBy: { createdAt: "asc" },
@@ -214,9 +208,14 @@ export const sendMessage = async ({
       });
 
       const customerSocket = getReceiverSocketId(String(receiverId));
+      console.log(`Customer ${receiverId} socket: ${customerSocket}`);
       if (customerSocket) {
         io.to(customerSocket).emit("newMessage", msg);
       }
+
+      getOnlineSupportSockets().forEach((socketId) => {
+        io.to(socketId).emit("newMessage", msg);
+      });
 
       return { data: msg };
     }
