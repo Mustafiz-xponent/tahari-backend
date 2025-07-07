@@ -69,7 +69,8 @@ export const zMarkMessageAsReadDto = {
       .transform(BigInt)
       .refine((val) => val > 0n, {
         message: "Sender ID must be a positive integer",
-      }),
+      })
+      .optional(),
   }),
 };
 

@@ -44,7 +44,7 @@ app.use(compression());
 app.use(rateLimiter(1000, 15 * 60 * 1000)); // 1000 requests per 15 minutes for dev
 const corsOptions = {
   origin: process.env.CLIENT_URL,
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 };
 app.use(cors(corsOptions));
 

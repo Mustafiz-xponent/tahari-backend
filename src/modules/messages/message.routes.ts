@@ -37,7 +37,7 @@ router.post(
   MessageController.sendMessage
 );
 // Route to mark message as read
-router.put(
+router.patch(
   "/read",
   authMiddleware,
   validator(zMarkMessageAsReadDto),
