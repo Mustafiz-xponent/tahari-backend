@@ -69,7 +69,7 @@ export const getAllMessages = async (
     );
     res.status(httpStatus.OK).json({
       success: true,
-      message: "Messages fetched successfully",
+      message: "Messages retrieved successfully",
       data: results.messages,
       pagination: {
         currentPage: results.currentPage,
@@ -183,6 +183,36 @@ export const sendMessage = async (
       data: result.data,
     });
   } catch (error) {
-    throw error;
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to send message" });
+  }
+};
+/**
+ * Mark message as read
+ */
+export const markMessageAsRead = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
+    const { senderId } = req.body;
+
+    await messageService.markMessageAsRead({
+      userId,
+      userRole,
+      senderId,
+    });
+
+    res.status(httpStatus.OK).json({
+      success: true,
+      message: "Message marked as read successfully",
+    });
+  } catch (error) {
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to mark message as read" });
   }
 };

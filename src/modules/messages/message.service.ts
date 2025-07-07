@@ -262,7 +262,7 @@ export const sendMessage = async ({
       return { data: msg };
     }
 
-    //  Support/Admin ➜ Customer direct message
+    //  Support/Admin/SuperAdmin --> Customer direct message
     if (
       (senderRole === UserRole.SUPPORT ||
         senderRole === UserRole.ADMIN ||
@@ -319,5 +319,60 @@ export const sendMessage = async ({
     return { data: null };
   } catch (error) {
     throw new Error(`Failed to send message: ${getErrorMessage(error)}`);
+  }
+};
+/**
+ * mark unread message as read
+ **/
+export const markMessageAsRead = async ({
+  userId,
+  userRole,
+  senderId,
+}: {
+  userId: bigint | number;
+  userRole: UserRole;
+  senderId: bigint | number;
+}) => {
+  try {
+    const now = new Date();
+    let whereClause = {};
+
+    if (
+      userRole === UserRole.SUPPORT ||
+      userRole === UserRole.ADMIN ||
+      userRole === UserRole.SUPER_ADMIN
+    ) {
+      // Support reading customer-sent messages
+      whereClause = {
+        senderId: BigInt(senderId), // FROM customer
+        receiverId: null,
+        status: "UNREAD",
+      };
+    } else if (userRole === UserRole.CUSTOMER) {
+      // Customer reading support-sent messages
+      whereClause = {
+        sender: {
+          role: {
+            in: ["SUPPORT", "ADMIN", "SUPER_ADMIN"],
+          },
+        },
+        receiverId: BigInt(userId),
+        status: "UNREAD",
+      };
+    } else {
+      throw new Error("Invalid role");
+    }
+
+    await prisma.message.updateMany({
+      where: whereClause,
+      data: {
+        status: "READ",
+        readAt: now,
+      },
+    });
+  } catch (error) {
+    throw new Error(
+      `Failed to mark message as read: ${getErrorMessage(error)}`
+    );
   }
 };

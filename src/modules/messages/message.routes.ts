@@ -6,7 +6,10 @@
 import { Router } from "express";
 import * as MessageController from "@/modules/messages/message.controller";
 import validator from "@/middlewares/validator";
-import { zSendMessageDto } from "@/modules/messages/message.dto";
+import {
+  zMarkMessageAsReadDto,
+  zSendMessageDto,
+} from "@/modules/messages/message.dto";
 import { authMiddleware } from "@/middlewares/auth";
 
 const router = Router();
@@ -32,6 +35,13 @@ router.post(
   authMiddleware,
   validator(zSendMessageDto),
   MessageController.sendMessage
+);
+// Route to mark message as read
+router.put(
+  "/read",
+  authMiddleware,
+  validator(zMarkMessageAsReadDto),
+  MessageController.markMessageAsRead
 );
 
 export default router;

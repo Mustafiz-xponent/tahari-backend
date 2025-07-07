@@ -61,3 +61,16 @@ export const zSendMessageDto = {
 };
 
 export type SendMessageDto = z.infer<typeof zSendMessageDto.body>;
+
+export const zMarkMessageAsReadDto = {
+  body: z.object({
+    senderId: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Sender ID must be a positive integer",
+      }),
+  }),
+};
+
+export type MarkMessageAsReadDto = z.infer<typeof zMarkMessageAsReadDto.body>;
