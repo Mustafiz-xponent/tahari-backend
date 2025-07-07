@@ -11,13 +11,6 @@ import {
 } from "@/modules/messages/message.dto";
 import { ZodError, z } from "zod";
 import httpStatus from "http-status";
-import {
-  getOnlineSupportSockets,
-  getReceiverSocketId,
-  io,
-} from "@/utils/socket";
-import { UserRole } from "@/generated/prisma/client";
-import prisma from "@/prisma-client/prismaClient";
 
 const messageIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Message ID must be a positive integer",
@@ -59,16 +52,33 @@ export const getAllMessages = async (
     const userId = req.user?.userId;
     const userRole = req.user?.role;
     const receiverId = req.query?.receiverId as string;
+    const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+    const limit = Math.min(
+      Math.max(parseInt(req.query.limit as string) || 10, 1),
+      100
+    ); // Max 100 items per page
+    const skip = (page - 1) * limit;
+    const sort = req.query.sort === "asc" ? "asc" : "desc";
+    const paginationParams = { page, limit, skip, sort };
 
-    const messages = await messageService.getAllMessages(
+    const results = await messageService.getAllMessages(
       userId,
       userRole,
+      paginationParams,
       receiverId
     );
     res.status(httpStatus.OK).json({
       success: true,
       message: "Messages fetched successfully",
-      data: messages,
+      data: results.messages,
+      pagination: {
+        currentPage: results.currentPage,
+        totalPages: results.totalPages,
+        totalItems: results.totalCount,
+        itemsPerPage: limit,
+        hasNextPage: page < results.totalPages,
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
     console.error("Error fetching messages:", error);

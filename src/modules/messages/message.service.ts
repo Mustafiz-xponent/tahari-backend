@@ -16,6 +16,13 @@ import {
   io,
 } from "@/utils/socket";
 
+type GetAllMessagesResult = {
+  messages: Message[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+};
+
 /**
  * Create a new message
  */
@@ -48,40 +55,107 @@ export async function createMessage(data: CreateMessageDto): Promise<Message> {
 export async function getAllMessages(
   userId: bigint | number,
   userRole: UserRole,
+  paginationParams: { page: number; limit: number; skip: number; sort: string },
   receiverId?: string
-): Promise<Message[]> {
+): Promise<GetAllMessagesResult> {
   try {
+    let messages: Message[] = [];
+    let totalMessageCount: number = 0;
+    // Customer send message to support team
     if (userRole === UserRole.CUSTOMER) {
-      return prisma.message.findMany({
+      messages = await prisma.message.findMany({
         where: {
           OR: [{ senderId: BigInt(userId) }, { receiverId: BigInt(userId) }],
         },
-        orderBy: { createdAt: "asc" },
         include: {
-          sender: true,
-          receiver: true,
+          sender: {
+            select: {
+              userId: true,
+              name: true,
+              email: true,
+              phone: true,
+              role: true,
+            },
+          },
+          receiver: {
+            select: {
+              userId: true,
+              name: true,
+              email: true,
+              phone: true,
+              role: true,
+            },
+          },
+        },
+        take: paginationParams.limit,
+        skip: paginationParams.skip,
+        orderBy: {
+          createdAt: paginationParams.sort === "asc" ? "asc" : "desc",
+        },
+      });
+
+      totalMessageCount = await prisma.message.count({
+        where: {
+          OR: [{ senderId: BigInt(userId) }, { receiverId: BigInt(userId) }],
         },
       });
     }
-
+    // Support and Admin send message to customer--
     if (
       receiverId &&
       (userRole === UserRole.SUPPORT ||
         userRole === UserRole.ADMIN ||
         userRole === UserRole.SUPER_ADMIN)
     ) {
-      return prisma.message.findMany({
+      messages = await prisma.message.findMany({
         where: {
           OR: [
             { senderId: BigInt(receiverId) },
             { receiverId: BigInt(receiverId) },
           ],
         },
-        orderBy: { createdAt: "asc" },
-        include: { sender: true, receiver: true },
+        include: {
+          sender: {
+            select: {
+              userId: true,
+              name: true,
+              email: true,
+              phone: true,
+              role: true,
+            },
+          },
+          receiver: {
+            select: {
+              userId: true,
+              name: true,
+              email: true,
+              phone: true,
+              role: true,
+            },
+          },
+        },
+        take: paginationParams.limit,
+        skip: paginationParams.skip,
+        orderBy: {
+          createdAt: paginationParams.sort === "asc" ? "asc" : "desc",
+        },
+      });
+
+      totalMessageCount = await prisma.message.count({
+        where: {
+          OR: [
+            { senderId: BigInt(receiverId) },
+            { receiverId: BigInt(receiverId) },
+          ],
+        },
       });
     }
-    return [];
+    return {
+      messages,
+      totalCount: totalMessageCount,
+      totalPages: Math.ceil(totalMessageCount / paginationParams.limit),
+      currentPage: paginationParams.page,
+    };
   } catch (error) {
     throw new Error(`Failed to fetch messages: ${getErrorMessage(error)}`);
   }
@@ -169,7 +243,15 @@ export const sendMessage = async ({
           senderId: BigInt(senderId),
         },
         include: {
-          sender: true,
+          sender: {
+            select: {
+              userId: true,
+              name: true,
+              email: true,
+              phone: true,
+              role: true,
+            },
+          },
         },
       });
 
@@ -202,13 +284,28 @@ export const sendMessage = async ({
           receiverId: BigInt(receiverId),
         },
         include: {
-          sender: true,
-          receiver: true,
+          sender: {
+            select: {
+              userId: true,
+              name: true,
+              email: true,
+              phone: true,
+              role: true,
+            },
+          },
+          receiver: {
+            select: {
+              userId: true,
+              name: true,
+              email: true,
+              phone: true,
+              role: true,
+            },
+          },
         },
       });
 
       const customerSocket = getReceiverSocketId(String(receiverId));
-      console.log(`Customer ${receiverId} socket: ${customerSocket}`);
       if (customerSocket) {
         io.to(customerSocket).emit("newMessage", msg);
       }
