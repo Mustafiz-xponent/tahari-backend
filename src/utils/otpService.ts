@@ -50,7 +50,7 @@ async function sendSms(phone: string, message: string): Promise<void> {
 /**
  * Send OTP
  */
-export async function sendOtp(phone: string): Promise<void> {
+export async function sendOtp(phone: string) {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const otpHash = await bcrypt.hash(otp, SALT_ROUNDS);
   const expiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
@@ -62,7 +62,7 @@ export async function sendOtp(phone: string): Promise<void> {
 
   // Send SMS with OTP
   const message = `Your OTP is ${otp}. Valid for ${OTP_EXPIRY_MINUTES} minutes.`;
-
+  return { otp }; // TODO: remove this line when in production
   // TODO: Enable the sendSMS function at production
   // await sendSms(phone, message);
 }

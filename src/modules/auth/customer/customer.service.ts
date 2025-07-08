@@ -99,7 +99,7 @@ export async function loginCustomer(
  */
 export async function otpLoginCustomer(
   data: CustomerOtpLoginDto
-): Promise<void> {
+): Promise<string> {
   await prisma.user.upsert({
     where: { phone: data.phone },
     update: {}, // No updates needed if user exists
@@ -111,7 +111,8 @@ export async function otpLoginCustomer(
     },
   });
 
-  await sendOtp(data.phone);
+  const res = await sendOtp(data.phone);
+  return res.otp; // TODO: remove this line when in production
 }
 
 /**

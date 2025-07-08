@@ -1,0 +1,533 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma/client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Enum for  User Role 
+enum UserRole {
+  ADMIN
+  SUPER_ADMIN
+  CUSTOMER
+  SUPPORT
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum NotificationStatus {
+  READ
+  UNREAD
+}
+
+enum MessageStatus {
+  READ
+  UNREAD
+}
+
+// Enum for Admin user type 
+enum AdminRole {
+  SuperAdmin
+  Admin
+  Support
+}
+
+// Enums for status and type fields
+enum AdminStatus {
+  Active
+  FIRED
+  InActive
+}
+
+// Enums for status and type fields
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  CONFIRMED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum TransactionType {
+  IN
+  OUT
+  ADJUSTMENT
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+  EXPIRED
+  PENDING
+}
+
+enum InventoryPurchaseStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum WalletTransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  PURCHASE
+  REFUND
+}
+
+enum ProductUnitType {
+  KG
+  GM
+  L
+  ML
+  PCS
+  PACK
+  BUNDLE
+  DOZEN
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FLAT
+}
+
+model User {
+  userId           BigInt     @id @default(autoincrement())
+  email            String?    @unique
+  name             String? // Optional
+  phone            String     @unique
+  address          String[] // Optional
+  passwordHash     String? // Hashed with bcrypt
+  role             UserRole
+  status           UserStatus
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  admin            Admin?
+  customer         Customer?
+  otps             Otp[]
+  sentMessages     Message[]  @relation("SentMessages")
+  receivedMessages Message[]  @relation("ReceivedMessages")
+
+  @@index([userId])
+  @@index([phone])
+}
+
+model Admin {
+  adminId BigInt @id @default(autoincrement())
+  userId  BigInt @unique
+  user    User   @relation(fields: [userId], references: [userId])
+
+  @@index([userId])
+}
+
+model Customer {
+  customerId    BigInt         @id @default(autoincrement())
+  userId        BigInt         @unique
+  user          User           @relation(fields: [userId], references: [userId])
+  wallet        Wallet?
+  orders        Order[]
+  subscriptions Subscription[]
+  // messages      Message[]
+
+  @@index([userId])
+}
+
+model Otp {
+  otpId     BigInt   @id @default(autoincrement())
+  phone     String
+  otpHash   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [phone], references: [phone])
+
+  @@index([otpId])
+  @@index([phone])
+}
+
+// Farmers table to store farm/garden profiles (managed by admin)
+model Farmer {
+  farmerId           BigInt              @id @default(autoincrement())
+  name               String
+  farmName           String
+  address            String
+  contactInfo        String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  products           Product[]
+  inventoryPurchases InventoryPurchase[]
+  farmerTransactions FarmerTransaction[]
+  farmerPayments     FarmerPayment[]
+
+  @@index([farmerId])
+}
+
+// Categories table for product categorization
+model Category {
+  categoryId     BigInt    @id @default(autoincrement())
+  name           String    @unique
+  imageUrl       String?
+  isPrivateImage Boolean   @default(true)
+  description    String?
+  products       Product[]
+
+  @@index([categoryId])
+}
+
+// Products table for regular, subscription, and pre-order items
+model Product {
+  productId                BigInt              @id @default(autoincrement())
+  name                     String
+  description              String?
+  unitType                 ProductUnitType     @default(GM)
+  price                    Decimal // display price = unitPrice * packageSize
+  unitPrice                Decimal             @default(0) // Price per smallest unit (e.g. per gram)
+  packageSize              Float               @default(1) // Selling unit (e.g. 250 for 250g packages)
+  stockQuantity            Int                 @default(0) // Stock stored in units matching unitType
+  reorderLevel             Int                 @default(0)
+  isSubscription           Boolean             @default(false)
+  isPreorder               Boolean             @default(false)
+  isPrivateImages          Boolean             @default(false)
+  preorderAvailabilityDate DateTime?
+  imageUrls                String[]            @default([])
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+  categoryId               BigInt
+  farmerId                 BigInt
+  category                 Category            @relation(fields: [categoryId], references: [categoryId])
+  farmer                   Farmer              @relation(fields: [farmerId], references: [farmerId])
+  inventoryPurchases       InventoryPurchase[]
+  stockTransactions        StockTransaction[]
+  subscriptionPlans        SubscriptionPlan[]
+  orderItems               OrderItem[]
+  // deal                     Deal?               @relation(fields: [dealId], references: [dealId])
+  // dealId                   BigInt?
+
+  @@index([farmerId])
+  @@index([categoryId])
+  @@index([productId])
+}
+
+// Inventory purchases to track stock acquired from farmers
+model InventoryPurchase {
+  purchaseId         BigInt                  @id @default(autoincrement())
+  quantity           Int
+  unitCost           Decimal
+  totalCost          Decimal
+  packageSize        Float                   @default(1)
+  purchaseDate       DateTime                @default(now())
+  status             InventoryPurchaseStatus @default(PENDING)
+  notes              String?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  farmerId           BigInt
+  productId          BigInt
+  farmer             Farmer                  @relation(fields: [farmerId], references: [farmerId])
+  product            Product                 @relation(fields: [productId], references: [productId])
+  farmerTransactions FarmerTransaction[]
+  stockTransactions  StockTransaction[]
+
+  @@index([farmerId])
+  @@index([productId])
+  @@index([purchaseId])
+}
+
+// Farmer transactions to track dues, payments, and balances
+model FarmerTransaction {
+  transactionId     BigInt            @id @default(autoincrement())
+  amountDue         Decimal           @default(0.00)
+  amountPaid        Decimal           @default(0.00)
+  balance           Decimal           @default(0.00)
+  paymentStatus     PaymentStatus     @default(PENDING)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  farmerId          BigInt
+  purchaseId        BigInt
+  farmer            Farmer            @relation(fields: [farmerId], references: [farmerId])
+  inventoryPurchase InventoryPurchase @relation(fields: [purchaseId], references: [purchaseId])
+  farmerPayments    FarmerPayment[]   @relation("FarmerPaymentToTransaction")
+
+  @@index([farmerId])
+  @@index([purchaseId])
+  @@index([transactionId])
+}
+
+// Farmer payments to track individual payment events
+model FarmerPayment {
+  paymentId         BigInt            @id @default(autoincrement())
+  amount            Decimal
+  paymentMethod     String
+  paymentDate       DateTime          @default(now())
+  notes             String?
+  createdAt         DateTime          @default(now())
+  transactionId     BigInt
+  farmerTransaction FarmerTransaction @relation("FarmerPaymentToTransaction", fields: [transactionId], references: [transactionId])
+  Farmer            Farmer?           @relation(fields: [farmerFarmerId], references: [farmerId])
+  farmerFarmerId    BigInt?
+
+  @@index([transactionId])
+  @@index([paymentId])
+}
+
+// Stock transactions to track stock movements
+model StockTransaction {
+  transactionId     BigInt             @id @default(autoincrement())
+  quantity          Int
+  transactionType   TransactionType
+  purchaseId        BigInt?
+  orderId           BigInt?
+  description       String?
+  createdAt         DateTime           @default(now())
+  productId         BigInt
+  product           Product            @relation(fields: [productId], references: [productId])
+  inventoryPurchase InventoryPurchase? @relation(fields: [purchaseId], references: [purchaseId])
+  order             Order?             @relation(fields: [orderId], references: [orderId])
+
+  @@index([productId])
+  @@index([purchaseId])
+  @@index([orderId])
+  @@index([transactionId])
+}
+
+// Subscription plans for weekly/monthly deliveries
+model SubscriptionPlan {
+  planId        BigInt         @id @default(autoincrement())
+  name          String
+  frequency     String
+  price         Decimal
+  description   String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  productId     BigInt
+  product       Product        @relation(fields: [productId], references: [productId])
+  subscriptions Subscription[]
+
+  @@index([productId])
+  @@index([planId])
+}
+
+// Customer wallets for balance management
+model Wallet {
+  walletId           BigInt              @id @default(autoincrement())
+  balance            Decimal             @default(0.00)
+  updatedAt          DateTime            @default(now())
+  customerId         BigInt              @unique
+  customer           Customer            @relation(fields: [customerId], references: [customerId])
+  walletTransactions WalletTransaction[]
+
+  @@index([customerId])
+  @@index([walletId])
+}
+
+// Wallet transactions to track fund additions, deductions, and refunds
+model WalletTransaction {
+  transactionId     BigInt                @id @default(autoincrement())
+  amount            Decimal
+  transactionType   WalletTransactionType
+  transactionStatus PaymentStatus
+  description       String?
+  createdAt         DateTime              @default(now())
+  walletId          BigInt
+  wallet            Wallet                @relation(fields: [walletId], references: [walletId])
+  orderId           BigInt?
+  order             Order?                @relation(fields: [orderId], references: [orderId])
+  Payment           Payment[]
+
+  @@index([walletId])
+  @@index([orderId])
+  @@index([transactionId])
+}
+
+// Orders table for regular, subscription, and pre-order purchases
+model Order {
+  orderId                BigInt                 @id @default(autoincrement())
+  orderDate              DateTime               @default(now())
+  status                 OrderStatus
+  totalAmount            Decimal
+  paymentMethod          String
+  paymentStatus          PaymentStatus
+  shippingAddress        String
+  isSubscription         Boolean                @default(false)
+  isPreorder             Boolean                @default(false)
+  preorderDeliveryDate   DateTime?
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  customerId             BigInt
+  customer               Customer               @relation(fields: [customerId], references: [customerId])
+  orderItems             OrderItem[]
+  orderTracking          OrderTracking[]
+  payments               Payment[]
+  walletTransactions     WalletTransaction[]
+  subscriptionDeliveries SubscriptionDelivery[]
+  StockTransaction       StockTransaction[]
+
+  @@index([customerId])
+  @@index([orderId])
+}
+
+// Order items to store individual products in an order
+model OrderItem {
+  orderItemId BigInt          @id @default(autoincrement())
+  quantity    Int
+  unitPrice   Decimal
+  packageSize Float           @default(1)
+  unitType    ProductUnitType @default(GM)
+  subtotal    Decimal
+  orderId     BigInt
+  productId   BigInt
+  order       Order           @relation(fields: [orderId], references: [orderId])
+  product     Product         @relation(fields: [productId], references: [productId])
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([orderItemId])
+}
+
+// Order tracking to store status updates for customer visibility
+model OrderTracking {
+  trackingId  BigInt      @id @default(autoincrement())
+  status      OrderStatus
+  updateDate  DateTime    @default(now())
+  description String?
+  createdAt   DateTime    @default(now())
+  orderId     BigInt
+  order       Order       @relation(fields: [orderId], references: [orderId])
+
+  @@index([orderId])
+  @@index([trackingId])
+}
+
+// Subscriptions table to track active customer subscriptions
+model Subscription {
+  subscriptionId         BigInt                 @id @default(autoincrement())
+  startDate              DateTime
+  endDate                DateTime?
+  status                 SubscriptionStatus
+  renewalDate            DateTime?
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  customerId             BigInt
+  planId                 BigInt
+  customer               Customer               @relation(fields: [customerId], references: [customerId])
+  subscriptionPlan       SubscriptionPlan       @relation(fields: [planId], references: [planId])
+  subscriptionDeliveries SubscriptionDelivery[]
+
+  @@index([customerId])
+  @@index([planId])
+  @@index([subscriptionId])
+}
+
+// Subscription deliveries to track delivery schedules
+model SubscriptionDelivery {
+  deliveryId     BigInt       @id @default(autoincrement())
+  deliveryDate   DateTime
+  status         OrderStatus
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  subscriptionId BigInt
+  orderId        BigInt
+  subscription   Subscription @relation(fields: [subscriptionId], references: [subscriptionId])
+  order          Order        @relation(fields: [orderId], references: [orderId])
+
+  @@index([subscriptionId])
+  @@index([orderId])
+  @@index([deliveryId])
+}
+
+// Payments table to track customer payment transactions
+model Payment {
+  paymentId           BigInt             @id @default(autoincrement())
+  amount              Decimal
+  paymentMethod       String
+  paymentStatus       PaymentStatus
+  transactionId       String?
+  createdAt           DateTime           @default(now())
+  orderId             BigInt
+  walletTransactionId BigInt?
+  order               Order              @relation(fields: [orderId], references: [orderId])
+  walletTransaction   WalletTransaction? @relation(fields: [walletTransactionId], references: [transactionId])
+
+  @@index([orderId])
+  @@index([walletTransactionId])
+  @@index([paymentId])
+}
+
+// Messages for customer queries and feedback
+model Message {
+  messageId BigInt        @id @default(autoincrement())
+  // subject   String?
+  message   String
+  status    MessageStatus @default(UNREAD)
+  readAt    DateTime?
+  createdAt DateTime      @default(now())
+  // customerId BigInt
+  // customer   Customer      @relation(fields: [customerId], references: [customerId])
+
+  senderId   BigInt
+  receiverId BigInt?
+
+  sender   User  @relation("SentMessages", fields: [senderId], references: [userId])
+  receiver User? @relation("ReceivedMessages", fields: [receiverId], references: [userId])
+
+  // @@index([customerId])
+  @@index([messageId])
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+// Notifications for admin alerts
+model Notification {
+  notificationId BigInt             @id @default(autoincrement())
+  message        String
+  status         NotificationStatus @default(UNREAD)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@index([notificationId])
+}
+
+// model Deal {
+//   dealId        BigInt       @id @default(autoincrement())
+//   title         String
+//   description   String? // Optional description for the deal
+//   discountType  DiscountType // PERCENTAGE or FLAT
+//   discountValue Decimal // e.g. 10% or 50 BDT off
+//   startDate     DateTime
+//   endDate       DateTime
+
+//   isActive Boolean @default(true)
+//   isGlobal Boolean @default(false) // True = applies to all products
+
+//   createdAt DateTime  @default(now())
+//   updatedAt DateTime  @updatedAt
+//   Product   Product[]
+
+//   @@index([startDate, endDate])
+// }
+
+// model DealProduct {
+//   id        BigInt  @id @default(autoincrement())
+//   dealId    BigInt
+//   productId BigInt
+//   deal      Deal    @relation(fields: [dealId], references: [dealId], onDelete: Cascade)
+//   product   Product @relation(fields: [productId], references: [productId], onDelete: Cascade)
+
+//   @@unique([dealId, productId])
+//   @@index([dealId])
+//   @@index([productId])
+// }

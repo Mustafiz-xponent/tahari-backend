@@ -4,13 +4,14 @@
  */
 
 import prisma from "@/prisma-client/prismaClient";
-import { Message, UserRole } from "@/generated/prisma/client";
+
 import {
   CreateMessageDto,
   UpdateMessageDto,
 } from "@/modules/messages/message.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { getOnlineSupportSockets, getSocketId, io } from "@/utils/socket";
+import { UserRole, Message } from "@/generated/prisma/client";
 
 type GetAllMessagesResult = {
   messages: Message[];
@@ -303,14 +304,14 @@ export const sendMessage = async ({
         },
       });
 
-      const customerSocket = getSocketId(String(senderId));
-      if (customerSocket) {
-        io.to(customerSocket).emit("newMessage", msg);
-      }
-
       getOnlineSupportSockets().forEach((socketId) => {
         io.to(socketId).emit("newMessage", msg);
       });
+      const customerSocket = getSocketId(String(senderId));
+      if (customerSocket) {
+        console.log("customerSocket", customerSocket);
+        io.to(customerSocket).emit("newMessage", msg);
+      }
 
       return { data: msg };
     }

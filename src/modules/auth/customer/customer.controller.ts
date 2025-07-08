@@ -54,9 +54,10 @@ export const loginCustomer = async (req: Request, res: Response) => {
 export const otpLoginCustomer = async (req: Request, res: Response) => {
   try {
     const data = zCustomerOtpLoginDto.parse(req.body);
-    await customerService.otpLoginCustomer(data);
+    const otp = await customerService.otpLoginCustomer(data);
     res.json({
       success: true,
+      data: { otp },
       message: "OTP sent successfully",
     });
   } catch (error) {
