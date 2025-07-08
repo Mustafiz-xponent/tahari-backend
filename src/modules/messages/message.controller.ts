@@ -79,6 +79,9 @@ export const getAllMessages = async (
         hasNextPage: page < results.totalPages,
         hasPreviousPage: page > 1,
       },
+      meta: {
+        unreadMessageCount: results.unreadMessageCount,
+      },
     });
   } catch (error) {
     console.error("Error fetching messages:", error);

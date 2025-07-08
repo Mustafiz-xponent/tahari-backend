@@ -21,6 +21,7 @@ type GetAllMessagesResult = {
   totalCount: number;
   totalPages: number;
   currentPage: number;
+  unreadMessageCount: number;
 };
 
 /**
@@ -61,12 +62,14 @@ export async function getAllMessages(
   try {
     let messages: Message[] = [];
     let totalMessageCount: number = 0;
+    let unreadMessageCount: number = 0;
     // Customer send message to support team
     if (userRole === UserRole.CUSTOMER) {
+      const whereClause = {
+        OR: [{ senderId: BigInt(userId) }, { receiverId: BigInt(userId) }],
+      };
       messages = await prisma.message.findMany({
-        where: {
-          OR: [{ senderId: BigInt(userId) }, { receiverId: BigInt(userId) }],
-        },
+        where: whereClause,
         include: {
           sender: {
             select: {
@@ -95,8 +98,13 @@ export async function getAllMessages(
       });
 
       totalMessageCount = await prisma.message.count({
+        where: whereClause,
+      });
+      unreadMessageCount = await prisma.message.count({
         where: {
-          OR: [{ senderId: BigInt(userId) }, { receiverId: BigInt(userId) }],
+          ...whereClause,
+          status: "UNREAD",
+          receiverId: BigInt(userId),
         },
       });
     }
@@ -107,13 +115,14 @@ export async function getAllMessages(
         userRole === UserRole.ADMIN ||
         userRole === UserRole.SUPER_ADMIN)
     ) {
+      const whereClause = {
+        OR: [
+          { senderId: BigInt(receiverId) },
+          { receiverId: BigInt(receiverId) },
+        ],
+      };
       messages = await prisma.message.findMany({
-        where: {
-          OR: [
-            { senderId: BigInt(receiverId) },
-            { receiverId: BigInt(receiverId) },
-          ],
-        },
+        where: whereClause,
         include: {
           sender: {
             select: {
@@ -142,11 +151,14 @@ export async function getAllMessages(
       });
 
       totalMessageCount = await prisma.message.count({
+        where: whereClause,
+      });
+
+      unreadMessageCount = await prisma.message.count({
         where: {
-          OR: [
-            { senderId: BigInt(receiverId) },
-            { receiverId: BigInt(receiverId) },
-          ],
+          ...whereClause,
+          status: "UNREAD",
+          senderId: BigInt(receiverId),
         },
       });
     }
@@ -155,6 +167,7 @@ export async function getAllMessages(
       totalCount: totalMessageCount,
       totalPages: Math.ceil(totalMessageCount / paginationParams.limit),
       currentPage: paginationParams.page,
+      unreadMessageCount,
     };
   } catch (error) {
     throw new Error(`Failed to fetch messages: ${getErrorMessage(error)}`);
