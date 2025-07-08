@@ -75,3 +75,14 @@ export const zMarkMessageAsReadDto = {
 };
 
 export type MarkMessageAsReadDto = z.infer<typeof zMarkMessageAsReadDto.body>;
+
+export const zDeleteMessageDto = {
+  params: z.object({
+    id: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Params ID must be a positive integer",
+      }),
+  }),
+};

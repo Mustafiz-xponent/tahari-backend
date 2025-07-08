@@ -7,10 +7,11 @@ import { Router } from "express";
 import * as MessageController from "@/modules/messages/message.controller";
 import validator from "@/middlewares/validator";
 import {
+  zDeleteMessageDto,
   zMarkMessageAsReadDto,
   zSendMessageDto,
 } from "@/modules/messages/message.dto";
-import { authMiddleware } from "@/middlewares/auth";
+import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 
 const router = Router();
 
@@ -27,7 +28,13 @@ router.get("/:id", MessageController.getMessageById);
 router.put("/:id", MessageController.updateMessage);
 
 // Route to delete a message
-router.delete("/:id", MessageController.deleteMessage);
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN", "SUPPORT", "CUSTOMER"),
+  validator(zDeleteMessageDto),
+  MessageController.deleteMessage
+);
 
 // Route to send message
 router.post(

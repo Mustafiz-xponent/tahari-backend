@@ -19,7 +19,7 @@ const io = new SocketIOServer(server, {
 const onlineUsers = new Map<string, { socketId: string; role: UserRole }>();
 
 // Helper to get a specific user's socket ID
-export function getReceiverSocketId(userId: string): string | null {
+export function getSocketId(userId: string): string | null {
   return onlineUsers.get(userId)?.socketId || null;
 }
 

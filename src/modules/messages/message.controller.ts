@@ -150,15 +150,15 @@ export const deleteMessage = async (
   res: Response
 ): Promise<void> => {
   try {
-    const messageId = messageIdSchema.parse(req.params.id);
-    await messageService.deleteMessage(messageId);
-    res.json({ message: "Message deleted successfully" });
+    const messageId = req.params.id;
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
+
+    await messageService.deleteMessage(BigInt(messageId), userId, userRole);
+    res
+      .status(httpStatus.OK)
+      .json({ success: true, message: "Message deleted successfully" });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting message:", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json({ message: "Failed to delete message" });

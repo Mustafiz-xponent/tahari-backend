@@ -10,11 +10,7 @@ import {
   UpdateMessageDto,
 } from "@/modules/messages/message.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
-import {
-  getOnlineSupportSockets,
-  getReceiverSocketId,
-  io,
-} from "@/utils/socket";
+import { getOnlineSupportSockets, getSocketId, io } from "@/utils/socket";
 
 type GetAllMessagesResult = {
   messages: Message[];
@@ -224,10 +220,48 @@ export async function updateMessage(
 /**
  * Delete a message by its ID
  */
-export async function deleteMessage(messageId: BigInt): Promise<void> {
+export async function deleteMessage(
+  messageId: BigInt,
+  userId: bigint,
+  userRole: UserRole
+): Promise<void> {
   try {
-    await prisma.message.delete({
+    const message = await prisma.message.findUnique({
       where: { messageId: Number(messageId) },
+    });
+
+    if (!message) {
+      throw new Error("Message not found");
+    }
+    // Permission check:
+    if (userRole === UserRole.CUSTOMER) {
+      // Customer can ONLY delete their own sent messages
+      if (message.senderId !== BigInt(userId)) {
+        throw new Error("You can't delete this message");
+      }
+    }
+    const deletedMessage = await prisma.message.delete({
+      where: { messageId: Number(messageId) },
+    });
+    const senderSocket = getSocketId(String(deletedMessage.senderId));
+    const receiverSocket = deletedMessage.receiverId
+      ? getSocketId(String(deletedMessage.receiverId))
+      : null;
+
+    if (senderSocket) {
+      io.to(senderSocket).emit("messageDeleted", {
+        messageId: deletedMessage.messageId,
+      });
+    }
+    if (receiverSocket) {
+      io.to(receiverSocket).emit("messageDeleted", {
+        messageId: deletedMessage.messageId,
+      });
+    }
+    getOnlineSupportSockets().forEach((socketId) => {
+      io.to(socketId).emit("messageDeleted", {
+        messageId: deletedMessage.messageId,
+      });
     });
   } catch (error) {
     throw new Error(`Failed to delete message: ${getErrorMessage(error)}`);
@@ -267,6 +301,11 @@ export const sendMessage = async ({
           },
         },
       });
+
+      const customerSocket = getSocketId(String(senderId));
+      if (customerSocket) {
+        io.to(customerSocket).emit("newMessage", msg);
+      }
 
       getOnlineSupportSockets().forEach((socketId) => {
         io.to(socketId).emit("newMessage", msg);
@@ -318,7 +357,7 @@ export const sendMessage = async ({
         },
       });
 
-      const customerSocket = getReceiverSocketId(String(receiverId));
+      const customerSocket = getSocketId(String(receiverId));
       if (customerSocket) {
         io.to(customerSocket).emit("newMessage", msg);
       }
