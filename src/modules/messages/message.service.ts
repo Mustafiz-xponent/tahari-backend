@@ -166,6 +166,7 @@ export async function getAllMessages(
       unreadMessageCount,
     };
   } catch (error) {
+    console.log("ERROR:", error);
     throw new Error(`Failed to fetch messages: ${getErrorMessage(error)}`);
   }
 }
