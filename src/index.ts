@@ -1,7 +1,7 @@
 "use strict";
 
 import dotenv from "dotenv";
-import app from "@/app";
+import { server } from "@/utils/socket";
 import logger from "@/utils/logger";
 
 // Load environment variables
@@ -15,7 +15,7 @@ process.on("uncaughtException", (err) => {
 
 const PORT = process.env.PORT || 3000;
 
-const server = app.listen(PORT, () => {
+server.listen(PORT, () => {
   logger.info(`Accounting API server running on http://localhost:${PORT}`);
 });
 

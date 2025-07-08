@@ -45,12 +45,44 @@ export const createMessage = async (
  * Get all messages
  */
 export const getAllMessages = async (
-  _req: Request,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const messages = await messageService.getAllMessages();
-    res.json(messages);
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
+    const receiverId = req.query?.receiverId as string;
+    const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+    const limit = Math.min(
+      Math.max(parseInt(req.query.limit as string) || 10, 1),
+      100
+    ); // Max 100 items per page
+    const skip = (page - 1) * limit;
+    const sort = req.query.sort === "asc" ? "asc" : "desc";
+    const paginationParams = { page, limit, skip, sort };
+
+    const results = await messageService.getAllMessages(
+      userId,
+      userRole,
+      paginationParams,
+      receiverId
+    );
+    res.status(httpStatus.OK).json({
+      success: true,
+      message: "Messages retrieved successfully",
+      data: results.messages,
+      pagination: {
+        currentPage: results.currentPage,
+        totalPages: results.totalPages,
+        totalItems: results.totalCount,
+        itemsPerPage: limit,
+        hasNextPage: page < results.totalPages,
+        hasPreviousPage: page > 1,
+      },
+      meta: {
+        unreadMessageCount: results.unreadMessageCount,
+      },
+    });
   } catch (error) {
     console.error("Error fetching messages:", error);
     res
@@ -118,15 +150,72 @@ export const deleteMessage = async (
   res: Response
 ): Promise<void> => {
   try {
-    const messageId = messageIdSchema.parse(req.params.id);
-    await messageService.deleteMessage(messageId);
-    res.json({ message: "Message deleted successfully" });
+    const messageId = req.params.id;
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
+
+    await messageService.deleteMessage(BigInt(messageId), userId, userRole);
+    res
+      .status(httpStatus.OK)
+      .json({ success: true, message: "Message deleted successfully" });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting message:", error);
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Failed to delete message" });
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to delete message" });
+  }
+};
+
+export const sendMessage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { message, receiverId } = req.body;
+    const senderId = req.user?.userId;
+    const senderRole = req.user?.role;
+
+    const result = await messageService.sendMessage({
+      message,
+      receiverId,
+      senderId,
+      senderRole,
+    });
+
+    res.status(httpStatus.CREATED).json({
+      message: "Message sent successfully",
+      data: result.data,
+    });
+  } catch (error) {
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to send message" });
+  }
+};
+/**
+ * Mark message as read
+ */
+export const markMessageAsRead = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
+    const { senderId } = req.body;
+
+    await messageService.markMessageAsRead({
+      userId,
+      userRole,
+      senderId,
+    });
+
+    res.status(httpStatus.OK).json({
+      success: true,
+      message: "Message marked as read successfully",
+    });
+  } catch (error) {
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to mark message as read" });
   }
 };

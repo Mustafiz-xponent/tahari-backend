@@ -10,6 +10,12 @@ const prisma = new PrismaClient({
         : process.env.DATABASE_URL,
     },
   },
+  // @ts-ignore
+  __internal: {
+    engine: {
+      disablePrepareStatements: true,
+    },
+  },
 });
 
 export default prisma;

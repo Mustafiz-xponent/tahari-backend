@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, Application } from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import helmet from "helmet";
@@ -26,13 +26,15 @@ import walletTransactionRoutes from "@/modules/wallet_transactions/wallet_transa
 import subscriptionRoutes from "@/modules/subscriptions/subscription.routes";
 import subscriptionPlanRoutes from "@/modules/subscription_plans/subscription_plan.routes";
 import subscriptionDeliveryRoutes from "@/modules/subscription_deliveries/subscription-delivery.routes";
+import messageRoutes from "@/modules/messages/message.routes";
+import customerRoutes from "@/modules/customers/customer.routes";
 import { rateLimiter } from "@/middlewares/rateLimiter";
 import { globalErrorHandler } from "@/middlewares/errorHandler";
+import cors from "cors";
 
 dotenv.config();
-// Initialize the app
-const app = express();
 
+const app: Application = express();
 // Core Middleware
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
@@ -40,6 +42,11 @@ app.use(helmet());
 app.use(morgran("dev"));
 app.use(compression());
 app.use(rateLimiter(1000, 15 * 60 * 1000)); // 1000 requests per 15 minutes for dev
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+};
+app.use(cors(corsOptions));
 
 // Global BigInt Serializer
 (BigInt.prototype as any).toJSON = function () {
@@ -65,6 +72,8 @@ app.use("/api/wallet-transactions", walletTransactionRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/subscription-plans", subscriptionPlanRoutes);
 app.use("/api/subscription-deliveries", subscriptionDeliveryRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/customers", customerRoutes);
 
 // Health check route
 app.get("/health", (_req: Request, res: Response) => {

@@ -46,10 +46,22 @@ import bcrypt from "bcrypt";
  */
 export async function getAllCustomers(): Promise<Customer[]> {
   try {
-    const customers = await prisma.customer.findMany();
+    const customers = await prisma.customer.findMany({
+      include: {
+        user: {
+          select: {
+            userId: true,
+            email: true,
+            name: true,
+            phone: true,
+            role: true,
+          },
+        },
+      },
+    });
     return customers;
   } catch (error) {
-    throw new Error(`Failed to fetch customers: ${getErrorMessage(error)}`);
+    throw error;
   }
 }
 

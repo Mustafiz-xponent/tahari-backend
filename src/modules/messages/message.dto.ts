@@ -43,3 +43,46 @@ export const zUpdateMessageDto = z.object({
  * TypeScript type inferred from update schema.
  */
 export type UpdateMessageDto = z.infer<typeof zUpdateMessageDto>;
+
+/**
+ * Zod schema for creating a new message.
+ */
+export const zSendMessageDto = {
+  body: z.object({
+    message: z.string().min(1, "Message is required"),
+    receiverId: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Receiver ID must be a positive integer",
+      })
+      .optional(),
+  }),
+};
+
+export type SendMessageDto = z.infer<typeof zSendMessageDto.body>;
+
+export const zMarkMessageAsReadDto = {
+  body: z.object({
+    senderId: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Sender ID must be a positive integer",
+      })
+      .optional(),
+  }),
+};
+
+export type MarkMessageAsReadDto = z.infer<typeof zMarkMessageAsReadDto.body>;
+
+export const zDeleteMessageDto = {
+  params: z.object({
+    id: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Params ID must be a positive integer",
+      }),
+  }),
+};
