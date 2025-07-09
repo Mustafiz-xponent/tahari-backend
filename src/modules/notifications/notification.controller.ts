@@ -24,11 +24,16 @@ export const createNotification = async (
   res: Response
 ): Promise<void> => {
   try {
-    const data = zCreateNotificationDto.parse(req.body);
-    const notification = await notificationService.createNotification(data);
-    res
-      .status(201)
-      .json({ message: "Notification created successfully", notification });
+    const { message, receiverId } = req.body;
+
+    const notification = await notificationService.createNotification({
+      message,
+      receiverId,
+    });
+    res.status(201).json({
+      message: "Notification created successfully",
+      data: notification,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });

@@ -10,6 +10,7 @@ import {
   UpdateNotificationDto,
 } from "@/modules/notifications/notification.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
+import { getSocketId, io } from "@/utils/socket";
 
 /**
  * Create a new notification
@@ -18,12 +19,23 @@ export async function createNotification(
   data: CreateNotificationDto
 ): Promise<Notification> {
   try {
+    const receiver = await prisma.user.findUnique({
+      where: { userId: data.receiverId },
+    });
+    if (!receiver) {
+      throw new Error("Receiver not found");
+    }
+
     const notification = await prisma.notification.create({
       data: {
         message: data.message,
-        status: data.status,
+        receiverId: data.receiverId,
       },
     });
+    const receiverId = getSocketId(String(data.receiverId));
+    if (receiverId) {
+      io.to(receiverId).emit("newNotification", notification);
+    }
     return notification;
   } catch (error) {
     throw new Error(`Failed to create notification: ${getErrorMessage(error)}`);

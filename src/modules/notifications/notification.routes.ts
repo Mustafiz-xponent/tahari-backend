@@ -5,11 +5,20 @@
 
 import { Router } from "express";
 import * as NotificationController from "@/modules/notifications/notification.controller";
+import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
+import validator from "@/middlewares/validator";
+import { zCreateNotificationDto } from "@/modules/notifications/notification.dto";
 
 const router = Router();
 
 // Route to create a new notification
-router.post("/", NotificationController.createNotification);
+router.post(
+  "/",
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  validator(zCreateNotificationDto),
+  NotificationController.createNotification
+);
 
 // Route to get all notifications
 router.get("/", NotificationController.getAllNotifications);

@@ -498,8 +498,8 @@ model Notification {
   status         NotificationStatus @default(UNREAD)
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
-  User           User?              @relation(fields: [userId], references: [userId])
-  userId         BigInt?
+  receiver       User?              @relation(fields: [receiverId], references: [userId])
+  receiverId     BigInt?
 
   @@index([notificationId])
 }

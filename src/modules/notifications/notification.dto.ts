@@ -10,15 +10,22 @@ const notificationStatusEnum = z.enum(["UNREAD", "READ"]);
 /**
  * Zod schema for creating a new notification.
  */
-export const zCreateNotificationDto = z.object({
-  message: z.string().min(1, "Message is required"),
-  status: notificationStatusEnum.default("UNREAD"),
-});
+export const zCreateNotificationDto = {
+  body: z.object({
+    message: z.string().min(1, "Message is required"),
+    receiverId: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Reciever ID must be a positive integer",
+      }),
+  }),
+};
 
 /**
  * TypeScript type inferred from create schema.
  */
-export type CreateNotificationDto = z.infer<typeof zCreateNotificationDto>;
+export type CreateNotificationDto = z.infer<typeof zCreateNotificationDto.body>;
 
 /**
  * Zod schema for updating a notification.
