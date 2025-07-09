@@ -48,3 +48,14 @@ export const zUpdateNotificationDto = {
  * TypeScript type inferred from update schema.
  */
 export type UpdateNotificationDto = z.infer<typeof zUpdateNotificationDto.body>;
+
+export const zDeleteNotificationDto = {
+  params: z.object({
+    id: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Params ID must be a positive integer",
+      }),
+  }),
+};

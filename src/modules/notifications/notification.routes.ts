@@ -9,6 +9,7 @@ import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 import validator from "@/middlewares/validator";
 import {
   zCreateNotificationDto,
+  zDeleteNotificationDto,
   zUpdateNotificationDto,
 } from "@/modules/notifications/notification.dto";
 
@@ -39,6 +40,12 @@ router.put(
 );
 
 // Route to delete a notification
-router.delete("/:id", NotificationController.deleteNotification);
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  validator(zDeleteNotificationDto),
+  NotificationController.deleteNotification
+);
 
 export default router;

@@ -94,7 +94,7 @@ export async function updateNotification(
 
     const receiverId = getSocketId(String(notification.receiverId));
     if (receiverId) {
-      io.to(receiverId).emit("updateNotification", notification);
+      io.to(receiverId).emit("notificationUpdated", notification);
     }
     return updatedNotification;
   } catch (error) {
@@ -109,9 +109,19 @@ export async function deleteNotification(
   notificationId: BigInt
 ): Promise<void> {
   try {
+    const notification = await prisma.notification.findUnique({
+      where: { notificationId: Number(notificationId) },
+    });
+    if (!notification) {
+      throw new Error("Notification not found");
+    }
     await prisma.notification.delete({
       where: { notificationId: Number(notificationId) },
     });
+    const receiverId = getSocketId(String(notification.receiverId));
+    if (receiverId) {
+      io.to(receiverId).emit("notificationDeleted", notification);
+    }
   } catch (error) {
     throw new Error(`Failed to delete notification: ${getErrorMessage(error)}`);
   }

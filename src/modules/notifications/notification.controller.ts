@@ -124,17 +124,12 @@ export const deleteNotification = async (
   res: Response
 ): Promise<void> => {
   try {
-    const notificationId = notificationIdSchema.parse(req.params.id);
-    await notificationService.deleteNotification(notificationId);
+    const notificationId = req.params.id;
+    await notificationService.deleteNotification(BigInt(notificationId));
     res.json({ message: "Notification deleted successfully" });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error deleting notification:", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to delete notification" });
+      .json({ success: false, message: "Failed to delete notification" });
   }
 };
