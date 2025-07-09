@@ -352,7 +352,8 @@ exports.Prisma.NotificationScalarFieldEnum = {
   message: 'message',
   status: 'status',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  userId: 'userId'
 };
 
 exports.Prisma.SortOrder = {

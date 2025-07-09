@@ -108,21 +108,22 @@ enum DiscountType {
 }
 
 model User {
-  userId           BigInt     @id @default(autoincrement())
-  email            String?    @unique
+  userId           BigInt         @id @default(autoincrement())
+  email            String?        @unique
   name             String? // Optional
-  phone            String     @unique
+  phone            String         @unique
   address          String[] // Optional
   passwordHash     String? // Hashed with bcrypt
   role             UserRole
   status           UserStatus
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
   admin            Admin?
   customer         Customer?
   otps             Otp[]
-  sentMessages     Message[]  @relation("SentMessages")
-  receivedMessages Message[]  @relation("ReceivedMessages")
+  sentMessages     Message[]      @relation("SentMessages")
+  receivedMessages Message[]      @relation("ReceivedMessages")
+  notifications    Notification[]
 
   @@index([userId])
   @@index([phone])
@@ -497,6 +498,8 @@ model Notification {
   status         NotificationStatus @default(UNREAD)
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
+  User           User?              @relation(fields: [userId], references: [userId])
+  userId         BigInt?
 
   @@index([notificationId])
 }
