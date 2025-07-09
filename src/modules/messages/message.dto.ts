@@ -27,22 +27,24 @@ export type CreateMessageDto = z.infer<typeof zCreateMessageDto>;
 /**
  * Zod schema for updating a message.
  */
-export const zUpdateMessageDto = z.object({
-  subject: z.string().min(1, "Subject is required").optional(),
-  message: z.string().min(1, "Message is required").optional(),
-  customerId: z
-    .union([z.string(), z.number()])
-    .transform(BigInt)
-    .refine((val) => val > 0n, {
-      message: "Customer ID must be a positive integer",
-    })
-    .optional(),
-});
+export const zUpdateMessageDto = {
+  body: z.object({
+    message: z.string().min(1, "Message is required").optional(),
+  }),
+  params: z.object({
+    id: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Params ID must be a positive integer",
+      }),
+  }),
+};
 
 /**
  * TypeScript type inferred from update schema.
  */
-export type UpdateMessageDto = z.infer<typeof zUpdateMessageDto>;
+export type UpdateMessageDto = z.infer<typeof zUpdateMessageDto.body>;
 
 /**
  * Zod schema for creating a new message.

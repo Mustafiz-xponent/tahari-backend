@@ -145,7 +145,11 @@
 
 //  ================= 2nd edition =====================
 
-import { PrismaClient, UserRole, UserStatus } from "../generated/prisma/client";
+import {
+  PrismaClient,
+  UserRole,
+  UserStatus,
+} from "../src/generated/prisma/client";
 import * as bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();

@@ -192,28 +192,75 @@ export async function getMessageById(
  * Update a message by its ID
  */
 export async function updateMessage(
-  messageId: BigInt,
-  data: UpdateMessageDto
-): Promise<Message> {
+  messageId: bigint,
+  newMessage: string,
+  userId: bigint,
+  userRole: UserRole
+) {
   try {
-    if (data.customerId) {
-      const customer = await prisma.customer.findUnique({
-        where: { customerId: data.customerId },
-      });
-      if (!customer) {
-        throw new Error("Customer not found");
+    const message = await prisma.message.findUnique({
+      where: { messageId: Number(messageId) },
+    });
+
+    if (!message) {
+      throw new Error("Message not found");
+    }
+
+    if (userRole === UserRole.CUSTOMER) {
+      if (message.senderId !== userId) {
+        throw new Error("You can't update this message");
       }
     }
 
-    const message = await prisma.message.update({
+    const updatedMessage = await prisma.message.update({
       where: { messageId: Number(messageId) },
-      data: {
-        // subject: data.subject,
-        message: data.message,
-        // customerId: data.customerId,
+      data: { message: newMessage },
+      include: {
+        sender: {
+          select: {
+            userId: true,
+            name: true,
+            email: true,
+            phone: true,
+            role: true,
+          },
+        },
+        receiver: {
+          select: {
+            userId: true,
+            name: true,
+            email: true,
+            phone: true,
+            role: true,
+          },
+        },
       },
     });
-    return message;
+
+    const senderSocket = getSocketId(String(updatedMessage.senderId));
+    const receiverSocket = updatedMessage.receiverId
+      ? getSocketId(String(updatedMessage.receiverId))
+      : null;
+
+    if (senderSocket) {
+      io.to(senderSocket).emit("messageUpdated", {
+        message: updatedMessage,
+      });
+    }
+
+    if (receiverSocket) {
+      io.to(receiverSocket).emit("messageUpdated", {
+        message: updatedMessage,
+      });
+    }
+
+    getOnlineSupportSockets().forEach((socketId) => {
+      io.to(socketId).emit("messageUpdated", {
+        message: updatedMessage,
+      });
+    });
+
+    return updatedMessage;
   } catch (error) {
     throw new Error(`Failed to update message: ${getErrorMessage(error)}`);
   }
@@ -309,7 +356,6 @@ export const sendMessage = async ({
       });
       const customerSocket = getSocketId(String(senderId));
       if (customerSocket) {
-        console.log("customerSocket", customerSocket);
         io.to(customerSocket).emit("newMessage", msg);
       }
 

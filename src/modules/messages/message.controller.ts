@@ -126,19 +126,27 @@ export const updateMessage = async (
   res: Response
 ): Promise<void> => {
   try {
-    const messageId = messageIdSchema.parse(req.params.id);
-    const data = zUpdateMessageDto.parse(req.body);
-    const updated = await messageService.updateMessage(messageId, data);
-    res.json({ message: "Message updated successfully", data: updated });
+    const messageId = req.params.id;
+    const { message } = req.body;
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
+
+    const updatedMessage = await messageService.updateMessage(
+      BigInt(messageId),
+      message,
+      userId,
+      userRole
+    );
+
+    res.status(httpStatus.OK).json({
+      success: true,
+      message: "Message updated successfully",
+      data: updatedMessage,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error updating message:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to update message" });
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+      message: "Failed to update message",
+    });
   }
 };
 

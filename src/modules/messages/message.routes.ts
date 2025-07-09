@@ -10,6 +10,7 @@ import {
   zDeleteMessageDto,
   zMarkMessageAsReadDto,
   zSendMessageDto,
+  zUpdateMessageDto,
 } from "@/modules/messages/message.dto";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 
@@ -25,7 +26,13 @@ router.get("/", authMiddleware, MessageController.getAllMessages);
 router.get("/:id", MessageController.getMessageById);
 
 // Route to update a message's details
-router.put("/:id", MessageController.updateMessage);
+router.put(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN", "SUPPORT", "CUSTOMER"),
+  validator(zUpdateMessageDto),
+  MessageController.updateMessage
+);
 
 // Route to delete a message
 router.delete(
