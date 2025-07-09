@@ -78,14 +78,25 @@ export async function updateNotification(
   data: UpdateNotificationDto
 ): Promise<Notification> {
   try {
-    const notification = await prisma.notification.update({
+    const notification = await prisma.notification.findUnique({
+      where: { notificationId: Number(notificationId) },
+    });
+    if (!notification) {
+      throw new Error("Notification not found");
+    }
+
+    const updatedNotification = await prisma.notification.update({
       where: { notificationId: Number(notificationId) },
       data: {
         message: data.message,
-        status: data.status,
       },
     });
-    return notification;
+
+    const receiverId = getSocketId(String(notification.receiverId));
+    if (receiverId) {
+      io.to(receiverId).emit("updateNotification", notification);
+    }
+    return updatedNotification;
   } catch (error) {
     throw new Error(`Failed to update notification: ${getErrorMessage(error)}`);
   }

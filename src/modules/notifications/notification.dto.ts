@@ -30,12 +30,21 @@ export type CreateNotificationDto = z.infer<typeof zCreateNotificationDto.body>;
 /**
  * Zod schema for updating a notification.
  */
-export const zUpdateNotificationDto = z.object({
-  message: z.string().min(1, "Message is required").optional(),
-  status: notificationStatusEnum.optional(),
-});
+export const zUpdateNotificationDto = {
+  body: z.object({
+    message: z.string().min(1, "Message is required").optional(),
+  }),
+  params: z.object({
+    id: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Params ID must be a positive integer",
+      }),
+  }),
+};
 
 /**
  * TypeScript type inferred from update schema.
  */
-export type UpdateNotificationDto = z.infer<typeof zUpdateNotificationDto>;
+export type UpdateNotificationDto = z.infer<typeof zUpdateNotificationDto.body>;

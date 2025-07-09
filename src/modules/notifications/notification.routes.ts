@@ -7,7 +7,10 @@ import { Router } from "express";
 import * as NotificationController from "@/modules/notifications/notification.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 import validator from "@/middlewares/validator";
-import { zCreateNotificationDto } from "@/modules/notifications/notification.dto";
+import {
+  zCreateNotificationDto,
+  zUpdateNotificationDto,
+} from "@/modules/notifications/notification.dto";
 
 const router = Router();
 
@@ -27,7 +30,13 @@ router.get("/", NotificationController.getAllNotifications);
 router.get("/:id", NotificationController.getNotificationById);
 
 // Route to update a notification's details
-router.put("/:id", NotificationController.updateNotification);
+router.put(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  validator(zUpdateNotificationDto),
+  NotificationController.updateNotification
+);
 
 // Route to delete a notification
 router.delete("/:id", NotificationController.deleteNotification);

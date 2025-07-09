@@ -1,4 +1,3 @@
-import httpStatus from "http-status";
 /**
  * Controller layer for Notification entity operations.
  * Handles HTTP requests and responses for notification-related endpoints.
@@ -6,11 +5,9 @@ import httpStatus from "http-status";
 
 import { Request, Response } from "express";
 import * as notificationService from "@/modules/notifications/notification.service";
-import {
-  zCreateNotificationDto,
-  zUpdateNotificationDto,
-} from "@/modules/notifications/notification.dto";
+import { zUpdateNotificationDto } from "@/modules/notifications/notification.dto";
 import { ZodError, z } from "zod";
+import httpStatus from "http-status";
 
 const notificationIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Notification ID must be a positive integer",
@@ -30,16 +27,12 @@ export const createNotification = async (
       message,
       receiverId,
     });
-    res.status(201).json({
+    res.status(httpStatus.CREATED).json({
+      success: true,
       message: "Notification created successfully",
       data: notification,
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error creating notification:", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json({ message: "Failed to create notification" });
@@ -103,22 +96,20 @@ export const updateNotification = async (
   res: Response
 ): Promise<void> => {
   try {
-    const notificationId = notificationIdSchema.parse(req.params.id);
-    const data = zUpdateNotificationDto.parse(req.body);
-    const updated = await notificationService.updateNotification(
-      notificationId,
+    const data = req.body;
+    const notificationId = req.params.id;
+
+    const updatedNotification = await notificationService.updateNotification(
+      BigInt(notificationId),
       data
     );
-    res.json({
+
+    res.status(httpStatus.OK).json({
+      success: true,
       message: "Notification updated successfully",
-      notification: updated,
+      data: updatedNotification,
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
-      return;
-    }
-    console.error("Error updating notification:", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json({ message: "Failed to update notification" });

@@ -26,6 +26,7 @@ import walletTransactionRoutes from "@/modules/wallet_transactions/wallet_transa
 import subscriptionRoutes from "@/modules/subscriptions/subscription.routes";
 import subscriptionPlanRoutes from "@/modules/subscription_plans/subscription_plan.routes";
 import subscriptionDeliveryRoutes from "@/modules/subscription_deliveries/subscription-delivery.routes";
+import notificationsRoutes from "@/modules/notifications/notification.routes";
 import messageRoutes from "@/modules/messages/message.routes";
 import customerRoutes from "@/modules/customers/customer.routes";
 import { rateLimiter } from "@/middlewares/rateLimiter";
@@ -75,6 +76,7 @@ app.use("/api/subscription-plans", subscriptionPlanRoutes);
 app.use("/api/subscription-deliveries", subscriptionDeliveryRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/customers", customerRoutes);
+app.use("/api/notifications", notificationsRoutes);
 
 // Health check route
 app.get("/health", (_req: Request, res: Response) => {
