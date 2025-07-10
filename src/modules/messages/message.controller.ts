@@ -5,10 +5,7 @@
 
 import { Request, Response } from "express";
 import * as messageService from "@/modules/messages/message.service";
-import {
-  zCreateMessageDto,
-  zUpdateMessageDto,
-} from "@/modules/messages/message.dto";
+import { zCreateMessageDto } from "@/modules/messages/message.dto";
 import { ZodError, z } from "zod";
 import httpStatus from "http-status";
 

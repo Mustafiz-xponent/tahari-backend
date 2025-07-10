@@ -470,6 +470,32 @@ export const markMessageAsRead = async ({
         readAt: now,
       },
     });
+
+    // Emit to the other side that these messages are read
+    if (
+      userRole === UserRole.SUPPORT ||
+      userRole === UserRole.ADMIN ||
+      userRole === UserRole.SUPER_ADMIN
+    ) {
+      // Notify CUSTOMER whose messages were read by support
+      const customerSocket = getSocketId(String(senderId));
+      if (customerSocket) {
+        io.to(customerSocket).emit("messagesRead", {
+          read: true,
+          readBy: "support",
+          senderId,
+        });
+      }
+    } else if (userRole === UserRole.CUSTOMER) {
+      // Notify support/admin that CUSTOMER read their messages
+      getOnlineSupportSockets().forEach((socketId) => {
+        io.to(socketId).emit("messagesRead", {
+          read: true,
+          by: "customer",
+          userId,
+        });
+      });
+    }
   } catch (error) {
     throw new Error(
       `Failed to mark message as read: ${getErrorMessage(error)}`
