@@ -9,6 +9,7 @@ import { CreateWalletDto, UpdateWalletDto } from "@/modules/wallets/wallet.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { processSSLCommerzWalletDeposite } from "@/utils/processWalletDeposite";
 import { validateSSLCommerzPayment } from "@/utils/processPayment";
+import * as notificationService from "@/modules/notifications/notification.service";
 
 /**
  * Create a new wallet
@@ -117,7 +118,7 @@ export async function handleDepositeSuccess(
           },
         });
         // Update wallet balance
-        await tx.wallet.update({
+        const updatedWallet = await tx.wallet.update({
           where: { walletId: walletTransaction.walletId },
           data: {
             balance: {
@@ -125,6 +126,13 @@ export async function handleDepositeSuccess(
             },
             updatedAt: new Date(),
           },
+          include: {
+            customer: true,
+          },
+        });
+        await notificationService.createNotification({
+          message: `অভিনন্দন! আপনার ওয়ালেটে ${walletTransaction.amount} টাকা সফলভাবে জমা হয়েছে (লেনদেন আইডি: ${tranId})। ধন্যবাদ আমাদের সাথে থাকার জন্য।`,
+          receiverId: updatedWallet.customer.userId,
         });
         return {
           success: true,
@@ -159,6 +167,13 @@ export async function handleDepositeFailure(failureData: any): Promise<void> {
         description: { contains: tranId },
         transactionStatus: "PENDING",
       },
+      include: {
+        wallet: {
+          include: {
+            customer: true,
+          },
+        },
+      },
     });
 
     if (walletTransaction) {
@@ -168,6 +183,10 @@ export async function handleDepositeFailure(failureData: any): Promise<void> {
           transactionStatus: "FAILED",
           description: `Wallet deposite failed. TransactionId: ${tranId}`,
         },
+      });
+      await notificationService.createNotification({
+        message: `দুঃখিত! আপনার ওয়ালেটে টাকা জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন বা সহায়তার জন্য আমাদের সাথে যোগাযোগ করুন।`,
+        receiverId: walletTransaction.wallet.customer.userId,
       });
     }
   } catch (error) {

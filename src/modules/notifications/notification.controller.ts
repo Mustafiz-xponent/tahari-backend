@@ -5,7 +5,6 @@
 
 import { Request, Response } from "express";
 import * as notificationService from "@/modules/notifications/notification.service";
-import { zUpdateNotificationDto } from "@/modules/notifications/notification.dto";
 import { ZodError, z } from "zod";
 import httpStatus from "http-status";
 

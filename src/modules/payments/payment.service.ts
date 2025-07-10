@@ -15,6 +15,8 @@ import {
   processCodPayment,
   validateSSLCommerzPayment,
 } from "@/utils/processPayment";
+import * as notificationService from "@/modules/notifications/notification.service";
+import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
 
 /**
  * create order payment through wallet or SSLCommerz
@@ -122,12 +124,17 @@ export async function handleSSLCommerzSuccess(
           where: { orderId },
           include: {
             orderItems: true,
+            customer: {
+              include: {
+                user: true,
+              },
+            },
           },
         });
 
         if (!order) throw new Error("Order not found");
         //  Update order
-        await tx.order.update({
+        const updatedOrder = await tx.order.update({
           where: { orderId },
           data: {
             paymentStatus: "COMPLETED",
@@ -165,7 +172,14 @@ export async function handleSSLCommerzSuccess(
             },
           });
         }
-
+        const message = getOrderStatusMessage(
+          updatedOrder.status,
+          updatedOrder.orderId
+        );
+        await notificationService.createNotification({
+          message,
+          receiverId: order.customer.userId,
+        });
         return {
           success: true,
           message: "SSLCommerz payment completed successfully",
@@ -231,7 +245,10 @@ export async function handleSSLCommerzFailure(failureData: any): Promise<void> {
       // Update order status if still pending
       const order = await tx.order.findUnique({
         where: { orderId },
+        include: { customer: true },
       });
+
+      if (!order) throw new Error("Order not found");
 
       if (order && order.paymentStatus === "PENDING") {
         await tx.order.update({
@@ -239,6 +256,10 @@ export async function handleSSLCommerzFailure(failureData: any): Promise<void> {
           data: { paymentStatus: "FAILED" },
         });
       }
+      await notificationService.createNotification({
+        message: `দুঃখিত! আপনার অর্ডারটি সম্পন্ন করা যায়নি কারণ পেমেন্ট সফল হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন। অর্ডার আইডিঃ #${order.orderId}`,
+        receiverId: order.customer.userId,
+      });
     });
   } catch (error) {
     console.error("handleSSLCommerzFailure error:", error);

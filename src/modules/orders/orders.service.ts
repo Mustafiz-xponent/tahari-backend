@@ -8,6 +8,8 @@ import { Order, OrderStatus } from "@/generated/prisma/client";
 import { CreateOrderDto, UpdateOrderDto } from "@/modules/orders/orders.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { getBatchAccessibleImageUrls } from "@/utils/fileUpload/s3Aws";
+import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
+import * as notificationService from "@/modules/notifications/notification.service";
 
 interface CustomerOrdersResult {
   orders: Order[];
@@ -167,6 +169,7 @@ export async function updateOrder(
           paymentStatus: true,
           paymentMethod: true,
           orderItems: true,
+          customer: true,
         },
       });
 
@@ -241,6 +244,13 @@ export async function updateOrder(
               status: data.status,
               description: `Status updated to ${data.status}`,
             },
+          });
+        }
+        if (currentOrder.customer.userId) {
+          const message = getOrderStatusMessage(data.status, orderId);
+          await notificationService.createNotification({
+            message,
+            receiverId: currentOrder.customer.userId,
           });
         }
       }
