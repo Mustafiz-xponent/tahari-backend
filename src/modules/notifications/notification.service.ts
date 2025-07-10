@@ -53,6 +53,27 @@ export async function getAllNotifications(): Promise<Notification[]> {
     throw new Error(`Failed to fetch notifications: ${getErrorMessage(error)}`);
   }
 }
+/**
+ * Retrieve a user's notifications
+ */
+export async function getUserNotifications(
+  userId: BigInt
+): Promise<Notification[]> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { userId: Number(userId) },
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const notifications = await prisma.notification.findMany({
+      where: { receiverId: Number(userId) },
+    });
+    return notifications;
+  } catch (error) {
+    throw new Error(`Failed to fetch notifications: ${getErrorMessage(error)}`);
+  }
+}
 
 /**
  * Retrieve a notification by its ID

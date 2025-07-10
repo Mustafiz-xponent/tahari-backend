@@ -56,7 +56,33 @@ export const getAllNotifications = async (
       .json({ message: "Failed to fetch notifications" });
   }
 };
+/**
+ * Get a user notification by userId
+ */
 
+export const getUserNotifications = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.params.id;
+
+    const notifications = await notificationService.getUserNotifications(
+      BigInt(userId)
+    );
+
+    res.status(httpStatus.OK).json({
+      success: true,
+      message: "Notifications retrieved successfully",
+      data: notifications,
+    });
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to fetch notifications" });
+  }
+};
 /**
  * Get a single notification by ID
  */
