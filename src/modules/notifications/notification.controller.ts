@@ -66,15 +66,31 @@ export const getUserNotifications = async (
 ): Promise<void> => {
   try {
     const userId = req.params.id;
-
-    const notifications = await notificationService.getUserNotifications(
-      BigInt(userId)
+    const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+    const limit = Math.min(
+      Math.max(parseInt(req.query.limit as string) || 10, 1),
+      100
+    ); // Max 100 items per page
+    const skip = (page - 1) * limit;
+    const sort = req.query.sort === "asc" ? "asc" : "desc";
+    const paginationParams = { page, limit, skip, sort };
+    const result = await notificationService.getUserNotifications(
+      BigInt(userId),
+      paginationParams
     );
 
     res.status(httpStatus.OK).json({
       success: true,
       message: "Notifications retrieved successfully",
-      data: notifications,
+      data: result.notifications,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalCount,
+        itemsPerPage: limit,
+        hasNextPage: page < result.totalPages,
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
     console.error("Error fetching notifications:", error);

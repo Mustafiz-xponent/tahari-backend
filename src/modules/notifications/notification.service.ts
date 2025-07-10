@@ -12,6 +12,13 @@ import {
 import { getErrorMessage } from "@/utils/errorHandler";
 import { getSocketId, io } from "@/utils/socket";
 
+interface GetUserNotificationResult {
+  notifications: Notification[];
+  totalCount: number;
+  currentPage: number;
+  totalPages: number;
+}
+
 /**
  * Create a new notification
  */
@@ -57,8 +64,9 @@ export async function getAllNotifications(): Promise<Notification[]> {
  * Retrieve a user's notifications
  */
 export async function getUserNotifications(
-  userId: BigInt
-): Promise<Notification[]> {
+  userId: BigInt,
+  paginationParams: { page: number; limit: number; skip: number; sort: string }
+): Promise<GetUserNotificationResult> {
   try {
     const user = await prisma.user.findUnique({
       where: { userId: Number(userId) },
@@ -68,8 +76,21 @@ export async function getUserNotifications(
     }
     const notifications = await prisma.notification.findMany({
       where: { receiverId: Number(userId) },
+      take: paginationParams.limit,
+      skip: paginationParams.skip,
+      orderBy: {
+        createdAt: paginationParams.sort === "asc" ? "asc" : "desc",
+      },
     });
-    return notifications;
+    const totalNotifications = await prisma.notification.count({
+      where: { receiverId: Number(userId) },
+    });
+    return {
+      notifications,
+      currentPage: paginationParams.page,
+      totalPages: Math.ceil(totalNotifications / paginationParams.limit),
+      totalCount: totalNotifications,
+    };
   } catch (error) {
     throw new Error(`Failed to fetch notifications: ${getErrorMessage(error)}`);
   }
