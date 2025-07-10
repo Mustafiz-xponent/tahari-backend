@@ -482,8 +482,7 @@ export const markMessageAsRead = async ({
       if (customerSocket) {
         io.to(customerSocket).emit("messagesRead", {
           read: true,
-          readBy: "support",
-          senderId,
+          readBy: "SUPPORT",
         });
       }
     } else if (userRole === UserRole.CUSTOMER) {
@@ -491,8 +490,7 @@ export const markMessageAsRead = async ({
       getOnlineSupportSockets().forEach((socketId) => {
         io.to(socketId).emit("messagesRead", {
           read: true,
-          by: "customer",
-          userId,
+          readBy: "CUSTOMER",
         });
       });
     }
