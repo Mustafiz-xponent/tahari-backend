@@ -159,3 +159,20 @@ export const deleteNotification = async (
       .json({ success: false, message: "Failed to delete notification" });
   }
 };
+
+export const markAllNotificationsAsRead = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    await notificationService.markAllNotificationsAsRead(userId);
+    res
+      .status(httpStatus.OK)
+      .json({ success: true, message: "All notifications marked as read" });
+  } catch (error) {
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to mark notifications as read" });
+  }
+};

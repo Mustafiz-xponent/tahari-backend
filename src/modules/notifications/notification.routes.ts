@@ -58,4 +58,12 @@ router.delete(
   NotificationController.deleteNotification
 );
 
+// Route to mark all notifications as read
+router.put(
+  "/read",
+  authMiddleware,
+  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  NotificationController.markAllNotificationsAsRead
+);
+
 export default router;

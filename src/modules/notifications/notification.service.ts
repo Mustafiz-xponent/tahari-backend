@@ -4,7 +4,7 @@
  */
 
 import prisma from "@/prisma-client/prismaClient";
-import { Notification } from "@/generated/prisma/client";
+import { Notification, NotificationStatus } from "@/generated/prisma/client";
 import {
   CreateNotificationDto,
   UpdateNotificationDto,
@@ -145,5 +145,28 @@ export async function deleteNotification(
     }
   } catch (error) {
     throw new Error(`Failed to delete notification: ${getErrorMessage(error)}`);
+  }
+}
+/**
+ * Mark all unread notifications as read for specific user
+ */
+
+export async function markAllNotificationsAsRead(
+  userId: BigInt
+): Promise<void> {
+  try {
+    await prisma.notification.updateMany({
+      where: {
+        receiverId: Number(userId),
+        status: NotificationStatus.UNREAD,
+      },
+      data: {
+        status: NotificationStatus.READ,
+      },
+    });
+  } catch (error) {
+    throw new Error(
+      `Failed to mark notifications as read: ${getErrorMessage(error)}`
+    );
   }
 }
