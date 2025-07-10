@@ -10,7 +10,6 @@ import validator from "@/middlewares/validator";
 import {
   zCreateNotificationDto,
   zDeleteNotificationDto,
-  zGetUserNotificationDto,
   zUpdateNotificationDto,
 } from "@/modules/notifications/notification.dto";
 
@@ -33,10 +32,9 @@ router.get("/:id", NotificationController.getNotificationById);
 
 // Route to get user notification
 router.get(
-  "/user/:id",
+  "/user",
   authMiddleware,
-  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
-  validator(zGetUserNotificationDto),
+  authorizeRoles("CUSTOMER"),
   NotificationController.getUserNotifications
 );
 

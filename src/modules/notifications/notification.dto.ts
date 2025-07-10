@@ -59,14 +59,3 @@ export const zDeleteNotificationDto = {
       }),
   }),
 };
-
-export const zGetUserNotificationDto = {
-  params: z.object({
-    id: z
-      .union([z.string(), z.number()])
-      .transform(BigInt)
-      .refine((val) => val > 0n, {
-        message: "Params ID must be a positive integer",
-      }),
-  }),
-};

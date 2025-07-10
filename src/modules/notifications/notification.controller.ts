@@ -64,7 +64,7 @@ export const getUserNotifications = async (
   res: Response
 ): Promise<void> => {
   try {
-    const userId = req.params.id;
+    const userId = req.user?.userId;
     const page = Math.max(parseInt(req.query.page as string) || 1, 1);
     const limit = Math.min(
       Math.max(parseInt(req.query.limit as string) || 10, 1),
