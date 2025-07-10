@@ -27,9 +27,6 @@ router.post(
 // Route to get all notifications
 router.get("/", NotificationController.getAllNotifications);
 
-// Route to get a notification by ID
-router.get("/:id", NotificationController.getNotificationById);
-
 // Route to get user notification
 router.get(
   "/user",
@@ -37,6 +34,15 @@ router.get(
   authorizeRoles("CUSTOMER"),
   NotificationController.getUserNotifications
 );
+// Route to mark all notifications as read
+router.patch(
+  "/read",
+  authMiddleware,
+  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  NotificationController.markAllNotificationsAsRead
+);
+// Route to get a notification by ID
+router.get("/:id", NotificationController.getNotificationById);
 
 // Route to update a notification's details
 router.put(
@@ -54,14 +60,6 @@ router.delete(
   authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
   validator(zDeleteNotificationDto),
   NotificationController.deleteNotification
-);
-
-// Route to mark all notifications as read
-router.put(
-  "/read",
-  authMiddleware,
-  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
-  NotificationController.markAllNotificationsAsRead
 );
 
 export default router;
