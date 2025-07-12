@@ -17,6 +17,7 @@ import {
 } from "@/utils/processPayment";
 import * as notificationService from "@/modules/notifications/notification.service";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
+import logger from "@/utils/logger";
 
 /**
  * create order payment through wallet or SSLCommerz
@@ -199,6 +200,51 @@ export async function handleSSLCommerzSuccess(
   }
 }
 
+/**
+ * Get order payment status for user callbacks
+ */
+export async function getOrderPaymentStatus(tranId: string): Promise<{
+  orderId: number;
+  paymentStatus: string;
+  orderStatus: string;
+}> {
+  try {
+    const orderIdMatch = tranId.match(/ORDER_(\d+)_/);
+    if (!orderIdMatch) {
+      throw new Error("Invalid transaction ID format");
+    }
+
+    const orderId = Number(orderIdMatch[1]);
+
+    const payment = await prisma.payment.findFirst({
+      where: {
+        orderId,
+        transactionId: tranId,
+      },
+      include: {
+        order: {
+          select: {
+            status: true,
+            paymentStatus: true,
+          },
+        },
+      },
+    });
+
+    if (!payment) {
+      throw new Error("Payment not found");
+    }
+
+    return {
+      orderId,
+      paymentStatus: payment.paymentStatus,
+      orderStatus: payment.order.status,
+    };
+  } catch (error) {
+    logger.error("Error getting order payment status:", error);
+    throw new Error(`Failed to get payment status: ${getErrorMessage(error)}`);
+  }
+}
 /**
  * Handle SSLCommerz payment failure
  */

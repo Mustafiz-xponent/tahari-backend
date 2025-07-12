@@ -5,6 +5,7 @@ import { getErrorMessage } from "@/utils/errorHandler";
 import * as notificationService from "@/modules/notifications/notification.service";
 import axios from "axios";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
+import logger from "@/utils/logger";
 
 export interface PaymentResult {
   payment?: Payment;
@@ -396,8 +397,10 @@ export async function validateSSLCommerzPayment(validationData: any) {
         timeout: 30000,
       }
     );
+    logger.info(response.data);
     return response.data;
   } catch (error) {
+    logger.error(error);
     throw error;
   }
 }

@@ -88,7 +88,7 @@ export async function handleDepositeSuccess(
     // Validate payment with SSLCommerz  implementation
     const validation = await validateSSLCommerzPayment(validationData);
 
-    if (validation.status === "VALID") {
+    if (["VALID", "VALIDATED"].includes(validation.status)) {
       // Extract wallet ID
       const tranId = validationData.tran_id;
 
@@ -147,12 +147,25 @@ export async function handleDepositeSuccess(
       );
     }
   } catch (error) {
+    console.error(error);
     throw new Error(
       `SSLCommerz success handling failed: ${getErrorMessage(error)}`
     );
   }
 }
+export async function getPaymentStatus(tranId: string): Promise<string> {
+  try {
+    const transaction = await prisma.walletTransaction.findFirst({
+      where: { description: { contains: tranId } },
+      select: { transactionStatus: true },
+    });
 
+    return transaction?.transactionStatus || "NOT_FOUND";
+  } catch (error) {
+    console.error("Error getting payment status:", error);
+    return "ERROR";
+  }
+}
 /**
  * Handle SSLCommerz payment failure
  */

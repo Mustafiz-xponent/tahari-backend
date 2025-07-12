@@ -12,6 +12,7 @@ import {
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import httpStatus from "http-status";
+import logger from "@/utils/logger";
 
 const paymentIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Payment ID must be a positive integer",
@@ -44,14 +45,16 @@ export const handleSSLCommerzSuccess = async (
   res: Response
 ): Promise<void> => {
   try {
-    const result = await paymentService.handleSSLCommerzSuccess(req.body);
+    const tranId = req.body.tran_id;
+    const paymentStatus = await paymentService.getOrderPaymentStatus(tranId);
 
-    if (result.success) {
+    if (paymentStatus.paymentStatus === "COMPLETED") {
       res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
     } else {
       res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
     }
   } catch (error) {
+    logger.error("Success callback error:", error);
     res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
   }
 };
@@ -94,11 +97,13 @@ export const handleSSLCommerzIPN = async (
 ): Promise<void> => {
   try {
     await paymentService.handleSSLCommerzSuccess(req.body);
-    res.status(httpStatus.OK).json({ message: "IPN received successfully" });
+    res
+      .status(httpStatus.OK)
+      .json({ success: true, message: "IPN received successfully" });
   } catch (error) {
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "IPN failed" });
+      .json({ success: false, message: "IPN failed" });
   }
 };
 
