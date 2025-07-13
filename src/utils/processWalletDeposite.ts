@@ -43,7 +43,6 @@ export async function processSSLCommerzWalletDeposite(
       redirectUrl: sslcommerzResponse.redirectGatewayURL,
     };
   } catch (error) {
-    console.error("SSLCommerz payment processing error:", error);
     throw new Error(`SSLCommerz payment failed: ${getErrorMessage(error)}`);
   }
 }

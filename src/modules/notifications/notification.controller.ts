@@ -23,7 +23,7 @@ export const createNotification = async (
     const { message, receiverId } = req.body;
 
     const notification = await notificationService.createNotification({
-      message,
+      message: message.replace(/\s+/g, " ").trim(),
       receiverId,
     });
     res.status(httpStatus.CREATED).json({

@@ -107,6 +107,11 @@ enum DiscountType {
   FLAT
 }
 
+enum SubscriptionPlanType {
+  WEEKLY
+  MONTHLY
+}
+
 model User {
   userId           BigInt         @id @default(autoincrement())
   email            String?        @unique
@@ -307,15 +312,15 @@ model StockTransaction {
 
 // Subscription plans for weekly/monthly deliveries
 model SubscriptionPlan {
-  planId        BigInt         @id @default(autoincrement())
+  planId        BigInt               @id @default(autoincrement())
   name          String
-  frequency     String
+  frequency     SubscriptionPlanType
   price         Decimal
   description   String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
   productId     BigInt
-  product       Product        @relation(fields: [productId], references: [productId])
+  product       Product              @relation(fields: [productId], references: [productId])
   subscriptions Subscription[]
 
   @@index([productId])

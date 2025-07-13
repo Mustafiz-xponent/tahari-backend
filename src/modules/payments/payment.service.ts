@@ -176,7 +176,9 @@ export async function handleSSLCommerzSuccess(
         const message = getOrderStatusMessage(
           updatedOrder.status,
           updatedOrder.orderId
-        );
+        )
+          .replace(/\s+/g, " ")
+          .trim();
         await notificationService.createNotification({
           message,
           receiverId: order.customer.userId,
@@ -302,7 +304,10 @@ export async function handleSSLCommerzFailure(failureData: any): Promise<void> {
         });
       }
       await notificationService.createNotification({
-        message: `দুঃখিত! আপনার অর্ডারটি সম্পন্ন করা যায়নি কারণ পেমেন্ট সফল হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন। অর্ডার আইডিঃ #${order.orderId}`,
+        message:
+          `দুঃখিত! আপনার অর্ডারটি সম্পন্ন করা যায়নি কারণ পেমেন্ট সফল হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন। অর্ডার আইডিঃ #${order.orderId}`
+            .replace(/\s+/g, " ")
+            .trim(),
         receiverId: order.customer.userId,
       });
     });

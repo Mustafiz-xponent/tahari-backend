@@ -247,7 +247,9 @@ export async function updateOrder(
           });
         }
         if (currentOrder.customer.userId) {
-          const message = getOrderStatusMessage(data.status, orderId);
+          const message = getOrderStatusMessage(data.status, orderId)
+            .replace(/\s+/g, " ")
+            .trim();
           await notificationService.createNotification({
             message,
             receiverId: currentOrder.customer.userId,

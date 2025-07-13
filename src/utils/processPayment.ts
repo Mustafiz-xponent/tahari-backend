@@ -5,7 +5,6 @@ import { getErrorMessage } from "@/utils/errorHandler";
 import * as notificationService from "@/modules/notifications/notification.service";
 import axios from "axios";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
-import logger from "@/utils/logger";
 
 export interface PaymentResult {
   payment?: Payment;
@@ -102,7 +101,9 @@ export async function processWalletPayment(
         },
       });
     }
-    const message = getOrderStatusMessage(updatedOrder.status, data.orderId);
+    const message = getOrderStatusMessage(updatedOrder.status, data.orderId)
+      .replace(/\s+/g, " ")
+      .trim();
     await notificationService.createNotification({
       message,
       receiverId: order.customer.userId,
@@ -161,7 +162,10 @@ export async function processCodPayment(
       },
     });
     await notificationService.createNotification({
-      message: `ধন্যবাদ! আপনার অর্ডারটি নিশ্চিত হয়েছে। দয়া করে পণ্য গ্রহণের সময় পেমেন্ট করুন। অর্ডার আইডিঃ #${data.orderId}`,
+      message:
+        `ধন্যবাদ! আপনার অর্ডারটি নিশ্চিত হয়েছে। দয়া করে পণ্য গ্রহণের সময় পেমেন্ট করুন। অর্ডার আইডিঃ #${data.orderId}`
+          .replace(/\s+/g, " ")
+          .trim(),
       receiverId: order.customer.userId,
     });
     return {

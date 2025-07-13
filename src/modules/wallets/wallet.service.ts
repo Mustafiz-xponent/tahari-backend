@@ -131,7 +131,10 @@ export async function handleDepositeSuccess(
           },
         });
         await notificationService.createNotification({
-          message: `অভিনন্দন! আপনার ওয়ালেটে ${walletTransaction.amount} টাকা সফলভাবে জমা হয়েছে (লেনদেন আইডি: ${tranId})। ধন্যবাদ আমাদের সাথে থাকার জন্য।`,
+          message:
+            `অভিনন্দন! আপনার ওয়ালেটে ${walletTransaction.amount} টাকা সফলভাবে জমা হয়েছে (লেনদেন আইডি: ${tranId})। ধন্যবাদ আমাদের সাথে থাকার জন্য।`
+              .replace(/\s+/g, " ")
+              .trim(),
           receiverId: updatedWallet.customer.userId,
         });
         return {
@@ -198,7 +201,10 @@ export async function handleDepositeFailure(failureData: any): Promise<void> {
         },
       });
       await notificationService.createNotification({
-        message: `দুঃখিত! আপনার ওয়ালেটে টাকা জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন বা সহায়তার জন্য আমাদের সাথে যোগাযোগ করুন।`,
+        message:
+          `দুঃখিত! আপনার ওয়ালেটে টাকা জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন বা সহায়তার জন্য আমাদের সাথে যোগাযোগ করুন।`
+            .replace(/\s+/g, " ")
+            .trim(),
         receiverId: walletTransaction.wallet.customer.userId,
       });
     }
