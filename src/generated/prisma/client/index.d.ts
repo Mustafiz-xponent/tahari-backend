@@ -263,6 +263,14 @@ export const DiscountType: {
 
 export type DiscountType = (typeof DiscountType)[keyof typeof DiscountType]
 
+
+export const SubscriptionPlanType: {
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY'
+};
+
+export type SubscriptionPlanType = (typeof SubscriptionPlanType)[keyof typeof SubscriptionPlanType]
+
 }
 
 export type UserRole = $Enums.UserRole
@@ -320,6 +328,10 @@ export const ProductUnitType: typeof $Enums.ProductUnitType
 export type DiscountType = $Enums.DiscountType
 
 export const DiscountType: typeof $Enums.DiscountType
+
+export type SubscriptionPlanType = $Enums.SubscriptionPlanType
+
+export const SubscriptionPlanType: typeof $Enums.SubscriptionPlanType
 
 /**
  * ##  Prisma Client ʲˢ
@@ -16672,7 +16684,7 @@ export namespace Prisma {
   export type SubscriptionPlanMinAggregateOutputType = {
     planId: bigint | null
     name: string | null
-    frequency: string | null
+    frequency: $Enums.SubscriptionPlanType | null
     price: Decimal | null
     description: string | null
     createdAt: Date | null
@@ -16683,7 +16695,7 @@ export namespace Prisma {
   export type SubscriptionPlanMaxAggregateOutputType = {
     planId: bigint | null
     name: string | null
-    frequency: string | null
+    frequency: $Enums.SubscriptionPlanType | null
     price: Decimal | null
     description: string | null
     createdAt: Date | null
@@ -16839,7 +16851,7 @@ export namespace Prisma {
   export type SubscriptionPlanGroupByOutputType = {
     planId: bigint
     name: string
-    frequency: string
+    frequency: $Enums.SubscriptionPlanType
     price: Decimal
     description: string | null
     createdAt: Date
@@ -16937,7 +16949,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       planId: bigint
       name: string
-      frequency: string
+      frequency: $Enums.SubscriptionPlanType
       price: Prisma.Decimal
       description: string | null
       createdAt: Date
@@ -17370,7 +17382,7 @@ export namespace Prisma {
   interface SubscriptionPlanFieldRefs {
     readonly planId: FieldRef<"SubscriptionPlan", 'BigInt'>
     readonly name: FieldRef<"SubscriptionPlan", 'String'>
-    readonly frequency: FieldRef<"SubscriptionPlan", 'String'>
+    readonly frequency: FieldRef<"SubscriptionPlan", 'SubscriptionPlanType'>
     readonly price: FieldRef<"SubscriptionPlan", 'Decimal'>
     readonly description: FieldRef<"SubscriptionPlan", 'String'>
     readonly createdAt: FieldRef<"SubscriptionPlan", 'DateTime'>
@@ -28450,6 +28462,7 @@ export namespace Prisma {
     notificationId: bigint | null
     message: string | null
     status: $Enums.NotificationStatus | null
+    isSeen: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
     receiverId: bigint | null
@@ -28459,6 +28472,7 @@ export namespace Prisma {
     notificationId: bigint | null
     message: string | null
     status: $Enums.NotificationStatus | null
+    isSeen: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
     receiverId: bigint | null
@@ -28468,6 +28482,7 @@ export namespace Prisma {
     notificationId: number
     message: number
     status: number
+    isSeen: number
     createdAt: number
     updatedAt: number
     receiverId: number
@@ -28489,6 +28504,7 @@ export namespace Prisma {
     notificationId?: true
     message?: true
     status?: true
+    isSeen?: true
     createdAt?: true
     updatedAt?: true
     receiverId?: true
@@ -28498,6 +28514,7 @@ export namespace Prisma {
     notificationId?: true
     message?: true
     status?: true
+    isSeen?: true
     createdAt?: true
     updatedAt?: true
     receiverId?: true
@@ -28507,6 +28524,7 @@ export namespace Prisma {
     notificationId?: true
     message?: true
     status?: true
+    isSeen?: true
     createdAt?: true
     updatedAt?: true
     receiverId?: true
@@ -28603,6 +28621,7 @@ export namespace Prisma {
     notificationId: bigint
     message: string
     status: $Enums.NotificationStatus
+    isSeen: boolean
     createdAt: Date
     updatedAt: Date
     receiverId: bigint | null
@@ -28631,6 +28650,7 @@ export namespace Prisma {
     notificationId?: boolean
     message?: boolean
     status?: boolean
+    isSeen?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     receiverId?: boolean
@@ -28641,6 +28661,7 @@ export namespace Prisma {
     notificationId?: boolean
     message?: boolean
     status?: boolean
+    isSeen?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     receiverId?: boolean
@@ -28651,6 +28672,7 @@ export namespace Prisma {
     notificationId?: boolean
     message?: boolean
     status?: boolean
+    isSeen?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     receiverId?: boolean
@@ -28661,12 +28683,13 @@ export namespace Prisma {
     notificationId?: boolean
     message?: boolean
     status?: boolean
+    isSeen?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     receiverId?: boolean
   }
 
-  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"notificationId" | "message" | "status" | "createdAt" | "updatedAt" | "receiverId", ExtArgs["result"]["notification"]>
+  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"notificationId" | "message" | "status" | "isSeen" | "createdAt" | "updatedAt" | "receiverId", ExtArgs["result"]["notification"]>
   export type NotificationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     receiver?: boolean | Notification$receiverArgs<ExtArgs>
   }
@@ -28686,6 +28709,7 @@ export namespace Prisma {
       notificationId: bigint
       message: string
       status: $Enums.NotificationStatus
+      isSeen: boolean
       createdAt: Date
       updatedAt: Date
       receiverId: bigint | null
@@ -29116,6 +29140,7 @@ export namespace Prisma {
     readonly notificationId: FieldRef<"Notification", 'BigInt'>
     readonly message: FieldRef<"Notification", 'String'>
     readonly status: FieldRef<"Notification", 'NotificationStatus'>
+    readonly isSeen: FieldRef<"Notification", 'Boolean'>
     readonly createdAt: FieldRef<"Notification", 'DateTime'>
     readonly updatedAt: FieldRef<"Notification", 'DateTime'>
     readonly receiverId: FieldRef<"Notification", 'BigInt'>
@@ -29860,6 +29885,7 @@ export namespace Prisma {
     notificationId: 'notificationId',
     message: 'message',
     status: 'status',
+    isSeen: 'isSeen',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     receiverId: 'receiverId'
@@ -30069,6 +30095,20 @@ export namespace Prisma {
    * Reference to a field of type 'TransactionType[]'
    */
   export type ListEnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SubscriptionPlanType'
+   */
+  export type EnumSubscriptionPlanTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubscriptionPlanType'>
+    
+
+
+  /**
+   * Reference to a field of type 'SubscriptionPlanType[]'
+   */
+  export type ListEnumSubscriptionPlanTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubscriptionPlanType[]'>
     
 
 
@@ -31005,7 +31045,7 @@ export namespace Prisma {
     NOT?: SubscriptionPlanWhereInput | SubscriptionPlanWhereInput[]
     planId?: BigIntFilter<"SubscriptionPlan"> | bigint | number
     name?: StringFilter<"SubscriptionPlan"> | string
-    frequency?: StringFilter<"SubscriptionPlan"> | string
+    frequency?: EnumSubscriptionPlanTypeFilter<"SubscriptionPlan"> | $Enums.SubscriptionPlanType
     price?: DecimalFilter<"SubscriptionPlan"> | Decimal | DecimalJsLike | number | string
     description?: StringNullableFilter<"SubscriptionPlan"> | string | null
     createdAt?: DateTimeFilter<"SubscriptionPlan"> | Date | string
@@ -31034,7 +31074,7 @@ export namespace Prisma {
     OR?: SubscriptionPlanWhereInput[]
     NOT?: SubscriptionPlanWhereInput | SubscriptionPlanWhereInput[]
     name?: StringFilter<"SubscriptionPlan"> | string
-    frequency?: StringFilter<"SubscriptionPlan"> | string
+    frequency?: EnumSubscriptionPlanTypeFilter<"SubscriptionPlan"> | $Enums.SubscriptionPlanType
     price?: DecimalFilter<"SubscriptionPlan"> | Decimal | DecimalJsLike | number | string
     description?: StringNullableFilter<"SubscriptionPlan"> | string | null
     createdAt?: DateTimeFilter<"SubscriptionPlan"> | Date | string
@@ -31066,7 +31106,7 @@ export namespace Prisma {
     NOT?: SubscriptionPlanScalarWhereWithAggregatesInput | SubscriptionPlanScalarWhereWithAggregatesInput[]
     planId?: BigIntWithAggregatesFilter<"SubscriptionPlan"> | bigint | number
     name?: StringWithAggregatesFilter<"SubscriptionPlan"> | string
-    frequency?: StringWithAggregatesFilter<"SubscriptionPlan"> | string
+    frequency?: EnumSubscriptionPlanTypeWithAggregatesFilter<"SubscriptionPlan"> | $Enums.SubscriptionPlanType
     price?: DecimalWithAggregatesFilter<"SubscriptionPlan"> | Decimal | DecimalJsLike | number | string
     description?: StringNullableWithAggregatesFilter<"SubscriptionPlan"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"SubscriptionPlan"> | Date | string
@@ -31764,6 +31804,7 @@ export namespace Prisma {
     notificationId?: BigIntFilter<"Notification"> | bigint | number
     message?: StringFilter<"Notification"> | string
     status?: EnumNotificationStatusFilter<"Notification"> | $Enums.NotificationStatus
+    isSeen?: BoolFilter<"Notification"> | boolean
     createdAt?: DateTimeFilter<"Notification"> | Date | string
     updatedAt?: DateTimeFilter<"Notification"> | Date | string
     receiverId?: BigIntNullableFilter<"Notification"> | bigint | number | null
@@ -31774,6 +31815,7 @@ export namespace Prisma {
     notificationId?: SortOrder
     message?: SortOrder
     status?: SortOrder
+    isSeen?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     receiverId?: SortOrderInput | SortOrder
@@ -31787,6 +31829,7 @@ export namespace Prisma {
     NOT?: NotificationWhereInput | NotificationWhereInput[]
     message?: StringFilter<"Notification"> | string
     status?: EnumNotificationStatusFilter<"Notification"> | $Enums.NotificationStatus
+    isSeen?: BoolFilter<"Notification"> | boolean
     createdAt?: DateTimeFilter<"Notification"> | Date | string
     updatedAt?: DateTimeFilter<"Notification"> | Date | string
     receiverId?: BigIntNullableFilter<"Notification"> | bigint | number | null
@@ -31797,6 +31840,7 @@ export namespace Prisma {
     notificationId?: SortOrder
     message?: SortOrder
     status?: SortOrder
+    isSeen?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     receiverId?: SortOrderInput | SortOrder
@@ -31814,6 +31858,7 @@ export namespace Prisma {
     notificationId?: BigIntWithAggregatesFilter<"Notification"> | bigint | number
     message?: StringWithAggregatesFilter<"Notification"> | string
     status?: EnumNotificationStatusWithAggregatesFilter<"Notification"> | $Enums.NotificationStatus
+    isSeen?: BoolWithAggregatesFilter<"Notification"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Notification"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Notification"> | Date | string
     receiverId?: BigIntNullableWithAggregatesFilter<"Notification"> | bigint | number | null
@@ -32725,7 +32770,7 @@ export namespace Prisma {
   export type SubscriptionPlanCreateInput = {
     planId?: bigint | number
     name: string
-    frequency: string
+    frequency: $Enums.SubscriptionPlanType
     price: Decimal | DecimalJsLike | number | string
     description?: string | null
     createdAt?: Date | string
@@ -32737,7 +32782,7 @@ export namespace Prisma {
   export type SubscriptionPlanUncheckedCreateInput = {
     planId?: bigint | number
     name: string
-    frequency: string
+    frequency: $Enums.SubscriptionPlanType
     price: Decimal | DecimalJsLike | number | string
     description?: string | null
     createdAt?: Date | string
@@ -32749,7 +32794,7 @@ export namespace Prisma {
   export type SubscriptionPlanUpdateInput = {
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    frequency?: StringFieldUpdateOperationsInput | string
+    frequency?: EnumSubscriptionPlanTypeFieldUpdateOperationsInput | $Enums.SubscriptionPlanType
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32761,7 +32806,7 @@ export namespace Prisma {
   export type SubscriptionPlanUncheckedUpdateInput = {
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    frequency?: StringFieldUpdateOperationsInput | string
+    frequency?: EnumSubscriptionPlanTypeFieldUpdateOperationsInput | $Enums.SubscriptionPlanType
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32773,7 +32818,7 @@ export namespace Prisma {
   export type SubscriptionPlanCreateManyInput = {
     planId?: bigint | number
     name: string
-    frequency: string
+    frequency: $Enums.SubscriptionPlanType
     price: Decimal | DecimalJsLike | number | string
     description?: string | null
     createdAt?: Date | string
@@ -32784,7 +32829,7 @@ export namespace Prisma {
   export type SubscriptionPlanUpdateManyMutationInput = {
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    frequency?: StringFieldUpdateOperationsInput | string
+    frequency?: EnumSubscriptionPlanTypeFieldUpdateOperationsInput | $Enums.SubscriptionPlanType
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32794,7 +32839,7 @@ export namespace Prisma {
   export type SubscriptionPlanUncheckedUpdateManyInput = {
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    frequency?: StringFieldUpdateOperationsInput | string
+    frequency?: EnumSubscriptionPlanTypeFieldUpdateOperationsInput | $Enums.SubscriptionPlanType
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33506,6 +33551,7 @@ export namespace Prisma {
     notificationId?: bigint | number
     message: string
     status?: $Enums.NotificationStatus
+    isSeen?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     receiver?: UserCreateNestedOneWithoutNotificationsInput
@@ -33515,6 +33561,7 @@ export namespace Prisma {
     notificationId?: bigint | number
     message: string
     status?: $Enums.NotificationStatus
+    isSeen?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     receiverId?: bigint | number | null
@@ -33524,6 +33571,7 @@ export namespace Prisma {
     notificationId?: BigIntFieldUpdateOperationsInput | bigint | number
     message?: StringFieldUpdateOperationsInput | string
     status?: EnumNotificationStatusFieldUpdateOperationsInput | $Enums.NotificationStatus
+    isSeen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     receiver?: UserUpdateOneWithoutNotificationsNestedInput
@@ -33533,6 +33581,7 @@ export namespace Prisma {
     notificationId?: BigIntFieldUpdateOperationsInput | bigint | number
     message?: StringFieldUpdateOperationsInput | string
     status?: EnumNotificationStatusFieldUpdateOperationsInput | $Enums.NotificationStatus
+    isSeen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     receiverId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
@@ -33542,6 +33591,7 @@ export namespace Prisma {
     notificationId?: bigint | number
     message: string
     status?: $Enums.NotificationStatus
+    isSeen?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     receiverId?: bigint | number | null
@@ -33551,6 +33601,7 @@ export namespace Prisma {
     notificationId?: BigIntFieldUpdateOperationsInput | bigint | number
     message?: StringFieldUpdateOperationsInput | string
     status?: EnumNotificationStatusFieldUpdateOperationsInput | $Enums.NotificationStatus
+    isSeen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -33559,6 +33610,7 @@ export namespace Prisma {
     notificationId?: BigIntFieldUpdateOperationsInput | bigint | number
     message?: StringFieldUpdateOperationsInput | string
     status?: EnumNotificationStatusFieldUpdateOperationsInput | $Enums.NotificationStatus
+    isSeen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     receiverId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
@@ -34618,6 +34670,13 @@ export namespace Prisma {
     _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
   }
 
+  export type EnumSubscriptionPlanTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubscriptionPlanType | EnumSubscriptionPlanTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SubscriptionPlanType[] | ListEnumSubscriptionPlanTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubscriptionPlanType[] | ListEnumSubscriptionPlanTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubscriptionPlanTypeFilter<$PrismaModel> | $Enums.SubscriptionPlanType
+  }
+
   export type SubscriptionPlanCountOrderByAggregateInput = {
     planId?: SortOrder
     name?: SortOrder
@@ -34661,6 +34720,16 @@ export namespace Prisma {
     planId?: SortOrder
     price?: SortOrder
     productId?: SortOrder
+  }
+
+  export type EnumSubscriptionPlanTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubscriptionPlanType | EnumSubscriptionPlanTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SubscriptionPlanType[] | ListEnumSubscriptionPlanTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubscriptionPlanType[] | ListEnumSubscriptionPlanTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubscriptionPlanTypeWithAggregatesFilter<$PrismaModel> | $Enums.SubscriptionPlanType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSubscriptionPlanTypeFilter<$PrismaModel>
+    _max?: NestedEnumSubscriptionPlanTypeFilter<$PrismaModel>
   }
 
   export type CustomerScalarRelationFilter = {
@@ -35226,6 +35295,7 @@ export namespace Prisma {
     notificationId?: SortOrder
     message?: SortOrder
     status?: SortOrder
+    isSeen?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     receiverId?: SortOrder
@@ -35240,6 +35310,7 @@ export namespace Prisma {
     notificationId?: SortOrder
     message?: SortOrder
     status?: SortOrder
+    isSeen?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     receiverId?: SortOrder
@@ -35249,6 +35320,7 @@ export namespace Prisma {
     notificationId?: SortOrder
     message?: SortOrder
     status?: SortOrder
+    isSeen?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     receiverId?: SortOrder
@@ -36445,6 +36517,10 @@ export namespace Prisma {
     connect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
   }
 
+  export type EnumSubscriptionPlanTypeFieldUpdateOperationsInput = {
+    set?: $Enums.SubscriptionPlanType
+  }
+
   export type ProductUpdateOneRequiredWithoutSubscriptionPlansNestedInput = {
     create?: XOR<ProductCreateWithoutSubscriptionPlansInput, ProductUncheckedCreateWithoutSubscriptionPlansInput>
     connectOrCreate?: ProductCreateOrConnectWithoutSubscriptionPlansInput
@@ -37495,6 +37571,23 @@ export namespace Prisma {
     _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
   }
 
+  export type NestedEnumSubscriptionPlanTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubscriptionPlanType | EnumSubscriptionPlanTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SubscriptionPlanType[] | ListEnumSubscriptionPlanTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubscriptionPlanType[] | ListEnumSubscriptionPlanTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubscriptionPlanTypeFilter<$PrismaModel> | $Enums.SubscriptionPlanType
+  }
+
+  export type NestedEnumSubscriptionPlanTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubscriptionPlanType | EnumSubscriptionPlanTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SubscriptionPlanType[] | ListEnumSubscriptionPlanTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubscriptionPlanType[] | ListEnumSubscriptionPlanTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubscriptionPlanTypeWithAggregatesFilter<$PrismaModel> | $Enums.SubscriptionPlanType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSubscriptionPlanTypeFilter<$PrismaModel>
+    _max?: NestedEnumSubscriptionPlanTypeFilter<$PrismaModel>
+  }
+
   export type NestedEnumWalletTransactionTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.WalletTransactionType | EnumWalletTransactionTypeFieldRefInput<$PrismaModel>
     in?: $Enums.WalletTransactionType[] | ListEnumWalletTransactionTypeFieldRefInput<$PrismaModel>
@@ -37696,6 +37789,7 @@ export namespace Prisma {
     notificationId?: bigint | number
     message: string
     status?: $Enums.NotificationStatus
+    isSeen?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -37704,6 +37798,7 @@ export namespace Prisma {
     notificationId?: bigint | number
     message: string
     status?: $Enums.NotificationStatus
+    isSeen?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -37857,6 +37952,7 @@ export namespace Prisma {
     notificationId?: BigIntFilter<"Notification"> | bigint | number
     message?: StringFilter<"Notification"> | string
     status?: EnumNotificationStatusFilter<"Notification"> | $Enums.NotificationStatus
+    isSeen?: BoolFilter<"Notification"> | boolean
     createdAt?: DateTimeFilter<"Notification"> | Date | string
     updatedAt?: DateTimeFilter<"Notification"> | Date | string
     receiverId?: BigIntNullableFilter<"Notification"> | bigint | number | null
@@ -38822,7 +38918,7 @@ export namespace Prisma {
   export type SubscriptionPlanCreateWithoutProductInput = {
     planId?: bigint | number
     name: string
-    frequency: string
+    frequency: $Enums.SubscriptionPlanType
     price: Decimal | DecimalJsLike | number | string
     description?: string | null
     createdAt?: Date | string
@@ -38833,7 +38929,7 @@ export namespace Prisma {
   export type SubscriptionPlanUncheckedCreateWithoutProductInput = {
     planId?: bigint | number
     name: string
-    frequency: string
+    frequency: $Enums.SubscriptionPlanType
     price: Decimal | DecimalJsLike | number | string
     description?: string | null
     createdAt?: Date | string
@@ -39013,7 +39109,7 @@ export namespace Prisma {
     NOT?: SubscriptionPlanScalarWhereInput | SubscriptionPlanScalarWhereInput[]
     planId?: BigIntFilter<"SubscriptionPlan"> | bigint | number
     name?: StringFilter<"SubscriptionPlan"> | string
-    frequency?: StringFilter<"SubscriptionPlan"> | string
+    frequency?: EnumSubscriptionPlanTypeFilter<"SubscriptionPlan"> | $Enums.SubscriptionPlanType
     price?: DecimalFilter<"SubscriptionPlan"> | Decimal | DecimalJsLike | number | string
     description?: StringNullableFilter<"SubscriptionPlan"> | string | null
     createdAt?: DateTimeFilter<"SubscriptionPlan"> | Date | string
@@ -41092,7 +41188,7 @@ export namespace Prisma {
   export type SubscriptionPlanCreateWithoutSubscriptionsInput = {
     planId?: bigint | number
     name: string
-    frequency: string
+    frequency: $Enums.SubscriptionPlanType
     price: Decimal | DecimalJsLike | number | string
     description?: string | null
     createdAt?: Date | string
@@ -41103,7 +41199,7 @@ export namespace Prisma {
   export type SubscriptionPlanUncheckedCreateWithoutSubscriptionsInput = {
     planId?: bigint | number
     name: string
-    frequency: string
+    frequency: $Enums.SubscriptionPlanType
     price: Decimal | DecimalJsLike | number | string
     description?: string | null
     createdAt?: Date | string
@@ -41183,7 +41279,7 @@ export namespace Prisma {
   export type SubscriptionPlanUpdateWithoutSubscriptionsInput = {
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    frequency?: StringFieldUpdateOperationsInput | string
+    frequency?: EnumSubscriptionPlanTypeFieldUpdateOperationsInput | $Enums.SubscriptionPlanType
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41194,7 +41290,7 @@ export namespace Prisma {
   export type SubscriptionPlanUncheckedUpdateWithoutSubscriptionsInput = {
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    frequency?: StringFieldUpdateOperationsInput | string
+    frequency?: EnumSubscriptionPlanTypeFieldUpdateOperationsInput | $Enums.SubscriptionPlanType
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41835,6 +41931,7 @@ export namespace Prisma {
     notificationId?: bigint | number
     message: string
     status?: $Enums.NotificationStatus
+    isSeen?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -41918,6 +42015,7 @@ export namespace Prisma {
     notificationId?: BigIntFieldUpdateOperationsInput | bigint | number
     message?: StringFieldUpdateOperationsInput | string
     status?: EnumNotificationStatusFieldUpdateOperationsInput | $Enums.NotificationStatus
+    isSeen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -41926,6 +42024,7 @@ export namespace Prisma {
     notificationId?: BigIntFieldUpdateOperationsInput | bigint | number
     message?: StringFieldUpdateOperationsInput | string
     status?: EnumNotificationStatusFieldUpdateOperationsInput | $Enums.NotificationStatus
+    isSeen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -41934,6 +42033,7 @@ export namespace Prisma {
     notificationId?: BigIntFieldUpdateOperationsInput | bigint | number
     message?: StringFieldUpdateOperationsInput | string
     status?: EnumNotificationStatusFieldUpdateOperationsInput | $Enums.NotificationStatus
+    isSeen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -42405,7 +42505,7 @@ export namespace Prisma {
   export type SubscriptionPlanCreateManyProductInput = {
     planId?: bigint | number
     name: string
-    frequency: string
+    frequency: $Enums.SubscriptionPlanType
     price: Decimal | DecimalJsLike | number | string
     description?: string | null
     createdAt?: Date | string
@@ -42501,7 +42601,7 @@ export namespace Prisma {
   export type SubscriptionPlanUpdateWithoutProductInput = {
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    frequency?: StringFieldUpdateOperationsInput | string
+    frequency?: EnumSubscriptionPlanTypeFieldUpdateOperationsInput | $Enums.SubscriptionPlanType
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -42512,7 +42612,7 @@ export namespace Prisma {
   export type SubscriptionPlanUncheckedUpdateWithoutProductInput = {
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    frequency?: StringFieldUpdateOperationsInput | string
+    frequency?: EnumSubscriptionPlanTypeFieldUpdateOperationsInput | $Enums.SubscriptionPlanType
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -42523,7 +42623,7 @@ export namespace Prisma {
   export type SubscriptionPlanUncheckedUpdateManyWithoutProductInput = {
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    frequency?: StringFieldUpdateOperationsInput | string
+    frequency?: EnumSubscriptionPlanTypeFieldUpdateOperationsInput | $Enums.SubscriptionPlanType
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

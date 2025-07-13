@@ -501,6 +501,7 @@ model Notification {
   notificationId BigInt             @id @default(autoincrement())
   message        String
   status         NotificationStatus @default(UNREAD)
+  isSeen         Boolean            @default(false)
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   receiver       User?              @relation(fields: [receiverId], references: [userId])

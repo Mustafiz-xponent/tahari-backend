@@ -92,6 +92,7 @@ export const getUserNotifications = async (
       },
       meta: {
         unreadNotificationsCount: result.unreadNotificationsCount,
+        unseenNotificationsCount: result.unseenNotificationsCount,
       },
     });
   } catch (error) {
@@ -212,5 +213,25 @@ export const markAllNotificationsAsRead = async (
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json({ message: "Failed to mark notifications as read" });
+  }
+};
+
+/**
+ * Mark all notifications as seen
+ **/
+export const markAllNotificationsAsSeen = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    await notificationService.markAllNotificationsAsSeen(userId);
+    res
+      .status(httpStatus.OK)
+      .json({ success: true, message: "All notifications marked as seen" });
+  } catch (error) {
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to mark notifications as seen" });
   }
 };

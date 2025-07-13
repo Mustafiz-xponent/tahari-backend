@@ -43,6 +43,13 @@ router.patch(
   authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
   NotificationController.markAllNotificationsAsRead
 );
+// Route to mark all notifications as read
+router.patch(
+  "/seen/all",
+  authMiddleware,
+  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  NotificationController.markAllNotificationsAsSeen
+);
 // Route to mark single notifications as read
 router.patch(
   "/read/:id",

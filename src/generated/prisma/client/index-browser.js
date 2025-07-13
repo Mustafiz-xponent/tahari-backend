@@ -351,6 +351,7 @@ exports.Prisma.NotificationScalarFieldEnum = {
   notificationId: 'notificationId',
   message: 'message',
   status: 'status',
+  isSeen: 'isSeen',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   receiverId: 'receiverId'
@@ -411,6 +412,11 @@ exports.TransactionType = exports.$Enums.TransactionType = {
   IN: 'IN',
   OUT: 'OUT',
   ADJUSTMENT: 'ADJUSTMENT'
+};
+
+exports.SubscriptionPlanType = exports.$Enums.SubscriptionPlanType = {
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY'
 };
 
 exports.WalletTransactionType = exports.$Enums.WalletTransactionType = {

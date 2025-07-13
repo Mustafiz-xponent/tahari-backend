@@ -20,6 +20,7 @@ interface GetUserNotificationResult {
   currentPage: number;
   totalPages: number;
   unreadNotificationsCount: number;
+  unseenNotificationsCount: number;
 }
 
 /**
@@ -94,12 +95,19 @@ export async function getUserNotifications(
         status: "UNREAD",
       },
     });
+    const unseenNotificationsCount = await prisma.notification.count({
+      where: {
+        receiverId: Number(userId),
+        isSeen: false,
+      },
+    });
     return {
       notifications,
       currentPage: paginationParams.page,
       totalPages: Math.ceil(totalNotifications / paginationParams.limit),
       totalCount: totalNotifications,
       unreadNotificationsCount,
+      unseenNotificationsCount,
     };
   } catch (error) {
     throw new Error(`Failed to fetch notifications: ${getErrorMessage(error)}`);
@@ -195,6 +203,9 @@ export async function markNotificationAsReadById(
     if (!notification) {
       throw new AppError("Notification not found", httpStatus.NOT_FOUND);
     }
+    if (notification.receiverId !== userId) {
+      throw new AppError("You don't have permission", httpStatus.FORBIDDEN);
+    }
     await prisma.notification.update({
       where: {
         notificationId: Number(notificationId),
@@ -228,6 +239,30 @@ export async function markAllNotificationsAsRead(
   } catch (error) {
     throw new Error(
       `Failed to mark notifications as read: ${getErrorMessage(error)}`
+    );
+  }
+}
+
+/**
+ * Mark all unseen notifications as seen for specific user
+ */
+
+export async function markAllNotificationsAsSeen(
+  userId: BigInt
+): Promise<void> {
+  try {
+    await prisma.notification.updateMany({
+      where: {
+        receiverId: Number(userId),
+        isSeen: false,
+      },
+      data: {
+        isSeen: true,
+      },
+    });
+  } catch (error) {
+    throw new Error(
+      `Failed to mark notifications as seen: ${getErrorMessage(error)}`
     );
   }
 }
