@@ -4,21 +4,22 @@
  */
 
 import { z } from "zod";
-
-const notificationStatusEnum = z.enum(["UNREAD", "READ"]);
-
+/**
+ * Common ID schema: supports string/number -> BigInt and must be > 0.
+ */
+const zBigIntId = z
+  .union([z.string(), z.number()])
+  .transform(BigInt)
+  .refine((val) => val > 0n, {
+    message: "ID must be a positive integer",
+  });
 /**
  * Zod schema for creating a new notification.
  */
 export const zCreateNotificationDto = {
   body: z.object({
     message: z.string().min(1, "Message is required"),
-    receiverId: z
-      .union([z.string(), z.number()])
-      .transform(BigInt)
-      .refine((val) => val > 0n, {
-        message: "Reciever ID must be a positive integer",
-      }),
+    receiverId: zBigIntId,
   }),
 };
 
@@ -35,12 +36,7 @@ export const zUpdateNotificationDto = {
     message: z.string().min(1, "Message is required").optional(),
   }),
   params: z.object({
-    id: z
-      .union([z.string(), z.number()])
-      .transform(BigInt)
-      .refine((val) => val > 0n, {
-        message: "Params ID must be a positive integer",
-      }),
+    id: zBigIntId,
   }),
 };
 
@@ -51,11 +47,11 @@ export type UpdateNotificationDto = z.infer<typeof zUpdateNotificationDto.body>;
 
 export const zDeleteNotificationDto = {
   params: z.object({
-    id: z
-      .union([z.string(), z.number()])
-      .transform(BigInt)
-      .refine((val) => val > 0n, {
-        message: "Params ID must be a positive integer",
-      }),
+    id: zBigIntId,
+  }),
+};
+export const zMarkNotificationAsReadDto = {
+  params: z.object({
+    id: zBigIntId,
   }),
 };

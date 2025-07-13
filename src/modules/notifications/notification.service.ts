@@ -177,6 +177,38 @@ export async function deleteNotification(
   }
 }
 /**
+ * Mark single unread notifications as read for specific user
+ */
+
+export async function markNotificationAsReadById(
+  userId: BigInt,
+  notificationId: BigInt
+): Promise<void> {
+  try {
+    const notification = await prisma.notification.findUnique({
+      where: {
+        notificationId: Number(notificationId),
+      },
+    });
+    if (!notification) {
+      throw new Error("Notification not found");
+    }
+    await prisma.notification.update({
+      where: {
+        notificationId: Number(notificationId),
+      },
+      data: {
+        status: NotificationStatus.READ,
+      },
+    });
+  } catch (error) {
+    throw new Error(
+      `Failed to mark notifications as read: ${getErrorMessage(error)}`
+    );
+  }
+}
+
+/**
  * Mark all unread notifications as read for specific user
  */
 
