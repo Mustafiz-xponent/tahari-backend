@@ -11,6 +11,8 @@ import {
 } from "@/modules/notifications/notification.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { getSocketId, io } from "@/utils/socket";
+import { AppError } from "@/utils/appError";
+import httpStatus from "http-status";
 
 interface GetUserNotificationResult {
   notifications: Notification[];
@@ -191,7 +193,7 @@ export async function markNotificationAsReadById(
       },
     });
     if (!notification) {
-      throw new Error("Notification not found");
+      throw new AppError("Notification not found", httpStatus.NOT_FOUND);
     }
     await prisma.notification.update({
       where: {
@@ -202,9 +204,7 @@ export async function markNotificationAsReadById(
       },
     });
   } catch (error) {
-    throw new Error(
-      `Failed to mark notifications as read: ${getErrorMessage(error)}`
-    );
+    throw error;
   }
 }
 

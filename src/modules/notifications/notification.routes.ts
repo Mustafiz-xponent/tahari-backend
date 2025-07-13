@@ -35,6 +35,14 @@ router.get(
   authorizeRoles("CUSTOMER"),
   NotificationController.getUserNotifications
 );
+
+// Route to mark all notifications as read
+router.patch(
+  "/read/all",
+  authMiddleware,
+  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  NotificationController.markAllNotificationsAsRead
+);
 // Route to mark single notifications as read
 router.patch(
   "/read/:id",
@@ -43,14 +51,6 @@ router.patch(
   validator(zMarkNotificationAsReadDto),
   NotificationController.markNotificationAsReadById
 );
-// Route to mark all notifications as read
-router.patch(
-  "/mark-all-read",
-  authMiddleware,
-  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
-  NotificationController.markAllNotificationsAsRead
-);
-
 // Route to get a notification by ID
 router.get("/:id", NotificationController.getNotificationById);
 
