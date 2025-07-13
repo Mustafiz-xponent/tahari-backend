@@ -163,7 +163,7 @@ export async function processCodPayment(
     });
     await notificationService.createNotification({
       message:
-        `ধন্যবাদ! আপনার অর্ডারটি নিশ্চিত হয়েছে। দয়া করে পণ্য গ্রহণের সময় পেমেন্ট করুন। অর্ডার আইডিঃ #${data.orderId}`
+        `ধন্যবাদ! আপনার অর্ডারটি নিশ্চিত হয়েছে। দয়া করে পণ্য গ্রহণের সময় পেমেন্ট করুন। (অর্ডার আইডিঃ #${data.orderId})`
           .replace(/\s+/g, " ")
           .trim(),
       receiverId: order.customer.userId,

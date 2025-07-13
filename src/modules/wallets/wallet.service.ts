@@ -132,7 +132,7 @@ export async function handleDepositeSuccess(
         });
         await notificationService.createNotification({
           message:
-            `অভিনন্দন! আপনার ওয়ালেটে ${walletTransaction.amount} টাকা সফলভাবে জমা হয়েছে (লেনদেন আইডি: ${tranId})। ধন্যবাদ আমাদের সাথে থাকার জন্য।`
+            `অভিনন্দন! আপনার ওয়ালেটে ${walletTransaction.amount} টাকা সফলভাবে জমা হয়েছে। ধন্যবাদ আমাদের সাথে থাকার জন্য। (লেনদেন আইডি: ${tranId})`
               .replace(/\s+/g, " ")
               .trim(),
           receiverId: updatedWallet.customer.userId,
