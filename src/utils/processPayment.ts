@@ -397,10 +397,8 @@ export async function validateSSLCommerzPayment(validationData: any) {
         timeout: 30000,
       }
     );
-    logger.info(response.data);
     return response.data;
   } catch (error) {
-    logger.error(error);
     throw error;
   }
 }

@@ -90,6 +90,9 @@ export const getUserNotifications = async (
         hasNextPage: page < result.totalPages,
         hasPreviousPage: page > 1,
       },
+      meta: {
+        unreadNotificationsCount: result.unreadNotificationsCount,
+      },
     });
   } catch (error) {
     console.error("Error fetching notifications:", error);

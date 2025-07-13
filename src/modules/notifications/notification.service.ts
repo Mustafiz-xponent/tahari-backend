@@ -17,6 +17,7 @@ interface GetUserNotificationResult {
   totalCount: number;
   currentPage: number;
   totalPages: number;
+  unreadNotificationsCount: number;
 }
 
 /**
@@ -85,11 +86,18 @@ export async function getUserNotifications(
     const totalNotifications = await prisma.notification.count({
       where: { receiverId: Number(userId) },
     });
+    const unreadNotificationsCount = await prisma.notification.count({
+      where: {
+        receiverId: Number(userId),
+        status: "UNREAD",
+      },
+    });
     return {
       notifications,
       currentPage: paginationParams.page,
       totalPages: Math.ceil(totalNotifications / paginationParams.limit),
       totalCount: totalNotifications,
+      unreadNotificationsCount,
     };
   } catch (error) {
     throw new Error(`Failed to fetch notifications: ${getErrorMessage(error)}`);

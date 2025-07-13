@@ -79,7 +79,7 @@ export async function handleSSLCommerzSuccess(
     // Validate payment with SSLCommerz  implementation
     const validation = await validateSSLCommerzPayment(validationData);
 
-    if (validation.status === "VALID") {
+    if (["VALID", "VALIDATED"].includes(validation.status)) {
       // Extract order ID from transaction ID
       const tranId = validationData.tran_id;
       const orderIdMatch = tranId.match(/ORDER_(\d+)_/);
@@ -241,7 +241,6 @@ export async function getOrderPaymentStatus(tranId: string): Promise<{
       orderStatus: payment.order.status,
     };
   } catch (error) {
-    logger.error("Error getting order payment status:", error);
     throw new Error(`Failed to get payment status: ${getErrorMessage(error)}`);
   }
 }

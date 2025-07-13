@@ -12,7 +12,6 @@ import {
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import httpStatus from "http-status";
-import logger from "@/utils/logger";
 
 const paymentIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Payment ID must be a positive integer",
@@ -54,7 +53,6 @@ export const handleSSLCommerzSuccess = async (
       res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
     }
   } catch (error) {
-    logger.error("Success callback error:", error);
     res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
   }
 };
