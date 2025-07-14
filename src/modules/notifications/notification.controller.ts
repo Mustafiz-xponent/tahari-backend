@@ -20,11 +20,12 @@ export const createNotification = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { message, receiverId } = req.body;
+    const { message, receiverId, type } = req.body;
 
     const notification = await notificationService.createNotification({
       message: message.replace(/\s+/g, " ").trim(),
       receiverId,
+      type,
     });
     res.status(httpStatus.CREATED).json({
       success: true,

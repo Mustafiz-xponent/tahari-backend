@@ -112,6 +112,17 @@ enum SubscriptionPlanType {
   MONTHLY
 }
 
+enum NotificationType {
+  ORDER
+  PAYMENT
+  WALLET
+  SUBSCRIPTION
+  INVENTORY
+  PROMOTION
+  SYSTEM_ALERT
+  REFUND
+}
+
 model User {
   userId           BigInt         @id @default(autoincrement())
   email            String?        @unique
@@ -501,6 +512,7 @@ model Notification {
   notificationId BigInt             @id @default(autoincrement())
   message        String
   status         NotificationStatus @default(UNREAD)
+  type           NotificationType
   isSeen         Boolean            @default(false)
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt

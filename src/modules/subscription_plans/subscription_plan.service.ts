@@ -4,7 +4,10 @@
  */
 
 import prisma from "@/prisma-client/prismaClient";
-import { SubscriptionPlan } from "@/generated/prisma/client";
+import {
+  SubscriptionPlan,
+  SubscriptionPlanType,
+} from "@/generated/prisma/client";
 import {
   CreateSubscriptionPlanDto,
   UpdateSubscriptionPlanDto,

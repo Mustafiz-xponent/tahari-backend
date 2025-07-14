@@ -351,6 +351,7 @@ exports.Prisma.NotificationScalarFieldEnum = {
   notificationId: 'notificationId',
   message: 'message',
   status: 'status',
+  type: 'type',
   isSeen: 'isSeen',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -451,6 +452,17 @@ exports.MessageStatus = exports.$Enums.MessageStatus = {
 exports.NotificationStatus = exports.$Enums.NotificationStatus = {
   READ: 'READ',
   UNREAD: 'UNREAD'
+};
+
+exports.NotificationType = exports.$Enums.NotificationType = {
+  ORDER: 'ORDER',
+  PAYMENT: 'PAYMENT',
+  WALLET: 'WALLET',
+  SUBSCRIPTION: 'SUBSCRIPTION',
+  INVENTORY: 'INVENTORY',
+  PROMOTION: 'PROMOTION',
+  SYSTEM_ALERT: 'SYSTEM_ALERT',
+  REFUND: 'REFUND'
 };
 
 exports.Prisma.ModelName = {

@@ -107,6 +107,7 @@ export async function processWalletPayment(
     await notificationService.createNotification({
       message,
       receiverId: order.customer.userId,
+      type: "ORDER",
     });
     return {
       payment,
@@ -167,6 +168,7 @@ export async function processCodPayment(
           .replace(/\s+/g, " ")
           .trim(),
       receiverId: order.customer.userId,
+      type: "ORDER",
     });
     return {
       payment,

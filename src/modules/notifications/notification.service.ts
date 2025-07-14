@@ -41,6 +41,7 @@ export async function createNotification(
       data: {
         message: data.message,
         receiverId: data.receiverId,
+        type: data.type,
       },
     });
     const receiverId = getSocketId(String(data.receiverId));
@@ -149,6 +150,7 @@ export async function updateNotification(
       where: { notificationId: Number(notificationId) },
       data: {
         message: data.message,
+        type: data.type,
       },
     });
 

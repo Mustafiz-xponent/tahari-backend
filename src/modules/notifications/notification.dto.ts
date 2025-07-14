@@ -3,6 +3,7 @@
  * These interfaces define the expected shape of data when creating or updating a notification.
  */
 
+import { NotificationType } from "@/generated/prisma/client";
 import { z } from "zod";
 /**
  * Common ID schema: supports string/number -> BigInt and must be > 0.
@@ -20,6 +21,12 @@ export const zCreateNotificationDto = {
   body: z.object({
     message: z.string().min(1, "Message is required"),
     receiverId: zBigIntId,
+    type: z.nativeEnum(NotificationType, {
+      errorMap: () => ({
+        message:
+          "Invalid notification type. Must be ORDER, PAYMENT, WALLET, etc.",
+      }),
+    }),
   }),
 };
 
@@ -34,6 +41,14 @@ export type CreateNotificationDto = z.infer<typeof zCreateNotificationDto.body>;
 export const zUpdateNotificationDto = {
   body: z.object({
     message: z.string().min(1, "Message is required").optional(),
+    type: z
+      .nativeEnum(NotificationType, {
+        errorMap: () => ({
+          message:
+            "Invalid notification type. Must be ORDER, PAYMENT, WALLET, etc.",
+        }),
+      })
+      .optional(),
   }),
   params: z.object({
     id: zBigIntId,

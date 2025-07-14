@@ -182,6 +182,7 @@ export async function handleSSLCommerzSuccess(
         await notificationService.createNotification({
           message,
           receiverId: order.customer.userId,
+          type: "ORDER",
         });
         return {
           success: true,
@@ -309,6 +310,7 @@ export async function handleSSLCommerzFailure(failureData: any): Promise<void> {
             .replace(/\s+/g, " ")
             .trim(),
         receiverId: order.customer.userId,
+        type: "ORDER",
       });
     });
   } catch (error) {

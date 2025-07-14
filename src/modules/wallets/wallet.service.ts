@@ -136,6 +136,7 @@ export async function handleDepositeSuccess(
               .replace(/\s+/g, " ")
               .trim(),
           receiverId: updatedWallet.customer.userId,
+          type: "WALLET",
         });
         return {
           success: true,
@@ -206,6 +207,7 @@ export async function handleDepositeFailure(failureData: any): Promise<void> {
             .replace(/\s+/g, " ")
             .trim(),
         receiverId: walletTransaction.wallet.customer.userId,
+        type: "WALLET",
       });
     }
   } catch (error) {

@@ -4,10 +4,8 @@
  * You can also use these types with validation libraries like Zod or Joi if needed.
  */
 
+import { SubscriptionPlanType } from "@/generated/prisma/client";
 import { z } from "zod";
-
-// Optional enum for frequency (adjust based on your requirements)
-const frequencyEnum = z.enum(["WEEKLY", "MONTHLY"]);
 
 /**
  * Zod schema for creating a new subscription plan.
@@ -15,7 +13,11 @@ const frequencyEnum = z.enum(["WEEKLY", "MONTHLY"]);
  */
 export const zCreateSubscriptionPlanDto = z.object({
   name: z.string().min(1, "Name is required"),
-  frequency: frequencyEnum.or(z.string().min(1, "Frequency is required")),
+  frequency: z.nativeEnum(SubscriptionPlanType, {
+    errorMap: () => ({
+      message: "Invalid frequency. Must be WEEKLY or MONTHLY.",
+    }),
+  }),
   price: z.number().positive("Price must be positive"),
   productId: z
     .union([z.string(), z.number()])
@@ -40,8 +42,12 @@ export type CreateSubscriptionPlanDto = z.infer<
  */
 export const zUpdateSubscriptionPlanDto = z.object({
   name: z.string().min(1, "Name is required").optional(),
-  frequency: frequencyEnum
-    .or(z.string().min(1, "Frequency is required"))
+  frequency: z
+    .nativeEnum(SubscriptionPlanType, {
+      errorMap: () => ({
+        message: "Invalid frequency. Must be WEEKLY or MONTHLY.",
+      }),
+    })
     .optional(),
   price: z.number().positive("Price must be positive").optional(),
   productId: z

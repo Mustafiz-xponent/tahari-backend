@@ -253,6 +253,7 @@ export async function updateOrder(
           await notificationService.createNotification({
             message,
             receiverId: currentOrder.customer.userId,
+            type: "ORDER",
           });
         }
       }
