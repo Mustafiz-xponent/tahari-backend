@@ -57,7 +57,9 @@ export async function createSubscriptionPlan(
  */
 export async function getAllSubscriptionPlans(): Promise<SubscriptionPlan[]> {
   try {
-    const subscriptionPlans = await prisma.subscriptionPlan.findMany();
+    const subscriptionPlans = await prisma.subscriptionPlan.findMany({
+      include: { product: true },
+    });
     return subscriptionPlans;
   } catch (error) {
     throw new Error(
@@ -78,6 +80,7 @@ export async function getSubscriptionPlanById(
   try {
     const subscriptionPlan = await prisma.subscriptionPlan.findUnique({
       where: { planId: Number(planId) },
+      include: { product: true },
     });
     if (!subscriptionPlan) throw new Error("Subscription plan not found");
     return subscriptionPlan;
@@ -131,12 +134,9 @@ export async function updateSubscriptionPlan(
  */
 export async function deleteSubscriptionPlan(planId: BigInt): Promise<void> {
   try {
-    const subscriptionPlan = await prisma.subscriptionPlan.delete({
+    await prisma.subscriptionPlan.delete({
       where: { planId: Number(planId) },
     });
-    if (!subscriptionPlan) {
-      throw new Error("Subscription plan not found");
-    }
   } catch (error) {
     throw new Error(
       `Failed to delete subscription plan: ${getErrorMessage(error)}`

@@ -42,6 +42,11 @@ router.put(
 );
 
 // Route to delete a subscription plan
-router.delete("/:id", SubscriptionPlanController.deleteSubscriptionPlan);
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  SubscriptionPlanController.deleteSubscriptionPlan
+);
 
 export default router;
