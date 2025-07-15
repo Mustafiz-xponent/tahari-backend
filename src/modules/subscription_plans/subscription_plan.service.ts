@@ -24,6 +24,15 @@ export async function createSubscriptionPlan(
   data: CreateSubscriptionPlanDto
 ): Promise<SubscriptionPlan> {
   try {
+    const product = await prisma.product.findUnique({
+      where: { productId: data.productId },
+    });
+    if (!product) {
+      throw new Error("Product not found");
+    }
+    if (!product.isSubscription) {
+      throw new Error("Product is not under subscription");
+    }
     const subscriptionPlan = await prisma.subscriptionPlan.create({
       data: {
         name: data.name,
@@ -70,6 +79,7 @@ export async function getSubscriptionPlanById(
     const subscriptionPlan = await prisma.subscriptionPlan.findUnique({
       where: { planId: Number(planId) },
     });
+    if (!subscriptionPlan) throw new Error("Subscription plan not found");
     return subscriptionPlan;
   } catch (error) {
     throw new Error(
@@ -90,6 +100,12 @@ export async function updateSubscriptionPlan(
   data: UpdateSubscriptionPlanDto
 ): Promise<SubscriptionPlan> {
   try {
+    const existingPlan = await prisma.subscriptionPlan.findUnique({
+      where: { planId: Number(planId) },
+    });
+    if (!existingPlan) {
+      throw new Error("Subscription plan not found");
+    }
     const subscriptionPlan = await prisma.subscriptionPlan.update({
       where: { planId: Number(planId) },
       data: {
@@ -115,9 +131,12 @@ export async function updateSubscriptionPlan(
  */
 export async function deleteSubscriptionPlan(planId: BigInt): Promise<void> {
   try {
-    await prisma.subscriptionPlan.delete({
+    const subscriptionPlan = await prisma.subscriptionPlan.delete({
       where: { planId: Number(planId) },
     });
+    if (!subscriptionPlan) {
+      throw new Error("Subscription plan not found");
+    }
   } catch (error) {
     throw new Error(
       `Failed to delete subscription plan: ${getErrorMessage(error)}`

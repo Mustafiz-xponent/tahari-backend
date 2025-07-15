@@ -57,7 +57,7 @@ export async function createOrder(data: CreateOrderDto): Promise<Order> {
         data: {
           orderId: Number(order.orderId),
           status: "PENDING",
-          description: "Order created and payment pending for Cash on Delivery",
+          description: "Order created",
         },
       });
 

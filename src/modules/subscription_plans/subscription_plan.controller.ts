@@ -65,9 +65,7 @@ export const getSubscriptionPlanById = async (
   try {
     const planId = planIdSchema.parse(req.params.id);
     const plan = await subscriptionPlanService.getSubscriptionPlanById(planId);
-    if (!plan) {
-      throw new Error("Subscription plan not found");
-    }
+
     res.json({
       success: true,
       message: "Subscription plan fetched successfully",
@@ -115,7 +113,6 @@ export const deleteSubscriptionPlan = async (
     res.json({
       success: true,
       message: "Subscription plan deleted successfully",
-      data: null,
     });
   } catch (error) {
     handleErrorResponse(error, res, "delete subscription plan");

@@ -321,23 +321,6 @@ model StockTransaction {
   @@index([transactionId])
 }
 
-// Subscription plans for weekly/monthly deliveries
-model SubscriptionPlan {
-  planId        BigInt               @id @default(autoincrement())
-  name          String
-  frequency     SubscriptionPlanType
-  price         Decimal
-  description   String?
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-  productId     BigInt
-  product       Product              @relation(fields: [productId], references: [productId])
-  subscriptions Subscription[]
-
-  @@index([productId])
-  @@index([planId])
-}
-
 // Customer wallets for balance management
 model Wallet {
   walletId           BigInt              @id @default(autoincrement())
@@ -447,6 +430,23 @@ model Subscription {
   @@index([customerId])
   @@index([planId])
   @@index([subscriptionId])
+}
+
+// Subscription plans for weekly/monthly deliveries
+model SubscriptionPlan {
+  planId        BigInt               @id @default(autoincrement())
+  name          String
+  frequency     SubscriptionPlanType
+  price         Decimal
+  description   String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  productId     BigInt
+  product       Product              @relation(fields: [productId], references: [productId])
+  subscriptions Subscription[]
+
+  @@index([productId])
+  @@index([planId])
 }
 
 // Subscription deliveries to track delivery schedules

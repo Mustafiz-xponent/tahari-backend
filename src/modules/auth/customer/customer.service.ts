@@ -112,7 +112,7 @@ export async function otpLoginCustomer(
   });
 
   const res = await sendOtp(data.phone);
-  return res.otp; // TODO: remove this line when in production
+  return res.otp; // TODO: Need to remove this line when in production
 }
 
 /**
