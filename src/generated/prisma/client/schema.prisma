@@ -321,27 +321,11 @@ model StockTransaction {
   @@index([transactionId])
 }
 
-// Subscription plans for weekly/monthly deliveries
-model SubscriptionPlan {
-  planId        BigInt               @id @default(autoincrement())
-  name          String
-  frequency     SubscriptionPlanType
-  price         Decimal
-  description   String?
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-  productId     BigInt
-  product       Product              @relation(fields: [productId], references: [productId])
-  subscriptions Subscription[]
-
-  @@index([productId])
-  @@index([planId])
-}
-
 // Customer wallets for balance management
 model Wallet {
   walletId           BigInt              @id @default(autoincrement())
   balance            Decimal             @default(0.00)
+  lockedBalance      Decimal             @default(0.00)
   updatedAt          DateTime            @default(now())
   customerId         BigInt              @unique
   customer           Customer            @relation(fields: [customerId], references: [customerId])
@@ -435,6 +419,9 @@ model Subscription {
   startDate              DateTime
   endDate                DateTime?
   status                 SubscriptionStatus
+  paymentMethod          String
+  isProcessing           Boolean                @default(false) // For processing subscription renewals in the background  
+  shippingAddress        String
   renewalDate            DateTime?
   createdAt              DateTime               @default(now())
   updatedAt              DateTime               @updatedAt
@@ -447,6 +434,23 @@ model Subscription {
   @@index([customerId])
   @@index([planId])
   @@index([subscriptionId])
+}
+
+// Subscription plans for weekly/monthly deliveries
+model SubscriptionPlan {
+  planId        BigInt               @id @default(autoincrement())
+  name          String
+  frequency     SubscriptionPlanType
+  price         Decimal
+  description   String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  productId     BigInt
+  product       Product              @relation(fields: [productId], references: [productId])
+  subscriptions Subscription[]
+
+  @@index([productId])
+  @@index([planId])
 }
 
 // Subscription deliveries to track delivery schedules

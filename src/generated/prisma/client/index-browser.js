@@ -239,20 +239,10 @@ exports.Prisma.StockTransactionScalarFieldEnum = {
   productId: 'productId'
 };
 
-exports.Prisma.SubscriptionPlanScalarFieldEnum = {
-  planId: 'planId',
-  name: 'name',
-  frequency: 'frequency',
-  price: 'price',
-  description: 'description',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  productId: 'productId'
-};
-
 exports.Prisma.WalletScalarFieldEnum = {
   walletId: 'walletId',
   balance: 'balance',
+  lockedBalance: 'lockedBalance',
   updatedAt: 'updatedAt',
   customerId: 'customerId'
 };
@@ -309,11 +299,25 @@ exports.Prisma.SubscriptionScalarFieldEnum = {
   startDate: 'startDate',
   endDate: 'endDate',
   status: 'status',
+  paymentMethod: 'paymentMethod',
+  isProcessing: 'isProcessing',
+  shippingAddress: 'shippingAddress',
   renewalDate: 'renewalDate',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   customerId: 'customerId',
   planId: 'planId'
+};
+
+exports.Prisma.SubscriptionPlanScalarFieldEnum = {
+  planId: 'planId',
+  name: 'name',
+  frequency: 'frequency',
+  price: 'price',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  productId: 'productId'
 };
 
 exports.Prisma.SubscriptionDeliveryScalarFieldEnum = {
@@ -415,11 +419,6 @@ exports.TransactionType = exports.$Enums.TransactionType = {
   ADJUSTMENT: 'ADJUSTMENT'
 };
 
-exports.SubscriptionPlanType = exports.$Enums.SubscriptionPlanType = {
-  WEEKLY: 'WEEKLY',
-  MONTHLY: 'MONTHLY'
-};
-
 exports.WalletTransactionType = exports.$Enums.WalletTransactionType = {
   DEPOSIT: 'DEPOSIT',
   WITHDRAWAL: 'WITHDRAWAL',
@@ -442,6 +441,11 @@ exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
   CANCELLED: 'CANCELLED',
   EXPIRED: 'EXPIRED',
   PENDING: 'PENDING'
+};
+
+exports.SubscriptionPlanType = exports.$Enums.SubscriptionPlanType = {
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY'
 };
 
 exports.MessageStatus = exports.$Enums.MessageStatus = {
@@ -477,13 +481,13 @@ exports.Prisma.ModelName = {
   FarmerTransaction: 'FarmerTransaction',
   FarmerPayment: 'FarmerPayment',
   StockTransaction: 'StockTransaction',
-  SubscriptionPlan: 'SubscriptionPlan',
   Wallet: 'Wallet',
   WalletTransaction: 'WalletTransaction',
   Order: 'Order',
   OrderItem: 'OrderItem',
   OrderTracking: 'OrderTracking',
   Subscription: 'Subscription',
+  SubscriptionPlan: 'SubscriptionPlan',
   SubscriptionDelivery: 'SubscriptionDelivery',
   Payment: 'Payment',
   Message: 'Message',

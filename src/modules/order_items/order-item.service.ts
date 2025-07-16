@@ -66,65 +66,69 @@ export async function createOrderItem(
  * @throws {Error} If order or products don't exist
  */
 export async function createOrderItems(data: CreateOrderItemsDto) {
-  // Convert all IDs to BigInt for consistent comparison
-  const orderId = data.orderId;
-  const productIds = data.items.map((item) => item.productId);
+  try {
+    // Convert all IDs to BigInt for consistent comparison
+    const orderId = data.orderId;
+    const productIds = data.items.map((item) => item.productId);
 
-  // Validate order exists (convert to number for Prisma query)
-  const order = await prisma.order.findUnique({
-    where: { orderId: Number(orderId) },
-  });
-  if (!order) throw new Error(`Order not found: ${orderId.toString()}`);
+    // Validate order exists (convert to number for Prisma query)
+    const order = await prisma.order.findUnique({
+      where: { orderId: Number(orderId) },
+    });
+    if (!order) throw new Error(`Order not found: ${orderId.toString()}`);
 
-  // Validate products exist
-  const products = await prisma.product.findMany({
-    where: {
-      productId: {
-        in: productIds.map((id) => Number(id)), // Convert to number for query
-      },
-    },
-  });
-
-  // Compare using BigInt for type safety
-  const missingProducts = productIds.filter(
-    (id) => !products.some((p) => BigInt(p.productId) === id)
-  );
-
-  if (missingProducts.length > 0) {
-    throw new Error(`Products not found: ${missingProducts.join(", ")}`);
-  }
-
-  // Validate stock quantity
-  for (const item of data.items) {
-    const product = products.find(
-      (p) => BigInt(p.productId) === item.productId
-    );
-    if (!product) {
-      throw new Error(`Product not found: ${item.productId.toString()}`);
-    }
-
-    if (product.stockQuantity < item.quantity * item.packageSize) {
-      throw new Error(
-        `Insufficient stock quantity for product ${item.productId.toString()}`
-      );
-    }
-  }
-  // Create items in transaction (convert to number for Prisma)
-  return prisma.$transaction(
-    data.items.map((item) =>
-      prisma.orderItem.create({
-        data: {
-          orderId: Number(orderId),
-          productId: Number(item.productId),
-          unitType: item.unitType,
-          packageSize: item.packageSize,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          subtotal: item.subtotal,
+    // Validate products exist
+    const products = await prisma.product.findMany({
+      where: {
+        productId: {
+          in: productIds.map((id) => Number(id)), // Convert to number for query
         },
-      })
-    )
-  );
+      },
+    });
+
+    // Compare using BigInt for type safety
+    const missingProducts = productIds.filter(
+      (id) => !products.some((p) => BigInt(p.productId) === id)
+    );
+
+    if (missingProducts.length > 0) {
+      throw new Error(`Products not found: ${missingProducts.join(", ")}`);
+    }
+
+    // Validate stock quantity
+    for (const item of data.items) {
+      const product = products.find(
+        (p) => BigInt(p.productId) === item.productId
+      );
+      if (!product) {
+        throw new Error(`Product not found: ${item.productId.toString()}`);
+      }
+
+      if (product.stockQuantity < item.quantity * item.packageSize) {
+        throw new Error(
+          `Insufficient stock quantity for product ${item.productId.toString()}`
+        );
+      }
+    }
+    // Create items in transaction (convert to number for Prisma)
+    return prisma.$transaction(
+      data.items.map((item) =>
+        prisma.orderItem.create({
+          data: {
+            orderId: Number(orderId),
+            productId: Number(item.productId),
+            unitType: item.unitType,
+            packageSize: item.packageSize,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            subtotal: item.subtotal,
+          },
+        })
+      )
+    );
+  } catch (error) {
+    throw new Error(`Failed to create order item: ${getErrorMessage(error)}`);
+  }
 }
 
 /**

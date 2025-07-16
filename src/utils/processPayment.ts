@@ -24,8 +24,14 @@ export async function processWalletPayment(
     }
 
     // Check wallet balance
-    if (Number(order.customer.wallet.balance) < Number(order.totalAmount)) {
-      throw new Error("Insufficient wallet balance");
+    const { balance, lockedAmount } = order.customer.wallet;
+    const availableBalance = Number(balance) - Number(lockedAmount);
+    const orderAmount = Number(order.totalAmount);
+
+    if (availableBalance < orderAmount) {
+      throw new Error(
+        "Insufficient available wallet balance to place this order."
+      );
     }
 
     // Deduct amount from wallet
@@ -149,7 +155,7 @@ export async function processCodPayment(
       where: { orderId: Number(data.orderId) },
       data: {
         paymentStatus: "PENDING",
-        status: "PENDING",
+        status: "CONFIRMED",
       },
     });
 
