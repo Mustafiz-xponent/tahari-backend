@@ -5,7 +5,11 @@ import { addWeeks, addMonths, nextSaturday, startOfMonth } from "date-fns";
 import * as notificationService from "@/modules/notifications/notification.service";
 import * as orderItemService from "@/modules/order_items/order-item.service";
 import { Prisma } from "@prisma/client";
-import { Order, Product } from "@/generated/prisma/client";
+import {
+  Order,
+  Product,
+  SubscriptionPlanType,
+} from "@/generated/prisma/client";
 import { Decimal } from "@/generated/prisma/client/runtime/library";
 
 // Types
@@ -16,7 +20,7 @@ type SubscriptionWithRelations = {
   customer: CustomerWithWallet;
   subscriptionPlan: {
     price: Decimal;
-    frequency: "WEEKLY" | "MONTHLY";
+    frequency: SubscriptionPlanType;
     productId: bigint;
   };
 };
@@ -41,8 +45,8 @@ type ProcessingResult = {
 // Configuration
 const CONFIG = {
   BATCH_SIZE: 100, // Number of subscriptions to process per batch
-  TIMEZONE: process.env.TIME_ZONE || "Asia/Dhaka",
-  CRON_SCHEDULE: process.env.SUBSCRIPTION_CRON_SCHEDULE || "0 2 * * *", // Run at 2 AM
+  TIMEZONE: "Asia/Dhaka",
+  CRON_SCHEDULE: "0 2 * * *", // Run at 2 AM
   MAX_RETRIES: 3,
   CONCURRENT_BATCHES: 5, // Process multiple batches concurrently
 } as const;
@@ -207,7 +211,7 @@ const processSubscriptionBatch = async (
 const processSingleSubscription = async (
   subscription: SubscriptionWithRelations,
   today: Date
-): Promise<void> => {
+) => {
   const paymentMethod = subscription.paymentMethod as "COD" | "WALLET";
 
   const processors = {
@@ -603,12 +607,10 @@ const pauseAndNotifyInsufficientStock = async (
 };
 
 // Main renewal function
-export const renewSubscriptions = async (
-  today: Date = new Date()
-): Promise<void> => {
+export const renewSubscriptions = async (today: Date = new Date()) => {
   logger.info(`Starting subscription renewal for ${today.toISOString()}`);
 
-  const processAllBatches = async (): Promise<void> => {
+  const processAllBatches = async () => {
     let skip = 0;
     let totalProcessed = 0;
     let totalSuccessful = 0;
@@ -692,9 +694,5 @@ export const startSubscriptionRenewalJob = () => {
     {
       timezone: CONFIG.TIMEZONE,
     }
-  );
-
-  logger.info(
-    `Subscription renewal cron job started with schedule: ${CONFIG.CRON_SCHEDULE}`
   );
 };
