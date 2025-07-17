@@ -20,32 +20,40 @@ export async function createSubscription(
 ): Promise<Subscription> {
   try {
     return await prisma.$transaction(async (tx) => {
-      // Find plan
+      // Find plan & validate
       const plan = await tx.subscriptionPlan.findUnique({
         where: { planId: data.planId },
+        include: { product: true },
       });
       if (!plan) throw new Error("Subscription plan not found");
-
-      // Find customer & wallet
+      if (!plan.product?.isSubscription) {
+        throw new Error(
+          `Product ${
+            plan.product?.name || "N/A"
+          } is not available for subscription`
+        );
+      }
+      // check stock availability
+      const requiredStock = plan.product.packageSize * 1;
+      if (requiredStock > plan.product.stockQuantity) {
+        throw new Error(
+          `Insufficient stock for product ${plan.product.name}. Available: ${plan.product.stockQuantity}, Required: ${requiredStock}`
+        );
+      }
+      // Find customer & validate
       const customer = await tx.customer.findUnique({
         where: { customerId: data.customerId },
         include: { wallet: true },
       });
       if (!customer) throw new Error("Customer not found");
-      if (!customer.wallet) {
-        throw new Error("Customer wallet not found");
-      }
-
-      //  Validate product
-      const product = await tx.product.findUnique({
-        where: { productId: plan.productId },
-      });
-      if (!product?.isSubscription) {
-        throw new Error("Product is not valid for subscription");
-      }
 
       //  Handle payment method
       if (data.paymentMethod === "WALLET") {
+        if (!customer.wallet) {
+          throw new Error(
+            "Customer wallet not found.Please create wallet first"
+          );
+        }
         const availableBalance =
           customer.wallet.balance.toNumber() -
           customer.wallet.lockedBalance.toNumber();
@@ -74,23 +82,21 @@ export async function createSubscription(
             description: `Initial lock for subscription plan ${data.planId}`,
           },
         });
-      } else if (data.paymentMethod === "COD") {
-        // Do nothing cron job will handle
-      } else {
+      } else if (data.paymentMethod !== "COD") {
         throw new Error("Invalid payment method. Must be WALLET or COD.");
       }
 
       //  Create subscription
       const now = new Date();
       const frequency = plan.frequency.trim().toUpperCase();
-      let renewalDate;
-      if (frequency === "WEEKLY") {
-        renewalDate = addWeeks(now, 1);
-      } else if (frequency === "MONTHLY") {
-        renewalDate = addMonths(now, 1);
-      } else {
-        throw new Error("Invalid frequency. Must be WEEKLY or MONTHLY.");
+
+      if (!["WEEKLY", "MONTHLY"].includes(frequency)) {
+        throw new Error(
+          `Invalid frequency '${frequency}'. Must be WEEKLY or MONTHLY.`
+        );
       }
+      const renewalDate =
+        frequency === "WEEKLY" ? addWeeks(now, 1) : addMonths(now, 1);
 
       const subscription = await tx.subscription.create({
         data: {
