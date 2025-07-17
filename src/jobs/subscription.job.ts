@@ -3,7 +3,6 @@ import prisma from "@/prisma-client/prismaClient";
 import logger from "@/utils/logger";
 import { addWeeks, addMonths, nextSaturday, startOfMonth } from "date-fns";
 import * as notificationService from "@/modules/notifications/notification.service";
-import * as orderItemService from "@/modules/order_items/order-item.service";
 import { Prisma } from "@prisma/client";
 import {
   Order,
@@ -47,6 +46,7 @@ const CONFIG = {
   BATCH_SIZE: 100, // Number of subscriptions to process per batch
   TIMEZONE: "Asia/Dhaka",
   CRON_SCHEDULE: "0 2 * * *", // Run at 2 AM
+  // CRON_SCHEDULE: "* * * * *", // Run at every minute for testing
   MAX_RETRIES: 3,
   CONCURRENT_BATCHES: 5, // Process multiple batches concurrently
 } as const;
@@ -173,6 +173,7 @@ const processSubscriptionBatch = async (
         subscriptionId: subscription.subscriptionId,
       };
     } catch (error) {
+      logger.error(`${error}`);
       if (retries < CONFIG.MAX_RETRIES) {
         logger.warn(
           `Retrying subscription ${subscription.subscriptionId}, attempt ${
@@ -453,16 +454,17 @@ const createOrderWithItems = async (
       shippingAddress: subscription.shippingAddress,
     },
   });
-
   // Create order items
-  await orderItemService.createOrderItem({
-    quantity: 1,
-    unitPrice: Number(product.unitPrice),
-    unitType: product.unitType,
-    packageSize: product.packageSize,
-    subtotal: Number(product.unitPrice) * Number(product.packageSize),
-    orderId: order.orderId,
-    productId: product.productId,
+  await tx.orderItem.create({
+    data: {
+      quantity: 1,
+      unitPrice: Number(product.unitPrice),
+      unitType: product.unitType,
+      packageSize: product.packageSize,
+      subtotal: Number(product.unitPrice) * Number(product.packageSize),
+      orderId: order.orderId,
+      productId: product.productId,
+    },
   });
 
   // Track the order
@@ -681,6 +683,7 @@ export const renewSubscriptions = async (today: Date = new Date()) => {
 
 // Cron job starter
 export const startSubscriptionRenewalJob = () => {
+  logger.info("Starting subscription renewal job");
   cron.schedule(
     CONFIG.CRON_SCHEDULE,
     async () => {
