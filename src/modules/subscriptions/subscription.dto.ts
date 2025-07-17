@@ -15,29 +15,26 @@ const subscriptionStatusEnum = z.enum([
 /**
  * Zod schema for creating a new subscription.
  */
-export const zCreateSubscriptionDto = z.object({
-  startDate: z.string().datetime(),
-  status: subscriptionStatusEnum,
-  customerId: z
-    .union([z.string(), z.number()])
-    .transform(BigInt)
-    .refine((val) => val > 0n, {
-      message: "Customer ID must be a positive integer",
-    }),
-  planId: z
-    .union([z.string(), z.number()])
-    .transform(BigInt)
-    .refine((val) => val > 0n, {
-      message: "Plan ID must be a positive integer",
-    }),
-  endDate: z.string().datetime().optional(),
-  renewalDate: z.string().datetime().optional(),
-});
+export const zCreateSubscriptionDto = {
+  body: z.object({
+    customerId: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Customer ID must be a positive integer",
+      }),
+    planId: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Plan ID must be a positive integer",
+      }),
+    paymentMethod: z.enum(["WALLET", "COD"]),
+    shippingAddress: z.string().min(1, "Shipping address is required"),
+  }),
+};
 
-/**
- * TypeScript type inferred from create schema.
- */
-export type CreateSubscriptionDto = z.infer<typeof zCreateSubscriptionDto>;
+export type CreateSubscriptionDto = z.infer<typeof zCreateSubscriptionDto.body>;
 
 /**
  * Zod schema for updating a subscription.
@@ -62,8 +59,4 @@ export const zUpdateSubscriptionDto = z.object({
     })
     .optional(),
 });
-
-/**
- * TypeScript type inferred from update schema.
- */
 export type UpdateSubscriptionDto = z.infer<typeof zUpdateSubscriptionDto>;

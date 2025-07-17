@@ -20,11 +20,12 @@ export const createNotification = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { message, receiverId } = req.body;
+    const { message, receiverId, type } = req.body;
 
     const notification = await notificationService.createNotification({
-      message,
+      message: message.replace(/\s+/g, " ").trim(),
       receiverId,
+      type,
     });
     res.status(httpStatus.CREATED).json({
       success: true,
@@ -89,6 +90,10 @@ export const getUserNotifications = async (
         itemsPerPage: limit,
         hasNextPage: page < result.totalPages,
         hasPreviousPage: page > 1,
+      },
+      meta: {
+        unreadNotificationsCount: result.unreadNotificationsCount,
+        unseenNotificationsCount: result.unseenNotificationsCount,
       },
     });
   } catch (error) {
@@ -174,7 +179,27 @@ export const deleteNotification = async (
       .json({ success: false, message: "Failed to delete notification" });
   }
 };
+/**
+ * Mark all notifications as read
+ **/
+export const markNotificationAsReadById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const userId = req.user?.userId;
+  const notificationId = req.params.id;
+  await notificationService.markNotificationAsReadById(
+    userId,
+    BigInt(notificationId)
+  );
+  res
+    .status(httpStatus.OK)
+    .json({ success: true, message: "Notification marked as read" });
+};
 
+/**
+ * Mark all notifications as read
+ **/
 export const markAllNotificationsAsRead = async (
   req: Request,
   res: Response
@@ -189,5 +214,25 @@ export const markAllNotificationsAsRead = async (
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json({ message: "Failed to mark notifications as read" });
+  }
+};
+
+/**
+ * Mark all notifications as seen
+ **/
+export const markAllNotificationsAsSeen = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    await notificationService.markAllNotificationsAsSeen(userId);
+    res
+      .status(httpStatus.OK)
+      .json({ success: true, message: "All notifications marked as seen" });
+  } catch (error) {
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to mark notifications as seen" });
   }
 };

@@ -88,7 +88,7 @@ export async function handleDepositeSuccess(
     // Validate payment with SSLCommerz  implementation
     const validation = await validateSSLCommerzPayment(validationData);
 
-    if (validation.status === "VALID") {
+    if (["VALID", "VALIDATED"].includes(validation.status)) {
       // Extract wallet ID
       const tranId = validationData.tran_id;
 
@@ -131,8 +131,12 @@ export async function handleDepositeSuccess(
           },
         });
         await notificationService.createNotification({
-          message: `অভিনন্দন! আপনার ওয়ালেটে ${walletTransaction.amount} টাকা সফলভাবে জমা হয়েছে (লেনদেন আইডি: ${tranId})। ধন্যবাদ আমাদের সাথে থাকার জন্য।`,
+          message:
+            `অভিনন্দন! আপনার ওয়ালেটে ${walletTransaction.amount} টাকা সফলভাবে জমা হয়েছে। ধন্যবাদ আমাদের সাথে থাকার জন্য। (লেনদেন আইডি: ${tranId})`
+              .replace(/\s+/g, " ")
+              .trim(),
           receiverId: updatedWallet.customer.userId,
+          type: "WALLET",
         });
         return {
           success: true,
@@ -147,12 +151,25 @@ export async function handleDepositeSuccess(
       );
     }
   } catch (error) {
+    console.error(error);
     throw new Error(
       `SSLCommerz success handling failed: ${getErrorMessage(error)}`
     );
   }
 }
+export async function getPaymentStatus(tranId: string): Promise<string> {
+  try {
+    const transaction = await prisma.walletTransaction.findFirst({
+      where: { description: { contains: tranId } },
+      select: { transactionStatus: true },
+    });
 
+    return transaction?.transactionStatus || "NOT_FOUND";
+  } catch (error) {
+    console.error("Error getting payment status:", error);
+    return "ERROR";
+  }
+}
 /**
  * Handle SSLCommerz payment failure
  */
@@ -185,8 +202,12 @@ export async function handleDepositeFailure(failureData: any): Promise<void> {
         },
       });
       await notificationService.createNotification({
-        message: `দুঃখিত! আপনার ওয়ালেটে টাকা জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন বা সহায়তার জন্য আমাদের সাথে যোগাযোগ করুন।`,
+        message:
+          `দুঃখিত! আপনার ওয়ালেটে টাকা জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন বা সহায়তার জন্য আমাদের সাথে যোগাযোগ করুন।`
+            .replace(/\s+/g, " ")
+            .trim(),
         receiverId: walletTransaction.wallet.customer.userId,
+        type: "WALLET",
       });
     }
   } catch (error) {

@@ -24,8 +24,14 @@ export async function processWalletPayment(
     }
 
     // Check wallet balance
-    if (Number(order.customer.wallet.balance) < Number(order.totalAmount)) {
-      throw new Error("Insufficient wallet balance");
+    const { balance, lockedAmount } = order.customer.wallet;
+    const availableBalance = Number(balance) - Number(lockedAmount);
+    const orderAmount = Number(order.totalAmount);
+
+    if (availableBalance < orderAmount) {
+      throw new Error(
+        "Insufficient available wallet balance to place this order."
+      );
     }
 
     // Deduct amount from wallet
@@ -101,10 +107,13 @@ export async function processWalletPayment(
         },
       });
     }
-    const message = getOrderStatusMessage(updatedOrder.status, data.orderId);
+    const message = getOrderStatusMessage(updatedOrder.status, data.orderId)
+      .replace(/\s+/g, " ")
+      .trim();
     await notificationService.createNotification({
       message,
       receiverId: order.customer.userId,
+      type: "ORDER",
     });
     return {
       payment,
@@ -146,7 +155,7 @@ export async function processCodPayment(
       where: { orderId: Number(data.orderId) },
       data: {
         paymentStatus: "PENDING",
-        status: "PENDING",
+        status: "CONFIRMED",
       },
     });
 
@@ -160,8 +169,12 @@ export async function processCodPayment(
       },
     });
     await notificationService.createNotification({
-      message: `ধন্যবাদ! আপনার অর্ডারটি নিশ্চিত হয়েছে। দয়া করে পণ্য গ্রহণের সময় পেমেন্ট করুন। অর্ডার আইডিঃ #${data.orderId}`,
+      message:
+        `ধন্যবাদ! আপনার অর্ডারটি নিশ্চিত হয়েছে। দয়া করে পণ্য গ্রহণের সময় পেমেন্ট করুন। (অর্ডার আইডিঃ #${data.orderId})`
+          .replace(/\s+/g, " ")
+          .trim(),
       receiverId: order.customer.userId,
+      type: "ORDER",
     });
     return {
       payment,

@@ -79,8 +79,11 @@ export const handleSslCommerzSuccess = async (
   res: Response
 ): Promise<void> => {
   try {
-    const result = await walletService.handleDepositeSuccess(req.body);
-    if (result.success) {
+    // Optional: Check payment status for user feedback
+    const tranId = req.body.tran_id;
+    const paymentStatus = await walletService.getPaymentStatus(tranId);
+
+    if (paymentStatus === "COMPLETED") {
       res.redirect(`${process.env.PAYMENT_SUCCESS_DEEP_LINK}`);
     } else {
       res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
@@ -105,6 +108,7 @@ export const handleSslCommerzFailure = async (
   }
 };
 /**
+/**
  * Handle SSLCommerz cancel callback
  */
 export const handleSslCommerzCancel = async (
@@ -128,11 +132,13 @@ export const handleSslCommerzIPN = async (
 ): Promise<void> => {
   try {
     await walletService.handleDepositeSuccess(req.body);
-    res.status(httpStatus.OK).json({ message: "IPN received successfully" });
+    res
+      .status(httpStatus.OK)
+      .json({ success: true, message: "IPN received successfully" });
   } catch (error) {
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "IPN failed" });
+      .json({ success: false, message: "IPN failed" });
   }
 };
 /**

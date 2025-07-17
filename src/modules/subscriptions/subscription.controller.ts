@@ -25,7 +25,7 @@ export const createSubscription = async (
   res: Response
 ): Promise<void> => {
   try {
-    const data = zCreateSubscriptionDto.parse(req.body);
+    const data = req.body;
     const subscription = await subscriptionService.createSubscription(data);
     res.status(httpStatus.CREATED).json({
       success: true,

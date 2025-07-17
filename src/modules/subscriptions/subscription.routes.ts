@@ -5,11 +5,20 @@
 
 import { Router } from "express";
 import * as SubscriptionController from "@/modules/subscriptions/subscription.controller";
+import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
+import validator from "@/middlewares/validator";
+import { zCreateSubscriptionDto } from "@/modules/subscriptions/subscription.dto";
 
 const router = Router();
 
 // Route to create a new subscription
-router.post("/", SubscriptionController.createSubscription);
+router.post(
+  "/",
+  authMiddleware,
+  authorizeRoles("CUSTOMER"),
+  validator(zCreateSubscriptionDto),
+  SubscriptionController.createSubscription
+);
 
 // Route to get all subscriptions
 router.get("/", SubscriptionController.getAllSubscriptions);

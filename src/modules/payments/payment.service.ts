@@ -17,6 +17,7 @@ import {
 } from "@/utils/processPayment";
 import * as notificationService from "@/modules/notifications/notification.service";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
+import logger from "@/utils/logger";
 
 /**
  * create order payment through wallet or SSLCommerz
@@ -78,7 +79,7 @@ export async function handleSSLCommerzSuccess(
     // Validate payment with SSLCommerz  implementation
     const validation = await validateSSLCommerzPayment(validationData);
 
-    if (validation.status === "VALID") {
+    if (["VALID", "VALIDATED"].includes(validation.status)) {
       // Extract order ID from transaction ID
       const tranId = validationData.tran_id;
       const orderIdMatch = tranId.match(/ORDER_(\d+)_/);
@@ -175,10 +176,13 @@ export async function handleSSLCommerzSuccess(
         const message = getOrderStatusMessage(
           updatedOrder.status,
           updatedOrder.orderId
-        );
+        )
+          .replace(/\s+/g, " ")
+          .trim();
         await notificationService.createNotification({
           message,
           receiverId: order.customer.userId,
+          type: "ORDER",
         });
         return {
           success: true,
@@ -199,6 +203,50 @@ export async function handleSSLCommerzSuccess(
   }
 }
 
+/**
+ * Get order payment status for user callbacks
+ */
+export async function getOrderPaymentStatus(tranId: string): Promise<{
+  orderId: number;
+  paymentStatus: string;
+  orderStatus: string;
+}> {
+  try {
+    const orderIdMatch = tranId.match(/ORDER_(\d+)_/);
+    if (!orderIdMatch) {
+      throw new Error("Invalid transaction ID format");
+    }
+
+    const orderId = Number(orderIdMatch[1]);
+
+    const payment = await prisma.payment.findFirst({
+      where: {
+        orderId,
+        transactionId: tranId,
+      },
+      include: {
+        order: {
+          select: {
+            status: true,
+            paymentStatus: true,
+          },
+        },
+      },
+    });
+
+    if (!payment) {
+      throw new Error("Payment not found");
+    }
+
+    return {
+      orderId,
+      paymentStatus: payment.paymentStatus,
+      orderStatus: payment.order.status,
+    };
+  } catch (error) {
+    throw new Error(`Failed to get payment status: ${getErrorMessage(error)}`);
+  }
+}
 /**
  * Handle SSLCommerz payment failure
  */
@@ -257,8 +305,12 @@ export async function handleSSLCommerzFailure(failureData: any): Promise<void> {
         });
       }
       await notificationService.createNotification({
-        message: `দুঃখিত! আপনার অর্ডারটি সম্পন্ন করা যায়নি কারণ পেমেন্ট সফল হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন। অর্ডার আইডিঃ #${order.orderId}`,
+        message:
+          `দুঃখিত! আপনার অর্ডারটি সম্পন্ন করা যায়নি কারণ পেমেন্ট সফল হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন। (অর্ডার আইডিঃ #${order.orderId})`
+            .replace(/\s+/g, " ")
+            .trim(),
         receiverId: order.customer.userId,
+        type: "ORDER",
       });
     });
   } catch (error) {

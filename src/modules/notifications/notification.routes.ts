@@ -10,6 +10,7 @@ import validator from "@/middlewares/validator";
 import {
   zCreateNotificationDto,
   zDeleteNotificationDto,
+  zMarkNotificationAsReadDto,
   zUpdateNotificationDto,
 } from "@/modules/notifications/notification.dto";
 
@@ -34,12 +35,28 @@ router.get(
   authorizeRoles("CUSTOMER"),
   NotificationController.getUserNotifications
 );
+
 // Route to mark all notifications as read
 router.patch(
-  "/read",
+  "/read/all",
   authMiddleware,
   authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
   NotificationController.markAllNotificationsAsRead
+);
+// Route to mark all notifications as seen
+router.patch(
+  "/seen/all",
+  authMiddleware,
+  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  NotificationController.markAllNotificationsAsSeen
+);
+// Route to mark single notifications as read
+router.patch(
+  "/read/:id",
+  authMiddleware,
+  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  validator(zMarkNotificationAsReadDto),
+  NotificationController.markNotificationAsReadById
 );
 // Route to get a notification by ID
 router.get("/:id", NotificationController.getNotificationById);

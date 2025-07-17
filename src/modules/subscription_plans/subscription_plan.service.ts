@@ -4,7 +4,10 @@
  */
 
 import prisma from "@/prisma-client/prismaClient";
-import { SubscriptionPlan } from "@/generated/prisma/client";
+import {
+  SubscriptionPlan,
+  SubscriptionPlanType,
+} from "@/generated/prisma/client";
 import {
   CreateSubscriptionPlanDto,
   UpdateSubscriptionPlanDto,
@@ -21,6 +24,15 @@ export async function createSubscriptionPlan(
   data: CreateSubscriptionPlanDto
 ): Promise<SubscriptionPlan> {
   try {
+    const product = await prisma.product.findUnique({
+      where: { productId: data.productId },
+    });
+    if (!product) {
+      throw new Error("Product not found");
+    }
+    if (!product.isSubscription) {
+      throw new Error("Product is not under subscription");
+    }
     const subscriptionPlan = await prisma.subscriptionPlan.create({
       data: {
         name: data.name,
@@ -45,7 +57,9 @@ export async function createSubscriptionPlan(
  */
 export async function getAllSubscriptionPlans(): Promise<SubscriptionPlan[]> {
   try {
-    const subscriptionPlans = await prisma.subscriptionPlan.findMany();
+    const subscriptionPlans = await prisma.subscriptionPlan.findMany({
+      include: { product: true },
+    });
     return subscriptionPlans;
   } catch (error) {
     throw new Error(
@@ -66,7 +80,9 @@ export async function getSubscriptionPlanById(
   try {
     const subscriptionPlan = await prisma.subscriptionPlan.findUnique({
       where: { planId: Number(planId) },
+      include: { product: true },
     });
+    if (!subscriptionPlan) throw new Error("Subscription plan not found");
     return subscriptionPlan;
   } catch (error) {
     throw new Error(
@@ -87,6 +103,12 @@ export async function updateSubscriptionPlan(
   data: UpdateSubscriptionPlanDto
 ): Promise<SubscriptionPlan> {
   try {
+    const existingPlan = await prisma.subscriptionPlan.findUnique({
+      where: { planId: Number(planId) },
+    });
+    if (!existingPlan) {
+      throw new Error("Subscription plan not found");
+    }
     const subscriptionPlan = await prisma.subscriptionPlan.update({
       where: { planId: Number(planId) },
       data: {

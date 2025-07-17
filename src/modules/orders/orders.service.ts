@@ -57,7 +57,7 @@ export async function createOrder(data: CreateOrderDto): Promise<Order> {
         data: {
           orderId: Number(order.orderId),
           status: "PENDING",
-          description: "Order created and payment pending for Cash on Delivery",
+          description: "Order created",
         },
       });
 
@@ -247,10 +247,13 @@ export async function updateOrder(
           });
         }
         if (currentOrder.customer.userId) {
-          const message = getOrderStatusMessage(data.status, orderId);
+          const message = getOrderStatusMessage(data.status, orderId)
+            .replace(/\s+/g, " ")
+            .trim();
           await notificationService.createNotification({
             message,
             receiverId: currentOrder.customer.userId,
+            type: "ORDER",
           });
         }
       }

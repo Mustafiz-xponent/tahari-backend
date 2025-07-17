@@ -11,12 +11,16 @@ import {
 } from "@/modules/notifications/notification.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { getSocketId, io } from "@/utils/socket";
+import { AppError } from "@/utils/appError";
+import httpStatus from "http-status";
 
 interface GetUserNotificationResult {
   notifications: Notification[];
   totalCount: number;
   currentPage: number;
   totalPages: number;
+  unreadNotificationsCount: number;
+  unseenNotificationsCount: number;
 }
 
 /**
@@ -37,6 +41,7 @@ export async function createNotification(
       data: {
         message: data.message,
         receiverId: data.receiverId,
+        type: data.type,
       },
     });
     const receiverId = getSocketId(String(data.receiverId));
@@ -85,11 +90,25 @@ export async function getUserNotifications(
     const totalNotifications = await prisma.notification.count({
       where: { receiverId: Number(userId) },
     });
+    const unreadNotificationsCount = await prisma.notification.count({
+      where: {
+        receiverId: Number(userId),
+        status: "UNREAD",
+      },
+    });
+    const unseenNotificationsCount = await prisma.notification.count({
+      where: {
+        receiverId: Number(userId),
+        isSeen: false,
+      },
+    });
     return {
       notifications,
       currentPage: paginationParams.page,
       totalPages: Math.ceil(totalNotifications / paginationParams.limit),
       totalCount: totalNotifications,
+      unreadNotificationsCount,
+      unseenNotificationsCount,
     };
   } catch (error) {
     throw new Error(`Failed to fetch notifications: ${getErrorMessage(error)}`);
@@ -131,6 +150,7 @@ export async function updateNotification(
       where: { notificationId: Number(notificationId) },
       data: {
         message: data.message,
+        type: data.type,
       },
     });
 
@@ -169,6 +189,39 @@ export async function deleteNotification(
   }
 }
 /**
+ * Mark single unread notifications as read for specific user
+ */
+
+export async function markNotificationAsReadById(
+  userId: BigInt,
+  notificationId: BigInt
+): Promise<void> {
+  try {
+    const notification = await prisma.notification.findUnique({
+      where: {
+        notificationId: Number(notificationId),
+      },
+    });
+    if (!notification) {
+      throw new AppError("Notification not found", httpStatus.NOT_FOUND);
+    }
+    if (notification.receiverId !== userId) {
+      throw new AppError("You don't have permission", httpStatus.FORBIDDEN);
+    }
+    await prisma.notification.update({
+      where: {
+        notificationId: Number(notificationId),
+      },
+      data: {
+        status: NotificationStatus.READ,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
  * Mark all unread notifications as read for specific user
  */
 
@@ -188,6 +241,30 @@ export async function markAllNotificationsAsRead(
   } catch (error) {
     throw new Error(
       `Failed to mark notifications as read: ${getErrorMessage(error)}`
+    );
+  }
+}
+
+/**
+ * Mark all unseen notifications as seen for specific user
+ */
+
+export async function markAllNotificationsAsSeen(
+  userId: BigInt
+): Promise<void> {
+  try {
+    await prisma.notification.updateMany({
+      where: {
+        receiverId: Number(userId),
+        isSeen: false,
+      },
+      data: {
+        isSeen: true,
+      },
+    });
+  } catch (error) {
+    throw new Error(
+      `Failed to mark notifications as seen: ${getErrorMessage(error)}`
     );
   }
 }

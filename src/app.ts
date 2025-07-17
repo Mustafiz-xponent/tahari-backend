@@ -32,6 +32,7 @@ import customerRoutes from "@/modules/customers/customer.routes";
 import { rateLimiter } from "@/middlewares/rateLimiter";
 import { globalErrorHandler } from "@/middlewares/errorHandler";
 import cors from "cors";
+import { initJobs } from "@/jobs";
 
 dotenv.config();
 
@@ -49,6 +50,8 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 };
 app.use(cors(corsOptions));
+// Initialize cron jobs
+initJobs();
 
 // Global BigInt Serializer
 (BigInt.prototype as any).toJSON = function () {
