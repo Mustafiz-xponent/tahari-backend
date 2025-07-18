@@ -10,7 +10,10 @@ import {
   UpdateSubscriptionDto,
 } from "@/modules/subscriptions/subscription.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
-import { getNextRenewalDate } from "@/utils/processSubscription";
+import {
+  createOrderWithItems,
+  getNextRenewalDate,
+} from "@/utils/processSubscription";
 /**
  * Create a new subscription
  */

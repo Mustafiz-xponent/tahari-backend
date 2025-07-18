@@ -197,7 +197,7 @@ const updateProductStock = async (
     },
   });
 };
-const createOrderWithItems = async (
+export const createOrderWithItems = async (
   subscription: SubscriptionWithRelations,
   customer: CustomerWithWallet,
   product: Product,
