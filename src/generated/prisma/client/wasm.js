@@ -301,6 +301,7 @@ exports.Prisma.SubscriptionScalarFieldEnum = {
   status: 'status',
   paymentMethod: 'paymentMethod',
   isProcessing: 'isProcessing',
+  planPrice: 'planPrice',
   shippingAddress: 'shippingAddress',
   renewalDate: 'renewalDate',
   createdAt: 'createdAt',

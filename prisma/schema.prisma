@@ -420,7 +420,8 @@ model Subscription {
   endDate                DateTime?
   status                 SubscriptionStatus
   paymentMethod          String
-  isProcessing           Boolean                @default(false) // For processing subscription renewals in the background  
+  isProcessing           Boolean                @default(false) // For processing subscription renewals in the background cron job 
+  planPrice              Decimal                @default(0.00)
   shippingAddress        String
   renewalDate            DateTime?
   createdAt              DateTime               @default(now())

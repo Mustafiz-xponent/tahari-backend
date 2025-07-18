@@ -10,8 +10,7 @@ import {
   UpdateSubscriptionDto,
 } from "@/modules/subscriptions/subscription.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
-import { addWeeks, addMonths } from "date-fns";
-
+import { getNextRenewalDate } from "@/utils/processSubscription";
 /**
  * Create a new subscription
  */
@@ -51,7 +50,7 @@ export async function createSubscription(
       if (data.paymentMethod === "WALLET") {
         if (!customer.wallet) {
           throw new Error(
-            "Customer wallet not found.Please create wallet first"
+            "Customer wallet not found. Please create wallet first"
           );
         }
         const availableBalance =
@@ -88,15 +87,9 @@ export async function createSubscription(
 
       //  Create subscription
       const now = new Date();
-      const frequency = plan.frequency.trim().toUpperCase();
+      const frequency = plan.frequency;
 
-      if (!["WEEKLY", "MONTHLY"].includes(frequency)) {
-        throw new Error(
-          `Invalid frequency '${frequency}'. Must be WEEKLY or MONTHLY.`
-        );
-      }
-      const renewalDate =
-        frequency === "WEEKLY" ? addWeeks(now, 1) : addMonths(now, 1);
+      const renewalDate = getNextRenewalDate(now, frequency);
 
       const subscription = await tx.subscription.create({
         data: {
@@ -104,6 +97,7 @@ export async function createSubscription(
           renewalDate: renewalDate,
           status: "ACTIVE",
           paymentMethod: data.paymentMethod,
+          planPrice: plan.price,
           customerId: data.customerId,
           planId: data.planId,
           shippingAddress: data.shippingAddress,

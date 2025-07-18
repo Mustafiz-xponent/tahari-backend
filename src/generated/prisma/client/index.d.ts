@@ -22669,12 +22669,14 @@ export namespace Prisma {
 
   export type SubscriptionAvgAggregateOutputType = {
     subscriptionId: number | null
+    planPrice: Decimal | null
     customerId: number | null
     planId: number | null
   }
 
   export type SubscriptionSumAggregateOutputType = {
     subscriptionId: bigint | null
+    planPrice: Decimal | null
     customerId: bigint | null
     planId: bigint | null
   }
@@ -22686,6 +22688,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus | null
     paymentMethod: string | null
     isProcessing: boolean | null
+    planPrice: Decimal | null
     shippingAddress: string | null
     renewalDate: Date | null
     createdAt: Date | null
@@ -22701,6 +22704,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus | null
     paymentMethod: string | null
     isProcessing: boolean | null
+    planPrice: Decimal | null
     shippingAddress: string | null
     renewalDate: Date | null
     createdAt: Date | null
@@ -22716,6 +22720,7 @@ export namespace Prisma {
     status: number
     paymentMethod: number
     isProcessing: number
+    planPrice: number
     shippingAddress: number
     renewalDate: number
     createdAt: number
@@ -22728,12 +22733,14 @@ export namespace Prisma {
 
   export type SubscriptionAvgAggregateInputType = {
     subscriptionId?: true
+    planPrice?: true
     customerId?: true
     planId?: true
   }
 
   export type SubscriptionSumAggregateInputType = {
     subscriptionId?: true
+    planPrice?: true
     customerId?: true
     planId?: true
   }
@@ -22745,6 +22752,7 @@ export namespace Prisma {
     status?: true
     paymentMethod?: true
     isProcessing?: true
+    planPrice?: true
     shippingAddress?: true
     renewalDate?: true
     createdAt?: true
@@ -22760,6 +22768,7 @@ export namespace Prisma {
     status?: true
     paymentMethod?: true
     isProcessing?: true
+    planPrice?: true
     shippingAddress?: true
     renewalDate?: true
     createdAt?: true
@@ -22775,6 +22784,7 @@ export namespace Prisma {
     status?: true
     paymentMethod?: true
     isProcessing?: true
+    planPrice?: true
     shippingAddress?: true
     renewalDate?: true
     createdAt?: true
@@ -22877,6 +22887,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus
     paymentMethod: string
     isProcessing: boolean
+    planPrice: Decimal
     shippingAddress: string
     renewalDate: Date | null
     createdAt: Date
@@ -22911,6 +22922,7 @@ export namespace Prisma {
     status?: boolean
     paymentMethod?: boolean
     isProcessing?: boolean
+    planPrice?: boolean
     shippingAddress?: boolean
     renewalDate?: boolean
     createdAt?: boolean
@@ -22930,6 +22942,7 @@ export namespace Prisma {
     status?: boolean
     paymentMethod?: boolean
     isProcessing?: boolean
+    planPrice?: boolean
     shippingAddress?: boolean
     renewalDate?: boolean
     createdAt?: boolean
@@ -22947,6 +22960,7 @@ export namespace Prisma {
     status?: boolean
     paymentMethod?: boolean
     isProcessing?: boolean
+    planPrice?: boolean
     shippingAddress?: boolean
     renewalDate?: boolean
     createdAt?: boolean
@@ -22964,6 +22978,7 @@ export namespace Prisma {
     status?: boolean
     paymentMethod?: boolean
     isProcessing?: boolean
+    planPrice?: boolean
     shippingAddress?: boolean
     renewalDate?: boolean
     createdAt?: boolean
@@ -22972,7 +22987,7 @@ export namespace Prisma {
     planId?: boolean
   }
 
-  export type SubscriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"subscriptionId" | "startDate" | "endDate" | "status" | "paymentMethod" | "isProcessing" | "shippingAddress" | "renewalDate" | "createdAt" | "updatedAt" | "customerId" | "planId", ExtArgs["result"]["subscription"]>
+  export type SubscriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"subscriptionId" | "startDate" | "endDate" | "status" | "paymentMethod" | "isProcessing" | "planPrice" | "shippingAddress" | "renewalDate" | "createdAt" | "updatedAt" | "customerId" | "planId", ExtArgs["result"]["subscription"]>
   export type SubscriptionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
     subscriptionPlan?: boolean | SubscriptionPlanDefaultArgs<ExtArgs>
@@ -23002,6 +23017,7 @@ export namespace Prisma {
       status: $Enums.SubscriptionStatus
       paymentMethod: string
       isProcessing: boolean
+      planPrice: Prisma.Decimal
       shippingAddress: string
       renewalDate: Date | null
       createdAt: Date
@@ -23440,6 +23456,7 @@ export namespace Prisma {
     readonly status: FieldRef<"Subscription", 'SubscriptionStatus'>
     readonly paymentMethod: FieldRef<"Subscription", 'String'>
     readonly isProcessing: FieldRef<"Subscription", 'Boolean'>
+    readonly planPrice: FieldRef<"Subscription", 'Decimal'>
     readonly shippingAddress: FieldRef<"Subscription", 'String'>
     readonly renewalDate: FieldRef<"Subscription", 'DateTime'>
     readonly createdAt: FieldRef<"Subscription", 'DateTime'>
@@ -29907,6 +29924,7 @@ export namespace Prisma {
     status: 'status',
     paymentMethod: 'paymentMethod',
     isProcessing: 'isProcessing',
+    planPrice: 'planPrice',
     shippingAddress: 'shippingAddress',
     renewalDate: 'renewalDate',
     createdAt: 'createdAt',
@@ -31545,6 +31563,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFilter<"Subscription"> | $Enums.SubscriptionStatus
     paymentMethod?: StringFilter<"Subscription"> | string
     isProcessing?: BoolFilter<"Subscription"> | boolean
+    planPrice?: DecimalFilter<"Subscription"> | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFilter<"Subscription"> | string
     renewalDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
@@ -31563,6 +31582,7 @@ export namespace Prisma {
     status?: SortOrder
     paymentMethod?: SortOrder
     isProcessing?: SortOrder
+    planPrice?: SortOrder
     shippingAddress?: SortOrder
     renewalDate?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -31584,6 +31604,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFilter<"Subscription"> | $Enums.SubscriptionStatus
     paymentMethod?: StringFilter<"Subscription"> | string
     isProcessing?: BoolFilter<"Subscription"> | boolean
+    planPrice?: DecimalFilter<"Subscription"> | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFilter<"Subscription"> | string
     renewalDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
@@ -31602,6 +31623,7 @@ export namespace Prisma {
     status?: SortOrder
     paymentMethod?: SortOrder
     isProcessing?: SortOrder
+    planPrice?: SortOrder
     shippingAddress?: SortOrder
     renewalDate?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -31625,6 +31647,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusWithAggregatesFilter<"Subscription"> | $Enums.SubscriptionStatus
     paymentMethod?: StringWithAggregatesFilter<"Subscription"> | string
     isProcessing?: BoolWithAggregatesFilter<"Subscription"> | boolean
+    planPrice?: DecimalWithAggregatesFilter<"Subscription"> | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringWithAggregatesFilter<"Subscription"> | string
     renewalDate?: DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Subscription"> | Date | string
@@ -33315,6 +33338,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus
     paymentMethod: string
     isProcessing?: boolean
+    planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
     createdAt?: Date | string
@@ -33331,6 +33355,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus
     paymentMethod: string
     isProcessing?: boolean
+    planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
     createdAt?: Date | string
@@ -33347,6 +33372,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
     paymentMethod?: StringFieldUpdateOperationsInput | string
     isProcessing?: BoolFieldUpdateOperationsInput | boolean
+    planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33363,6 +33389,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
     paymentMethod?: StringFieldUpdateOperationsInput | string
     isProcessing?: BoolFieldUpdateOperationsInput | boolean
+    planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33379,6 +33406,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus
     paymentMethod: string
     isProcessing?: boolean
+    planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
     createdAt?: Date | string
@@ -33394,6 +33422,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
     paymentMethod?: StringFieldUpdateOperationsInput | string
     isProcessing?: BoolFieldUpdateOperationsInput | boolean
+    planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33407,6 +33436,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
     paymentMethod?: StringFieldUpdateOperationsInput | string
     isProcessing?: BoolFieldUpdateOperationsInput | boolean
+    planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35179,6 +35209,7 @@ export namespace Prisma {
     status?: SortOrder
     paymentMethod?: SortOrder
     isProcessing?: SortOrder
+    planPrice?: SortOrder
     shippingAddress?: SortOrder
     renewalDate?: SortOrder
     createdAt?: SortOrder
@@ -35189,6 +35220,7 @@ export namespace Prisma {
 
   export type SubscriptionAvgOrderByAggregateInput = {
     subscriptionId?: SortOrder
+    planPrice?: SortOrder
     customerId?: SortOrder
     planId?: SortOrder
   }
@@ -35200,6 +35232,7 @@ export namespace Prisma {
     status?: SortOrder
     paymentMethod?: SortOrder
     isProcessing?: SortOrder
+    planPrice?: SortOrder
     shippingAddress?: SortOrder
     renewalDate?: SortOrder
     createdAt?: SortOrder
@@ -35215,6 +35248,7 @@ export namespace Prisma {
     status?: SortOrder
     paymentMethod?: SortOrder
     isProcessing?: SortOrder
+    planPrice?: SortOrder
     shippingAddress?: SortOrder
     renewalDate?: SortOrder
     createdAt?: SortOrder
@@ -35225,6 +35259,7 @@ export namespace Prisma {
 
   export type SubscriptionSumOrderByAggregateInput = {
     subscriptionId?: SortOrder
+    planPrice?: SortOrder
     customerId?: SortOrder
     planId?: SortOrder
   }
@@ -38391,6 +38426,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus
     paymentMethod: string
     isProcessing?: boolean
+    planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
     createdAt?: Date | string
@@ -38406,6 +38442,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus
     paymentMethod: string
     isProcessing?: boolean
+    planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
     createdAt?: Date | string
@@ -38559,6 +38596,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFilter<"Subscription"> | $Enums.SubscriptionStatus
     paymentMethod?: StringFilter<"Subscription"> | string
     isProcessing?: BoolFilter<"Subscription"> | boolean
+    planPrice?: DecimalFilter<"Subscription"> | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFilter<"Subscription"> | string
     renewalDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
@@ -41453,6 +41491,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus
     paymentMethod: string
     isProcessing?: boolean
+    planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
     createdAt?: Date | string
@@ -41468,6 +41507,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus
     paymentMethod: string
     isProcessing?: boolean
+    planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
     createdAt?: Date | string
@@ -41568,6 +41608,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus
     paymentMethod: string
     isProcessing?: boolean
+    planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
     createdAt?: Date | string
@@ -41583,6 +41624,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus
     paymentMethod: string
     isProcessing?: boolean
+    planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
     createdAt?: Date | string
@@ -41661,6 +41703,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
     paymentMethod?: StringFieldUpdateOperationsInput | string
     isProcessing?: BoolFieldUpdateOperationsInput | boolean
+    planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41676,6 +41719,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
     paymentMethod?: StringFieldUpdateOperationsInput | string
     isProcessing?: BoolFieldUpdateOperationsInput | boolean
+    planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -42323,6 +42367,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus
     paymentMethod: string
     isProcessing?: boolean
+    planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
     createdAt?: Date | string
@@ -42394,6 +42439,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
     paymentMethod?: StringFieldUpdateOperationsInput | string
     isProcessing?: BoolFieldUpdateOperationsInput | boolean
+    planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -42409,6 +42455,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
     paymentMethod?: StringFieldUpdateOperationsInput | string
     isProcessing?: BoolFieldUpdateOperationsInput | boolean
+    planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -42424,6 +42471,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
     paymentMethod?: StringFieldUpdateOperationsInput | string
     isProcessing?: BoolFieldUpdateOperationsInput | boolean
+    planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43416,6 +43464,7 @@ export namespace Prisma {
     status: $Enums.SubscriptionStatus
     paymentMethod: string
     isProcessing?: boolean
+    planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
     createdAt?: Date | string
@@ -43430,6 +43479,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
     paymentMethod?: StringFieldUpdateOperationsInput | string
     isProcessing?: BoolFieldUpdateOperationsInput | boolean
+    planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43445,6 +43495,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
     paymentMethod?: StringFieldUpdateOperationsInput | string
     isProcessing?: BoolFieldUpdateOperationsInput | boolean
+    planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43460,6 +43511,7 @@ export namespace Prisma {
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
     paymentMethod?: StringFieldUpdateOperationsInput | string
     isProcessing?: BoolFieldUpdateOperationsInput | boolean
+    planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
