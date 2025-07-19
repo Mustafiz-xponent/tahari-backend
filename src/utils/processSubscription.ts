@@ -44,7 +44,7 @@ export type CustomerWithWallet = {
 };
 
 //  Buffer days for each frequency
-const defaultBufferConfig = { WEEKLY: 2, MONTHLY: 2 }; // 2 day buffer before delivery
+const defaultBufferConfig = { WEEKLY: 2, MONTHLY: 2 }; // 2 day buffer before delivery date
 
 // Calculate renewal date (always fixed: today + 7 or +30)
 export const getNextRenewalDate = (
@@ -118,7 +118,10 @@ export const hasInsufficientWalletBalance = (
 };
 
 export const canLockNextPayment = (wallet: any, price: Decimal): boolean => {
-  return wallet.balance.toNumber() - price.toNumber() >= price.toNumber();
+  return (
+    wallet.balance.toNumber() - wallet.lockedBalance.toNumber() >=
+    price.toNumber()
+  );
 };
 
 const createNotification = async (message: string, receiverId: bigint) => {
@@ -173,7 +176,7 @@ const pauseSubscription = async (
     data: { status: "PAUSED", isProcessing: false },
   });
 };
-const updateProductStock = async (
+export const updateProductStock = async (
   product: Product,
   tx: Prisma.TransactionClient,
   orderId: bigint
@@ -243,7 +246,7 @@ export const createOrderWithItems = async (
 
   return order;
 };
-const createSubscriptionDelivery = async (
+export const createSubscriptionDelivery = async (
   subscription: SubscriptionWithRelations,
   order: Order,
   today: Date,

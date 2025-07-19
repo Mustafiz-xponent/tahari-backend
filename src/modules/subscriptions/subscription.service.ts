@@ -11,9 +11,15 @@ import {
 } from "@/modules/subscriptions/subscription.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import {
+  canLockNextPayment,
   createOrderWithItems,
+  createSubscriptionDelivery,
   getNextRenewalDate,
+  hasInsufficientStock,
+  SubscriptionWithRelations,
+  updateProductStock,
 } from "@/utils/processSubscription";
+
 /**
  * Create a new subscription
  */
@@ -36,11 +42,8 @@ export async function createSubscription(
         );
       }
       // check stock availability
-      const requiredStock = plan.product.packageSize * 1;
-      if (requiredStock > plan.product.stockQuantity) {
-        throw new Error(
-          `Insufficient stock for product ${plan.product.name}. Available: ${plan.product.stockQuantity}, Required: ${requiredStock}`
-        );
+      if (hasInsufficientStock(plan.product, 1)) {
+        throw new Error(`Insufficient stock`);
       }
       // Find customer & validate
       const customer = await tx.customer.findUnique({
@@ -48,46 +51,6 @@ export async function createSubscription(
         include: { wallet: true },
       });
       if (!customer) throw new Error("Customer not found");
-
-      //  Handle payment method
-      if (data.paymentMethod === "WALLET") {
-        if (!customer.wallet) {
-          throw new Error(
-            "Customer wallet not found. Please create wallet first"
-          );
-        }
-        const availableBalance =
-          customer.wallet.balance.toNumber() -
-          customer.wallet.lockedBalance.toNumber();
-
-        if (availableBalance < plan.price.toNumber()) {
-          throw new Error("Insufficient wallet balance to lock funds.");
-        }
-
-        // Lock funds
-        await tx.wallet.update({
-          where: { walletId: customer.wallet.walletId },
-          data: {
-            lockedBalance: {
-              increment: plan.price,
-            },
-          },
-        });
-
-        // Record wallet transaction for lock
-        await tx.walletTransaction.create({
-          data: {
-            walletId: customer.wallet.walletId,
-            amount: plan.price,
-            transactionType: "PURCHASE",
-            transactionStatus: "PENDING",
-            description: `Initial lock for subscription plan ${data.planId}`,
-          },
-        });
-      } else if (data.paymentMethod !== "COD") {
-        throw new Error("Invalid payment method. Must be WALLET or COD.");
-      }
-
       //  Create subscription
       const now = new Date();
       const frequency = plan.frequency;
@@ -105,7 +68,107 @@ export async function createSubscription(
           planId: data.planId,
           shippingAddress: data.shippingAddress,
         },
+        include: {
+          customer: { include: { wallet: true } },
+          subscriptionPlan: { include: { product: true } },
+        },
       });
+      //  Handle payment method
+      if (data.paymentMethod === "WALLET") {
+        if (!customer.wallet) {
+          throw new Error(
+            "Customer wallet not found. Please create wallet first"
+          );
+        }
+
+        if (!canLockNextPayment(customer.wallet, plan.price)) {
+          throw new Error("Insufficient wallet balance to lock funds.");
+        }
+
+        // Lock funds
+        await tx.wallet.update({
+          where: { walletId: customer.wallet.walletId },
+          data: {
+            lockedBalance: {
+              increment: plan.price,
+            },
+          },
+        });
+
+        // Record wallet transaction for lock
+        const walletTransaction = await tx.walletTransaction.create({
+          data: {
+            walletId: customer.wallet.walletId,
+            amount: plan.price,
+            transactionType: "PURCHASE",
+            transactionStatus: "PENDING",
+            description: `Initial lock for subscription plan ${data.planId}`,
+          },
+        });
+
+        const order = await createOrderWithItems(
+          subscription,
+          customer,
+          plan.product,
+          plan.price,
+          "WALLET",
+          tx
+        );
+        // Create payment record
+        // await tx.payment.create({
+        //   data: {
+        //     amount: order.totalAmount,
+        //     paymentMethod: "WALLET",
+        //     paymentStatus: "PENDING",
+        //     orderId: order.orderId,
+        //     transactionId: `ORDER_${order.orderId}_${Date.now()}`,
+        //     walletTransactionId: walletTransaction.transactionId,
+        //   },
+        // });
+        // Update product stock
+        await updateProductStock(plan.product, tx, order.orderId);
+        // Create subscription delivery
+        await createSubscriptionDelivery(
+          subscription,
+          order,
+          now,
+          customer,
+          "WALLET",
+          tx
+        );
+      } else if (data.paymentMethod === "COD") {
+        const order = await createOrderWithItems(
+          subscription,
+          customer,
+          plan.product,
+          plan.price,
+          "COD",
+          tx
+        );
+
+        // Create pending payment record
+        await tx.payment.create({
+          data: {
+            amount: order.totalAmount,
+            paymentMethod: "COD",
+            paymentStatus: "PENDING",
+            orderId: order.orderId,
+            transactionId: `ORDER_${order.orderId}_${Date.now()}`,
+          },
+        });
+
+        // Create subscription delivery
+        await createSubscriptionDelivery(
+          subscription,
+          order,
+          now,
+          customer,
+          "COD",
+          tx
+        );
+      } else {
+        throw new Error("Invalid payment method. Must be WALLET or COD.");
+      }
 
       return subscription;
     });
