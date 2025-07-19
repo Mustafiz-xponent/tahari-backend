@@ -95,17 +95,6 @@ export async function createSubscription(
           },
         });
 
-        // Record wallet transaction for lock
-        const walletTransaction = await tx.walletTransaction.create({
-          data: {
-            walletId: customer.wallet.walletId,
-            amount: plan.price,
-            transactionType: "PURCHASE",
-            transactionStatus: "PENDING",
-            description: `Initial lock for subscription plan ${data.planId}`,
-          },
-        });
-
         const order = await createOrderWithItems(
           subscription,
           customer,
@@ -114,17 +103,28 @@ export async function createSubscription(
           "WALLET",
           tx
         );
+        // Record wallet transaction for lock
+        const walletTransaction = await tx.walletTransaction.create({
+          data: {
+            walletId: customer.wallet.walletId,
+            amount: plan.price,
+            transactionType: "PURCHASE",
+            transactionStatus: "PENDING",
+            orderId: order.orderId,
+            description: `LOCK_FUNDS_FOR_SUBSCRIPTION:#${subscription.subscriptionId}_PLAN:#${subscription.subscriptionPlan.planId}_ORDER:#${order.orderId}`, // Required description for further processing
+          },
+        });
         // Create payment record
-        // await tx.payment.create({
-        //   data: {
-        //     amount: order.totalAmount,
-        //     paymentMethod: "WALLET",
-        //     paymentStatus: "PENDING",
-        //     orderId: order.orderId,
-        //     transactionId: `ORDER_${order.orderId}_${Date.now()}`,
-        //     walletTransactionId: walletTransaction.transactionId,
-        //   },
-        // });
+        await tx.payment.create({
+          data: {
+            amount: order.totalAmount,
+            paymentMethod: "WALLET",
+            paymentStatus: "PENDING",
+            orderId: order.orderId,
+            transactionId: `ORDER_${order.orderId}_${Date.now()}`,
+            walletTransactionId: walletTransaction.transactionId,
+          },
+        });
         // Update product stock
         await updateProductStock(plan.product, tx, order.orderId);
         // Create subscription delivery

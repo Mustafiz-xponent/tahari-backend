@@ -31832,6 +31832,7 @@ export namespace Prisma {
 
   export type PaymentWhereUniqueInput = Prisma.AtLeast<{
     paymentId?: bigint | number
+    orderId?: bigint | number
     AND?: PaymentWhereInput | PaymentWhereInput[]
     OR?: PaymentWhereInput[]
     NOT?: PaymentWhereInput | PaymentWhereInput[]
@@ -31840,11 +31841,10 @@ export namespace Prisma {
     paymentStatus?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
     transactionId?: StringNullableFilter<"Payment"> | string | null
     createdAt?: DateTimeFilter<"Payment"> | Date | string
-    orderId?: BigIntFilter<"Payment"> | bigint | number
     walletTransactionId?: BigIntNullableFilter<"Payment"> | bigint | number | null
     order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
     walletTransaction?: XOR<WalletTransactionNullableScalarRelationFilter, WalletTransactionWhereInput> | null
-  }, "paymentId">
+  }, "paymentId" | "orderId">
 
   export type PaymentOrderByWithAggregationInput = {
     paymentId?: SortOrder

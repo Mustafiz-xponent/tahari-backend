@@ -26,6 +26,7 @@ export type SubscriptionWithRelations = {
   shippingAddress: string;
   customer: CustomerWithWallet;
   subscriptionPlan: {
+    planId: bigint;
     price: Decimal;
     frequency: SubscriptionPlanType;
     productId: bigint;
@@ -274,6 +275,21 @@ export const createSubscriptionDelivery = async (
   }
   await createNotification(message, customer.userId);
 };
+const getProduct = async (
+  subscription: SubscriptionWithRelations,
+  tx: Prisma.TransactionClient
+) => {
+  const product = await tx.product.findUnique({
+    where: { productId: subscription.subscriptionPlan.productId },
+  });
+
+  if (!product) {
+    throw new Error(
+      `Product not found for subscription ${subscription.subscriptionId}`
+    );
+  }
+  return product;
+};
 const handleRenewalWalletPayment = async (
   subscription: SubscriptionWithRelations,
   customer: CustomerWithWallet,
@@ -284,6 +300,13 @@ const handleRenewalWalletPayment = async (
   const wallet = customer.wallet!;
   const frequency = subscription.subscriptionPlan.frequency;
   const nextRenewal = getNextRenewalDate(today, frequency);
+
+  const product = await getProduct(subscription, tx);
+
+  if (hasInsufficientStock(product)) {
+    await pauseAndNotifyInsufficientStock(subscription, customer, tx);
+    return;
+  }
 
   if (canLockNextPayment(wallet, price)) {
     await tx.wallet.update({
@@ -299,6 +322,51 @@ const handleRenewalWalletPayment = async (
         isProcessing: false,
       },
     });
+
+    // Create order and related records
+    const order = await createOrderWithItems(
+      subscription,
+      customer,
+      product,
+      price,
+      "WALLET",
+      tx
+    );
+    // Create wallet transaction
+    const walletTransaction = await tx.walletTransaction.create({
+      data: {
+        amount: price,
+        transactionType: "PURCHASE",
+        transactionStatus: "PENDING",
+        description: `LOCK_FUNDS_FOR_SUBSCRIPTION:#${subscription.subscriptionId}_PLAN:#${subscription.subscriptionPlan.planId}_ORDER:#${order.orderId}`, // Required description for further processing
+        walletId: wallet.walletId,
+        orderId: order.orderId,
+      },
+    });
+    // Create payment record
+    await tx.payment.create({
+      data: {
+        amount: order.totalAmount,
+        paymentMethod: "WALLET",
+        paymentStatus: "PENDING",
+        orderId: order.orderId,
+        transactionId: `ORDER_${order.orderId}_${Date.now()}`,
+        walletTransactionId: walletTransaction.transactionId,
+      },
+    });
+
+    // Update product stock
+    await updateProductStock(product, tx, order.orderId);
+
+    // Create subscription delivery
+    await createSubscriptionDelivery(
+      subscription,
+      order,
+      today,
+      customer,
+      "WALLET",
+      tx
+    );
     // Notify customer
     const message = `আপনার সাবস্ক্রিপশন সফলভাবে রিনিউ হয়েছে।`;
     await createNotification(message, customer.userId);
@@ -333,86 +401,58 @@ export const handleWalletPayment = async (
     return;
   }
 
-  await prisma.$transaction(async (tx) => {
-    const product = await tx.product.findUnique({
-      where: { productId: subscription.subscriptionPlan.productId },
-    });
-
-    if (!product) {
-      throw new Error(
-        `Product not found for subscription ${subscription.subscriptionId}`
-      );
-    }
-
-    if (hasInsufficientStock(product)) {
-      await pauseAndNotifyInsufficientStock(subscription, customer, tx);
-      return;
-    }
-
+  try {
     const wallet = customer.wallet!;
     if (wallet.lockedBalance < price || wallet.balance < price) {
       throw new Error(
         `Wallet deduction error for customer ${customer.customerId}`
       );
     }
-
-    // Update wallet balance
-    await tx.wallet.update({
-      where: { walletId: Number(wallet.walletId) },
-      data: {
-        lockedBalance: { decrement: price },
-        balance: { decrement: price },
-      },
+    await prisma.$transaction(async (tx) => {
+      // deduct wallet balance for previous cycle
+      await tx.wallet.update({
+        where: { walletId: Number(wallet.walletId) },
+        data: {
+          lockedBalance: { decrement: price },
+          balance: { decrement: price },
+        },
+      });
+      // find previous wallet transaction
+      const walletTransaction = await tx.walletTransaction.findFirst({
+        where: {
+          walletId: wallet.walletId,
+          transactionType: "PURCHASE",
+          transactionStatus: "PENDING",
+          description: {
+            contains: `LOCK_FUNDS_FOR_SUBSCRIPTION:#${subscription.subscriptionId}`,
+          },
+        },
+      });
+      if (!walletTransaction) {
+        throw new Error("Wallet transaction not found");
+      }
+      // update wallet transaction
+      await tx.walletTransaction.update({
+        where: {
+          transactionId: walletTransaction?.transactionId,
+        },
+        data: {
+          transactionStatus: "COMPLETED",
+          description: `Payment completed for order #${walletTransaction?.orderId}`,
+        },
+      });
+      // update payment record
+      await tx.payment.update({
+        where: {
+          orderId: Number(walletTransaction.orderId),
+        },
+        data: {
+          paymentStatus: "COMPLETED",
+        },
+      });
     });
 
-    // Create wallet transaction
-    const walletTransaction = await tx.walletTransaction.create({
-      data: {
-        amount: price,
-        transactionType: "PURCHASE",
-        transactionStatus: "COMPLETED",
-        description: `Wallet payment for subscription ${subscription.subscriptionId}`,
-        walletId: Number(wallet.walletId),
-      },
-    });
-
-    // Create order and related records
-    const order = await createOrderWithItems(
-      subscription,
-      customer,
-      product,
-      price,
-      "WALLET",
-      tx
-    );
-
-    // Create payment record
-    await tx.payment.create({
-      data: {
-        amount: order.totalAmount,
-        paymentMethod: "WALLET",
-        paymentStatus: "COMPLETED",
-        orderId: order.orderId,
-        transactionId: `ORDER_${order.orderId}_${Date.now()}`,
-        walletTransactionId: walletTransaction.transactionId,
-      },
-    });
-
-    // Update product stock
-    await updateProductStock(product, tx, order.orderId);
-
-    // Create subscription delivery
-    await createSubscriptionDelivery(
-      subscription,
-      order,
-      today,
-      customer,
-      "WALLET",
-      tx
-    );
-  });
-  // Handle next renewal payment cycle
-  try {
+    // Handle next renewal payment cycle
     await prisma.$transaction(async (tx) => {
       await handleRenewalWalletPayment(
         subscription,
@@ -423,7 +463,7 @@ export const handleWalletPayment = async (
       );
     });
   } catch (err) {
-    logger.error("Error during subscription renewal via wallet");
+    logger.error("Error during wallet payment:", err);
   }
 };
 // Main function to handle COD payment

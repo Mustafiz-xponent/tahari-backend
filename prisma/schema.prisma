@@ -479,7 +479,7 @@ model Payment {
   paymentStatus       PaymentStatus
   transactionId       String?
   createdAt           DateTime           @default(now())
-  orderId             BigInt
+  orderId             BigInt             @unique
   walletTransactionId BigInt?
   order               Order              @relation(fields: [orderId], references: [orderId])
   walletTransaction   WalletTransaction? @relation(fields: [walletTransactionId], references: [transactionId])

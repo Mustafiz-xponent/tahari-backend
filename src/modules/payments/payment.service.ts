@@ -92,7 +92,7 @@ export async function handleSSLCommerzSuccess(
       // Update payment and order in transaction
       return await prisma.$transaction(async (tx) => {
         // Check payment status
-        const payment = await tx.payment.findFirst({
+        const payment = await tx.payment.findUnique({
           where: {
             orderId: Number(orderId),
             transactionId: tranId,
@@ -103,7 +103,7 @@ export async function handleSSLCommerzSuccess(
         if (payment.paymentStatus === "COMPLETED") {
           return {
             success: true,
-            message: "Payment was already processed successfully",
+            message: "Payment was already completed successfully",
           };
         }
 
@@ -219,7 +219,7 @@ export async function getOrderPaymentStatus(tranId: string): Promise<{
 
     const orderId = Number(orderIdMatch[1]);
 
-    const payment = await prisma.payment.findFirst({
+    const payment = await prisma.payment.findUnique({
       where: {
         orderId,
         transactionId: tranId,

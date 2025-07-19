@@ -285,18 +285,18 @@ export async function updateOrder(
           });
         }
         // update payment record
-        await tx.payment.updateMany({
+        await tx.payment.update({
           where: { orderId: Number(orderId), paymentMethod: "COD" },
           data: {
-            paymentStatus: "PENDING",
+            paymentStatus: "COMPLETED",
           },
         });
         // Also track the order update
         await tx.orderTracking.create({
           data: {
             orderId: Number(orderId),
-            status: "CONFIRMED",
-            description: "Order confirmed and payment completed via COD",
+            status: "DELIVERED",
+            description: "Order delivered and payment completed via COD",
           },
         });
       }

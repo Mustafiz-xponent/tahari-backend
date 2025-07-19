@@ -59,6 +59,7 @@ const fetchSubscriptionBatch = async (
       },
       subscriptionPlan: {
         select: {
+          planId: true,
           price: true,
           frequency: true,
           productId: true,
