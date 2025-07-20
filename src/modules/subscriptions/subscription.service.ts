@@ -75,9 +75,7 @@ export async function createSubscription(
       //  Handle payment method
       if (data.paymentMethod === "WALLET") {
         if (!customer.wallet) {
-          throw new Error(
-            "Customer wallet not found. Please create wallet first"
-          );
+          throw new Error("Wallet not found. Please create wallet first");
         }
 
         if (!canLockNextPayment(customer.wallet, plan.price)) {
@@ -110,7 +108,7 @@ export async function createSubscription(
             transactionType: "PURCHASE",
             transactionStatus: "PENDING",
             orderId: order.orderId,
-            description: `LOCK_FUNDS_FOR_SUBSCRIPTION:#${subscription.subscriptionId}_PLAN:#${subscription.subscriptionPlan.planId}_ORDER:#${order.orderId}`, // Required description for further processing
+            description: `LOCK_FUNDS_FOR_SUBSCRIPTION:#${subscription.subscriptionId}_PLAN:#${subscription.subscriptionPlan.planId}_ORDER:#${order.orderId}`, // Required description for further processing!!!
           },
         });
         // Create payment record

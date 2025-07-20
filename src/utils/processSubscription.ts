@@ -474,16 +474,7 @@ export const handleCODPayment = async (
   const { customer, subscriptionPlan, planPrice: price } = subscription;
 
   await prisma.$transaction(async (tx) => {
-    const product = await tx.product.findUnique({
-      where: { productId: subscription.subscriptionPlan.productId },
-    });
-
-    if (!product) {
-      throw new Error(
-        `Product not found for subscription ${subscription.subscriptionId}`
-      );
-    }
-
+    const product = await getProduct(subscription, tx);
     if (hasInsufficientStock(product)) {
       await pauseAndNotifyInsufficientStock(subscription, customer, tx);
       return;
