@@ -5,6 +5,7 @@ import {
   SubscriptionWithRelations,
   handleWalletPayment,
   handleCODPayment,
+  updateSubscriptionProcessing,
 } from "@/utils/processSubscription";
 
 type ProcessingResult = {
@@ -22,15 +23,6 @@ const CONFIG = {
   MAX_RETRIES: 3,
   CONCURRENT_BATCHES: 5, // Process multiple batches concurrently
 } as const;
-
-const updateSubscriptionProcessing = (
-  subscriptionId: bigint,
-  isProcessing: boolean
-) =>
-  prisma.subscription.update({
-    where: { subscriptionId },
-    data: { isProcessing },
-  });
 
 // Batch processing functions
 const fetchSubscriptionBatch = async (

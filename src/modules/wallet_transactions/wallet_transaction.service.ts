@@ -113,9 +113,7 @@ export async function getCustomerWalletTransactions({
       where: { userId },
       include: { wallet: true },
     });
-    if (!customer) {
-      throw new Error("Customer not found");
-    }
+    if (!customer) throw new Error("Customer not found");
 
     const { page, limit, skip, sort } = paginationParams;
     const { transactionStatus, transactionType } = filterParams;

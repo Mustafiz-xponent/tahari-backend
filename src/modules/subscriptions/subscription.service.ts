@@ -196,12 +196,45 @@ export async function getSubscriptionById(
     const subscription = await prisma.subscription.findUnique({
       where: { subscriptionId: Number(subscriptionId) },
     });
+
     return subscription;
   } catch (error) {
     throw new Error(`Failed to fetch subscription: ${getErrorMessage(error)}`);
   }
 }
+/**
+ * Retrieve a subscription by its ID
+ */
+export async function getUserSubscriptions(
+  userId: BigInt,
+  paginationParams: { page: number; limit: number; skip: number; sort: string }
+): Promise<any> {
+  try {
+    const { page, limit, skip, sort } = paginationParams;
+    const customer = await prisma.customer.findUnique({
+      where: { userId: Number(userId) },
+    });
+    if (!customer) throw new Error("Customer not found");
 
+    const subscriptions = await prisma.subscription.findMany({
+      where: { customerId: customer.customerId },
+      take: limit,
+      skip: skip,
+      orderBy: {
+        createdAt: sort === "asc" ? "asc" : "desc",
+      },
+    });
+
+    return {
+      subscriptions,
+      currentPage: page,
+      totalPages: Math.ceil(subscriptions.length / limit),
+      totalCount: subscriptions.length,
+    };
+  } catch (error) {
+    throw new Error(`Failed to fetch subscription: ${getErrorMessage(error)}`);
+  }
+}
 /**
  * Update a subscription by its ID
  */

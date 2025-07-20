@@ -204,6 +204,16 @@ export const updateProductStock = async (
     },
   });
 };
+export const updateSubscriptionProcessing = async (
+  subscriptionId: bigint,
+  isProcessing: boolean
+) => {
+  await prisma.subscription.update({
+    where: { subscriptionId },
+    data: { isProcessing },
+  });
+};
+
 export const createOrderWithItems = async (
   subscription: SubscriptionWithRelations,
   customer: CustomerWithWallet,
@@ -462,6 +472,7 @@ export const handleWalletPayment = async (
       );
     });
   } catch (err) {
+    await updateSubscriptionProcessing(subscription.subscriptionId, false);
     console.error(err);
     logger.error("Error during wallet payment:", err);
   }
