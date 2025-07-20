@@ -31760,6 +31760,7 @@ export namespace Prisma {
 
   export type SubscriptionDeliveryWhereUniqueInput = Prisma.AtLeast<{
     deliveryId?: bigint | number
+    orderId?: bigint | number
     AND?: SubscriptionDeliveryWhereInput | SubscriptionDeliveryWhereInput[]
     OR?: SubscriptionDeliveryWhereInput[]
     NOT?: SubscriptionDeliveryWhereInput | SubscriptionDeliveryWhereInput[]
@@ -31768,10 +31769,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"SubscriptionDelivery"> | Date | string
     updatedAt?: DateTimeFilter<"SubscriptionDelivery"> | Date | string
     subscriptionId?: BigIntFilter<"SubscriptionDelivery"> | bigint | number
-    orderId?: BigIntFilter<"SubscriptionDelivery"> | bigint | number
     subscription?: XOR<SubscriptionScalarRelationFilter, SubscriptionWhereInput>
     order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
-  }, "deliveryId">
+  }, "deliveryId" | "orderId">
 
   export type SubscriptionDeliveryOrderByWithAggregationInput = {
     deliveryId?: SortOrder

@@ -156,9 +156,7 @@ export async function updateOrder(
         const customer = await tx.customer.findUnique({
           where: { customerId: data.customerId },
         });
-        if (!customer) {
-          throw new Error("Customer not found");
-        }
+        if (!customer) throw new Error("Customer not found");
       }
 
       // Get current order status
@@ -170,6 +168,8 @@ export async function updateOrder(
           paymentMethod: true,
           orderItems: true,
           customer: true,
+          isPreorder: true,
+          isSubscription: true,
         },
       });
 
@@ -262,28 +262,29 @@ export async function updateOrder(
         data.paymentStatus === "COMPLETED" &&
         currentOrder.paymentMethod === "COD"
       ) {
-        for (const item of currentOrder.orderItems) {
-          // Decrement stock
-          await tx.product.update({
-            where: { productId: item.productId },
-            data: {
-              stockQuantity: {
-                decrement: item.quantity * item.packageSize,
+        await Promise.all(
+          currentOrder.orderItems.map(async (item) => {
+            await tx.product.update({
+              where: { productId: item.productId },
+              data: {
+                stockQuantity: {
+                  decrement: item.quantity * item.packageSize,
+                },
               },
-            },
-          });
+            });
 
-          // Create stock transaction
-          await tx.stockTransaction.create({
-            data: {
-              quantity: item.quantity * item.packageSize,
-              transactionType: "OUT",
-              productId: item.productId,
-              orderId: Number(orderId),
-              description: `Stock reduced for Order #${orderId}`,
-            },
-          });
-        }
+            await tx.stockTransaction.create({
+              data: {
+                quantity: item.quantity * item.packageSize,
+                transactionType: "OUT",
+                productId: item.productId,
+                orderId: Number(orderId),
+                description: `Stock reduced for Order #${orderId}`,
+              },
+            });
+          })
+        );
+
         // update payment record
         await tx.payment.update({
           where: { orderId: Number(orderId), paymentMethod: "COD" },
@@ -291,12 +292,12 @@ export async function updateOrder(
             paymentStatus: "COMPLETED",
           },
         });
-        // Also track the order update
-        await tx.orderTracking.create({
+      }
+      if (currentOrder.isSubscription) {
+        await tx.subscriptionDelivery.update({
+          where: { orderId: Number(orderId) },
           data: {
-            orderId: Number(orderId),
-            status: "DELIVERED",
-            description: "Order delivered and payment completed via COD",
+            status: data.status,
           },
         });
       }
