@@ -173,9 +173,7 @@ export async function updateOrder(
         },
       });
 
-      if (!currentOrder) {
-        throw new Error("Order not found");
-      }
+      if (!currentOrder) throw new Error("Order not found");
 
       // Update order
       const updatedOrder = await tx.order.update({

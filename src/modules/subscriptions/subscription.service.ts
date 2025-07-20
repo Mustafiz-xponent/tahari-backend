@@ -203,7 +203,7 @@ export async function getSubscriptionById(
   }
 }
 /**
- * Retrieve a subscription by its ID
+ * Retrieve customer subscriptions
  */
 export async function getUserSubscriptions(
   userId: BigInt,

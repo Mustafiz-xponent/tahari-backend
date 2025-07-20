@@ -19,13 +19,34 @@ router.post(
   validator(zCreateSubscriptionDto),
   SubscriptionController.createSubscription
 );
+// Route to get user subscriptions
 router.get(
   "/user",
   authMiddleware,
   authorizeRoles("CUSTOMER"),
   SubscriptionController.getUserSubscriptions
 );
-
+// Route to pause a subscription
+router.patch(
+  "/pause/:id",
+  authMiddleware,
+  authorizeRoles("CUSTOMER")
+  // SubscriptionController.pauseSubscription
+);
+// Route to resume a subscription
+// router.patch(
+//   "/resume/:id",
+//   authMiddleware,
+//   authorizeRoles("CUSTOMER"),
+//   SubscriptionController.resumeSubscription
+// );
+// Route to cancel a subscription
+// router.patch(
+//   "/cancel/:id",
+//   authMiddleware,
+//   authorizeRoles("CUSTOMER"),
+//   SubscriptionController.cancelSubscription
+// );
 // Route to get all subscriptions
 router.get(
   "/",
