@@ -115,7 +115,10 @@ export const hasInsufficientWalletBalance = (
   wallet: any,
   price: Decimal
 ): boolean => {
-  return wallet.lockedBalance.toNumber() < price.toNumber();
+  return (
+    wallet.balance.toNumber() < price.toNumber() ||
+    wallet.lockedBalance.toNumber() < price.toNumber()
+  );
 };
 
 export const canLockNextPayment = (wallet: any, price: Decimal): boolean => {
@@ -147,7 +150,7 @@ const pauseAndNotifyInsufficientBalance = async (
   });
 
   logger.warn(
-    `Subscription ${subscription.subscriptionId} paused due to insufficient locked balance.`
+    `Subscription ${subscription.subscriptionId} paused due to insufficient balance.`
   );
 };
 
@@ -403,11 +406,7 @@ export const handleWalletPayment = async (
 
   try {
     const wallet = customer.wallet!;
-    if (wallet.lockedBalance < price || wallet.balance < price) {
-      throw new Error(
-        `Wallet deduction error for customer ${customer.customerId}`
-      );
-    }
+
     await prisma.$transaction(async (tx) => {
       // deduct wallet balance for previous cycle
       await tx.wallet.update({
@@ -463,6 +462,7 @@ export const handleWalletPayment = async (
       );
     });
   } catch (err) {
+    console.error(err);
     logger.error("Error during wallet payment:", err);
   }
 };
