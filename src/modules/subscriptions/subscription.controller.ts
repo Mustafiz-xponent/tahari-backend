@@ -12,6 +12,7 @@ import {
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import httpStatus from "http-status";
+import { SubscriptionStatus } from "@/generated/prisma/client";
 
 const subscriptionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Subscription ID must be a positive integer",
@@ -20,6 +21,7 @@ interface IQueryParams {
   page?: string;
   limit?: string;
   sort?: "asc" | "desc";
+  status?: SubscriptionStatus;
 }
 /**
  * Create a new subscription
@@ -100,10 +102,12 @@ export const getUserSubscriptions = async (
     ); // Max 100 items per page
     const skip = (page - 1) * limit;
     const sort = req.query.sort === "asc" ? "asc" : "desc";
+    const status = req.query.status?.toUpperCase() as SubscriptionStatus;
     const paginationParams = { page, limit, skip, sort };
     const result = await subscriptionService.getUserSubscriptions(
       userId,
-      paginationParams
+      paginationParams,
+      status
     );
 
     res.json({

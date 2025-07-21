@@ -4,7 +4,7 @@
  */
 
 import prisma from "@/prisma-client/prismaClient";
-import { Subscription } from "@/generated/prisma/client";
+import { Subscription, SubscriptionStatus } from "@/generated/prisma/client";
 import {
   CreateSubscriptionDto,
   UpdateSubscriptionDto,
@@ -207,7 +207,8 @@ export async function getSubscriptionById(
  */
 export async function getUserSubscriptions(
   userId: BigInt,
-  paginationParams: { page: number; limit: number; skip: number; sort: string }
+  paginationParams: { page: number; limit: number; skip: number; sort: string },
+  status: SubscriptionStatus
 ): Promise<any> {
   try {
     const { page, limit, skip, sort } = paginationParams;
@@ -217,7 +218,7 @@ export async function getUserSubscriptions(
     if (!customer) throw new Error("Customer not found");
 
     const subscriptions = await prisma.subscription.findMany({
-      where: { customerId: customer.customerId },
+      where: { customerId: customer.customerId, ...(status && { status }) },
       take: limit,
       skip: skip,
       orderBy: {
