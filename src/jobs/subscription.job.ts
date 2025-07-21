@@ -18,8 +18,8 @@ type ProcessingResult = {
 const CONFIG = {
   BATCH_SIZE: 100, // Number of subscriptions to process per batch
   TIMEZONE: "Asia/Dhaka",
-  // CRON_SCHEDULE: "0 2 * * *", // Run at 2 AM
-  CRON_SCHEDULE: "* * * * *", // Run at every minute for testing
+  CRON_SCHEDULE: "0 2 * * *", // Run at 2 AM
+  // CRON_SCHEDULE: "* * * * *", // Run at every minute for testing
   MAX_RETRIES: 3,
   CONCURRENT_BATCHES: 5, // Process multiple batches concurrently
 } as const;

@@ -50,6 +50,10 @@ export async function createSubscription(
       include: { wallet: true },
     });
     if (!customer) throw new Error("Customer not found");
+    const isPlanPurchased = await prisma.subscription.findFirst({
+      where: { planId: data.planId, customerId: customer.customerId },
+    });
+    if (isPlanPurchased) throw new Error("Plan already purchased");
     //  Create subscription
     const now = new Date();
     const frequency = plan.frequency;
@@ -290,10 +294,17 @@ export async function pauseSubscription(
       where: { subscriptionId: Number(subscriptionId) },
       include: {
         subscriptionDeliveries: true,
+        subscriptionPlan: true,
         customer: { include: { wallet: true } },
       },
     });
     if (!subscription) throw new Error("Subscription not found");
+    if (
+      subscription.status === "PAUSED" ||
+      subscription.status === "CANCELLED"
+    ) {
+      throw new Error(`Subscription already ${subscription.status}`);
+    }
     const result = await pauseOrCancelSubscription(
       subscription,
       "PAUSED",
@@ -316,15 +327,28 @@ export async function cancelSubscription(
       where: { subscriptionId: Number(subscriptionId) },
       include: {
         subscriptionDeliveries: true,
+        subscriptionPlan: true,
         customer: { include: { wallet: true } },
       },
     });
     if (!subscription) throw new Error("Subscription not found");
-    const result = await pauseOrCancelSubscription(
-      subscription,
-      "CANCELLED",
-      bufferDays
-    );
+    if (subscription.status === "CANCELLED") {
+      throw new Error("Subscription already cancelled");
+    }
+    let result;
+    if (subscription.status === "PAUSED") {
+      result = await prisma.subscription.update({
+        where: { subscriptionId: subscription.subscriptionId },
+        data: { status: "CANCELLED" },
+      });
+    } else {
+      result = await pauseOrCancelSubscription(
+        subscription,
+        "CANCELLED",
+        bufferDays
+      );
+    }
+
     return result;
   } catch (error) {
     throw new Error(`Failed to cancel subscription: ${getErrorMessage(error)}`);

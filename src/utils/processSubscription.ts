@@ -128,12 +128,17 @@ export const canLockNextPayment = (wallet: any, price: Decimal): boolean => {
   );
 };
 
-// TODO: use transaction client here
-const createNotification = async (message: string, receiverId: bigint) => {
-  await notificationService.createNotification({
-    message: message.replace(/\s+/g, " ").trim(),
-    receiverId,
-    type: "SUBSCRIPTION",
+const createNotification = async (
+  message: string,
+  receiverId: bigint,
+  tx: Prisma.TransactionClient
+) => {
+  await tx.notification.create({
+    data: {
+      message: message.replace(/\s+/g, " ").trim(),
+      receiverId,
+      type: "SUBSCRIPTION",
+    },
   });
 };
 // Notification helper functions
@@ -146,7 +151,8 @@ const pauseAndNotifyInsufficientBalance = async (
 
     await createNotification(
       "আপনার সাবস্ক্রিপশন পর্যাপ্ত ওয়ালেট ব্যালেন্সের অভাবে সাময়িকভাবে বন্ধ হয়েছে। অনুগ্রহ করে রিচার্জ করুন।",
-      customer.userId
+      customer.userId,
+      tx
     );
   });
 
@@ -164,7 +170,8 @@ const pauseAndNotifyInsufficientStock = async (
 
   await createNotification(
     `আপনার সাবস্ক্রিপশন সাময়িকভাবে বন্ধ হয়েছে কারণ পণ্যটি স্টকে নেই।`,
-    customer.userId
+    customer.userId,
+    tx
   );
 
   logger.warn(
@@ -287,7 +294,7 @@ export const createSubscriptionDelivery = async (
   } else if (paymentMethod === "COD") {
     message = `আপনার সাবস্ক্রিপশন ডেলিভারি নির্ধারিত হয়েছে। দয়া করে পণ্য গ্রহণের সময় পেমেন্ট করুন।`;
   }
-  await createNotification(message, customer.userId);
+  await createNotification(message, customer.userId, tx);
 };
 const getProduct = async (
   subscription: SubscriptionWithRelations,
@@ -383,7 +390,7 @@ const handleRenewalWalletPayment = async (
     );
     // Notify customer
     const message = `আপনার সাবস্ক্রিপশন সফলভাবে রিনিউ হয়েছে।`;
-    await createNotification(message, customer.userId);
+    await createNotification(message, customer.userId, tx);
 
     logger.info(
       `Renewed subscription ${subscription.subscriptionId} with WALLET.`
@@ -392,7 +399,8 @@ const handleRenewalWalletPayment = async (
     await pauseSubscription(subscription.subscriptionId, tx);
     await createNotification(
       "পরবর্তী সাবস্ক্রিপশন পরিশোধের জন্য পর্যাপ্ত ব্যালেন্স নেই, অনুগ্রহ করে ওয়ালেট রিচার্জ করুন।",
-      customer.userId
+      customer.userId,
+      tx
     );
     logger.warn(
       `Subscription ${subscription.subscriptionId} paused due to insufficient funds for next cycle.`
@@ -476,6 +484,7 @@ export const handleWalletPayment = async (
     await updateSubscriptionProcessing(subscription.subscriptionId, false);
     console.error(err);
     logger.error("Error during wallet payment:", err);
+    throw err;
   }
 };
 // Main function to handle COD payment

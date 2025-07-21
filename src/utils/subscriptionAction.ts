@@ -8,15 +8,12 @@ export const canPauseOrCancelSubscription = async (
 ) => {
   const today = new Date();
   const nextDelivery = await prisma.subscriptionDelivery.findFirst({
-    where: {
-      subscriptionId,
-      deliveryDate: { gte: today },
-    },
+    where: { subscriptionId, deliveryDate: { gte: today } },
     orderBy: { deliveryDate: "asc" },
   });
-  if (!nextDelivery) return { status: true, nextDelivery: null }; // No upcoming delivery, allow pause
+  if (!nextDelivery) return { canProceed: true, nextDelivery: null };
   const daysLeft = differenceInCalendarDays(nextDelivery.deliveryDate, today);
-  return { status: daysLeft <= bufferDays, nextDelivery };
+  return { canProceed: daysLeft <= bufferDays, nextDelivery };
 };
 export async function pauseOrCancelSubscription(
   subscription: any,
@@ -28,7 +25,8 @@ export async function pauseOrCancelSubscription(
       subscription.subscriptionId,
       bufferDays
     );
-    if (!canPauseOrCancel.status) {
+
+    if (canPauseOrCancel.canProceed) {
       throw new Error(
         `Can't ${action} subscription within ${bufferDays} days of next delivery`
       );
@@ -53,7 +51,7 @@ export async function pauseOrCancelSubscription(
       data: {
         orderId: Number(canPauseOrCancel.nextDelivery?.orderId),
         status: "CANCELLED",
-        description: "Cancelled due to subscription pause",
+        description: `Cancelled due to subscription ${action.toLowerCase()}`,
       },
     });
     // update payment record
@@ -65,6 +63,9 @@ export async function pauseOrCancelSubscription(
     });
     if (subscription.paymentMethod === "WALLET") {
       const walletId = subscription.customer.wallet.walletId;
+      if (subscription.customer.wallet.lockedBalance < order.totalAmount) {
+        throw new Error("Insufficient locked balance");
+      }
       // Refund wallet balance
       await tx.wallet.update({
         where: { walletId },
@@ -79,14 +80,25 @@ export async function pauseOrCancelSubscription(
           description: `Refund for Order #${canPauseOrCancel.nextDelivery?.orderId}`,
         },
       });
-      // update product stock
+      // get product details
       const product = await tx.product.findUnique({
         where: { productId: subscription.subscriptionPlan.productId },
         select: { stockQuantity: true, packageSize: true },
       });
+      // update product stock
       await tx.product.update({
         where: { productId: subscription.subscriptionPlan.productId },
         data: { stockQuantity: { increment: product?.packageSize } },
+      });
+      // update stock transaction
+      await tx.stockTransaction.create({
+        data: {
+          quantity: Number(product?.packageSize),
+          transactionType: "IN",
+          productId: subscription.subscriptionPlan.productId,
+          orderId: order.orderId,
+          description: `Stock increased for Order #${canPauseOrCancel.nextDelivery?.orderId} ${action}`,
+        },
       });
     }
     return updatedSubscription;

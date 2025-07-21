@@ -494,7 +494,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\farmer-app-server\\src\\generated\\prisma\\client",
+      "value": "F:\\xponent-repo\\farmer-app-server\\src\\generated\\prisma\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -508,7 +508,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\farmer-app-server\\prisma\\schema.prisma",
+    "sourceFilePath": "F:\\xponent-repo\\farmer-app-server\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -526,7 +526,7 @@ const config = {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://postgres:1234@localhost:5432/farmerapp_postgres?schema=public"
+        "value": "postgresql://postgres:postgres@localhost:5432/farmerapp_postgres?schema=public"
       }
     }
   },
