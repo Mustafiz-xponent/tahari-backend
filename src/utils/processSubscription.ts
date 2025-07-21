@@ -12,7 +12,6 @@ import {
   isBefore,
   nextSaturday,
   startOfMonth,
-  differenceInCalendarDays,
 } from "date-fns";
 import logger from "@/utils/logger";
 import * as notificationService from "@/modules/notifications/notification.service";
