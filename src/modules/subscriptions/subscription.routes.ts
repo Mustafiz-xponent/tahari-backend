@@ -8,6 +8,7 @@ import * as SubscriptionController from "@/modules/subscriptions/subscription.co
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 import validator from "@/middlewares/validator";
 import {
+  zCancelSubscriptionDto,
   zCreateSubscriptionDto,
   zPauseSubscriptionDto,
 } from "@/modules/subscriptions/subscription.dto";
@@ -45,12 +46,13 @@ router.patch(
 //   SubscriptionController.resumeSubscription
 // );
 // Route to cancel a subscription
-// router.patch(
-//   "/cancel/:id",
-//   authMiddleware,
-//   authorizeRoles("CUSTOMER"),
-//   SubscriptionController.cancelSubscription
-// );
+router.patch(
+  "/cancel/:id",
+  authMiddleware,
+  authorizeRoles("CUSTOMER"),
+  validator(zCancelSubscriptionDto),
+  SubscriptionController.cancelSubscription
+);
 // Route to get all subscriptions
 router.get(
   "/",

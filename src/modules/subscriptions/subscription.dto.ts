@@ -17,12 +17,6 @@ const subscriptionStatusEnum = z.enum([
  */
 export const zCreateSubscriptionDto = {
   body: z.object({
-    customerId: z
-      .union([z.string(), z.number()])
-      .transform(BigInt)
-      .refine((val) => val > 0n, {
-        message: "Customer ID must be a positive integer",
-      }),
     planId: z
       .union([z.string(), z.number()])
       .transform(BigInt)
@@ -66,6 +60,17 @@ export type UpdateSubscriptionDto = z.infer<typeof zUpdateSubscriptionDto>;
  */
 
 export const zPauseSubscriptionDto = {
+  params: z.object({
+    id: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Subscription ID must be a positive integer",
+      }),
+  }),
+};
+
+export const zCancelSubscriptionDto = {
   params: z.object({
     id: z
       .union([z.string(), z.number()])

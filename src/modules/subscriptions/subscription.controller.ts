@@ -32,7 +32,11 @@ export const createSubscription = async (
 ): Promise<void> => {
   try {
     const data = req.body;
-    const subscription = await subscriptionService.createSubscription(data);
+    const userId = req.user?.userId!;
+    const subscription = await subscriptionService.createSubscription(
+      userId,
+      data
+    );
     res.status(httpStatus.CREATED).json({
       success: true,
       message: "Subscription created successfully",
@@ -169,6 +173,27 @@ export const pauseSubscription = async (
     });
   } catch (error) {
     handleErrorResponse(error, res, "pause subscription");
+  }
+};
+/**
+ * Cancel user subscription by Subscription Id
+ */
+export const cancelSubscription = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const subscriptionId = req.params.id;
+    const subscription = await subscriptionService.cancelSubscription(
+      BigInt(subscriptionId)
+    );
+    res.json({
+      success: true,
+      message: "Subscription cancelled successfully",
+      data: subscription,
+    });
+  } catch (error) {
+    handleErrorResponse(error, res, "cancel subscription");
   }
 };
 /**

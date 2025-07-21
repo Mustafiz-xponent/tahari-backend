@@ -24,6 +24,7 @@ import { pauseOrCancelSubscription } from "@/utils/subscriptionAction";
  * Create a new subscription
  */
 export async function createSubscription(
+  userId: bigint,
   data: CreateSubscriptionDto
 ): Promise<Subscription> {
   try {
@@ -47,7 +48,7 @@ export async function createSubscription(
       }
       // Find customer & validate
       const customer = await tx.customer.findUnique({
-        where: { customerId: data.customerId },
+        where: { userId },
         include: { wallet: true },
       });
       if (!customer) throw new Error("Customer not found");
@@ -64,7 +65,7 @@ export async function createSubscription(
           status: "ACTIVE",
           paymentMethod: data.paymentMethod,
           planPrice: plan.price,
-          customerId: data.customerId,
+          customerId: customer.customerId,
           planId: data.planId,
           shippingAddress: data.shippingAddress,
         },
@@ -303,6 +304,32 @@ export async function pauseSubscription(
     return result;
   } catch (error) {
     throw new Error(`Failed to pause subscription: ${getErrorMessage(error)}`);
+  }
+}
+/**
+ * Cancel a subscription by its ID
+ */
+export async function cancelSubscription(
+  subscriptionId: BigInt
+): Promise<Subscription> {
+  try {
+    const bufferDays = 2;
+    const subscription = await prisma.subscription.findUnique({
+      where: { subscriptionId: Number(subscriptionId) },
+      include: {
+        subscriptionDeliveries: true,
+        customer: { include: { wallet: true } },
+      },
+    });
+    if (!subscription) throw new Error("Subscription not found");
+    const result = await pauseOrCancelSubscription(
+      subscription,
+      "CANCELLED",
+      bufferDays
+    );
+    return result;
+  } catch (error) {
+    throw new Error(`Failed to cancel subscription: ${getErrorMessage(error)}`);
   }
 }
 /**

@@ -34,7 +34,7 @@ export async function pauseOrCancelSubscription(
       );
     }
     // Update subscription
-    await tx.subscription.update({
+    const updatedSubscription = await tx.subscription.update({
       where: { subscriptionId: subscription.subscriptionId },
       data: { status: action },
     });
@@ -89,6 +89,6 @@ export async function pauseOrCancelSubscription(
         data: { stockQuantity: { increment: product?.packageSize } },
       });
     }
-    return subscription;
+    return updatedSubscription;
   });
 }
