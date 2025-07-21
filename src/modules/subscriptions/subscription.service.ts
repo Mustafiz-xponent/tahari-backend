@@ -18,6 +18,7 @@ import {
   hasInsufficientStock,
   updateProductStock,
 } from "@/utils/processSubscription";
+import { pauseOrCancelSubscription } from "@/utils/subscriptionAction";
 
 /**
  * Create a new subscription
@@ -278,7 +279,32 @@ export async function updateSubscription(
     throw new Error(`Failed to update subscription: ${getErrorMessage(error)}`);
   }
 }
-
+/**
+ * Pause a subscription by its ID
+ */
+export async function pauseSubscription(
+  subscriptionId: BigInt
+): Promise<Subscription> {
+  try {
+    const bufferDays = 2;
+    const subscription = await prisma.subscription.findUnique({
+      where: { subscriptionId: Number(subscriptionId) },
+      include: {
+        subscriptionDeliveries: true,
+        customer: { include: { wallet: true } },
+      },
+    });
+    if (!subscription) throw new Error("Subscription not found");
+    const result = await pauseOrCancelSubscription(
+      subscription,
+      "PAUSED",
+      bufferDays
+    );
+    return result;
+  } catch (error) {
+    throw new Error(`Failed to pause subscription: ${getErrorMessage(error)}`);
+  }
+}
 /**
  * Delete a subscription by its ID
  */

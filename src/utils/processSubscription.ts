@@ -12,6 +12,7 @@ import {
   isBefore,
   nextSaturday,
   startOfMonth,
+  differenceInCalendarDays,
 } from "date-fns";
 import logger from "@/utils/logger";
 import * as notificationService from "@/modules/notifications/notification.service";
@@ -58,7 +59,7 @@ export const getNextRenewalDate = (
   throw new Error(`Invalid frequency: ${frequency}`);
 };
 
-// Calculate nearest delivery date (e.g., next Saturday or next month's first day)
+// Calculate nearest delivery date (e.g.,weekly - next Saturday, monthly - next month's first day)
 export const calculateNearestDeliveryDate = (
   currentDate: Date,
   frequency: SubscriptionPlanType

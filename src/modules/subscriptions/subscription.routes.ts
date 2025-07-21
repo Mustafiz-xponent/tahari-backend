@@ -7,7 +7,10 @@ import { Router } from "express";
 import * as SubscriptionController from "@/modules/subscriptions/subscription.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 import validator from "@/middlewares/validator";
-import { zCreateSubscriptionDto } from "@/modules/subscriptions/subscription.dto";
+import {
+  zCreateSubscriptionDto,
+  zPauseSubscriptionDto,
+} from "@/modules/subscriptions/subscription.dto";
 
 const router = Router();
 
@@ -30,8 +33,9 @@ router.get(
 router.patch(
   "/pause/:id",
   authMiddleware,
-  authorizeRoles("CUSTOMER")
-  // SubscriptionController.pauseSubscription
+  authorizeRoles("CUSTOMER"),
+  validator(zPauseSubscriptionDto),
+  SubscriptionController.pauseSubscription
 );
 // Route to resume a subscription
 // router.patch(

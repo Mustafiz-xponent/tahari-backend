@@ -345,7 +345,7 @@ model WalletTransaction {
   createdAt         DateTime              @default(now())
   walletId          BigInt
   wallet            Wallet                @relation(fields: [walletId], references: [walletId])
-  orderId           BigInt?
+  orderId           BigInt?               @unique
   order             Order?                @relation(fields: [orderId], references: [orderId])
   Payment           Payment[]
 

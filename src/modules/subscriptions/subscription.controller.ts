@@ -10,7 +10,7 @@ import {
   zUpdateSubscriptionDto,
 } from "@/modules/subscriptions/subscription.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
-import { z } from "zod";
+import { bigint, z } from "zod";
 import httpStatus from "http-status";
 import { SubscriptionStatus } from "@/generated/prisma/client";
 
@@ -150,7 +150,27 @@ export const updateSubscription = async (
     handleErrorResponse(error, res, "update subscription");
   }
 };
-
+/**
+ * Pause user subscription by Subscription Id
+ */
+export const pauseSubscription = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const subscriptionId = req.params.id;
+    const subscription = await subscriptionService.pauseSubscription(
+      BigInt(subscriptionId)
+    );
+    res.json({
+      success: true,
+      message: "Subscription paused successfully",
+      data: subscription,
+    });
+  } catch (error) {
+    handleErrorResponse(error, res, "pause subscription");
+  }
+};
 /**
  * Delete a subscription by ID
  */

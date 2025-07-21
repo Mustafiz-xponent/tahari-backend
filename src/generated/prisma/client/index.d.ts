@@ -31256,6 +31256,7 @@ export namespace Prisma {
 
   export type WalletTransactionWhereUniqueInput = Prisma.AtLeast<{
     transactionId?: bigint | number
+    orderId?: bigint | number
     AND?: WalletTransactionWhereInput | WalletTransactionWhereInput[]
     OR?: WalletTransactionWhereInput[]
     NOT?: WalletTransactionWhereInput | WalletTransactionWhereInput[]
@@ -31265,11 +31266,10 @@ export namespace Prisma {
     description?: StringNullableFilter<"WalletTransaction"> | string | null
     createdAt?: DateTimeFilter<"WalletTransaction"> | Date | string
     walletId?: BigIntFilter<"WalletTransaction"> | bigint | number
-    orderId?: BigIntNullableFilter<"WalletTransaction"> | bigint | number | null
     wallet?: XOR<WalletScalarRelationFilter, WalletWhereInput>
     order?: XOR<OrderNullableScalarRelationFilter, OrderWhereInput> | null
     Payment?: PaymentListRelationFilter
-  }, "transactionId">
+  }, "transactionId" | "orderId">
 
   export type WalletTransactionOrderByWithAggregationInput = {
     transactionId?: SortOrder

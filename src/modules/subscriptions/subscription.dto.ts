@@ -60,3 +60,18 @@ export const zUpdateSubscriptionDto = z.object({
     .optional(),
 });
 export type UpdateSubscriptionDto = z.infer<typeof zUpdateSubscriptionDto>;
+
+/**
+ * Zod schema for pause a subscription.
+ */
+
+export const zPauseSubscriptionDto = {
+  params: z.object({
+    id: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Subscription ID must be a positive integer",
+      }),
+  }),
+};
