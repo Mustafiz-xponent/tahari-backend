@@ -2,7 +2,6 @@
  * Service layer for Subscription entity operations.
  * Contains business logic and database interactions for subscriptions.
  */
-
 import prisma from "@/prisma-client/prismaClient";
 import { Subscription, SubscriptionStatus } from "@/generated/prisma/client";
 import {
@@ -28,36 +27,35 @@ export async function createSubscription(
   data: CreateSubscriptionDto
 ): Promise<Subscription> {
   try {
+    // Find plan & validate
+    const plan = await prisma.subscriptionPlan.findUnique({
+      where: { planId: data.planId },
+      include: { product: true },
+    });
+    if (!plan) throw new Error("Subscription plan not found");
+    if (!plan.product?.isSubscription) {
+      throw new Error(
+        `Product ${
+          plan.product?.name || "N/A"
+        } is not available for subscription`
+      );
+    }
+    // check stock availability
+    if (hasInsufficientStock(plan.product, 1)) {
+      throw new Error(`Insufficient stock`);
+    }
+    // Find customer & validate
+    const customer = await prisma.customer.findUnique({
+      where: { userId },
+      include: { wallet: true },
+    });
+    if (!customer) throw new Error("Customer not found");
+    //  Create subscription
+    const now = new Date();
+    const frequency = plan.frequency;
+    const renewalDate = getNextRenewalDate(now, frequency);
+
     return await prisma.$transaction(async (tx) => {
-      // Find plan & validate
-      const plan = await tx.subscriptionPlan.findUnique({
-        where: { planId: data.planId },
-        include: { product: true },
-      });
-      if (!plan) throw new Error("Subscription plan not found");
-      if (!plan.product?.isSubscription) {
-        throw new Error(
-          `Product ${
-            plan.product?.name || "N/A"
-          } is not available for subscription`
-        );
-      }
-      // check stock availability
-      if (hasInsufficientStock(plan.product, 1)) {
-        throw new Error(`Insufficient stock`);
-      }
-      // Find customer & validate
-      const customer = await tx.customer.findUnique({
-        where: { userId },
-        include: { wallet: true },
-      });
-      if (!customer) throw new Error("Customer not found");
-      //  Create subscription
-      const now = new Date();
-      const frequency = plan.frequency;
-
-      const renewalDate = getNextRenewalDate(now, frequency);
-
       const subscription = await tx.subscription.create({
         data: {
           startDate: now,
