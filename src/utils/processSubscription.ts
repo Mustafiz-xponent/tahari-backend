@@ -128,6 +128,7 @@ export const canLockNextPayment = (wallet: any, price: Decimal): boolean => {
   );
 };
 
+// TODO: use transaction client here
 const createNotification = async (message: string, receiverId: bigint) => {
   await notificationService.createNotification({
     message: message.replace(/\s+/g, " ").trim(),
