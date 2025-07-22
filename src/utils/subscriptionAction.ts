@@ -71,7 +71,14 @@ export async function pauseOrCancelSubscription(
     });
     if (subscription.paymentMethod === "WALLET") {
       const walletId = subscription.customer.wallet.walletId;
-      if (subscription.customer.wallet.lockedBalance < order.totalAmount) {
+      console.log(
+        subscription.customer.wallet.lockedBalance,
+        order.totalAmount
+      );
+      if (
+        Number(subscription.customer.wallet.lockedBalance) <
+        Number(order.totalAmount)
+      ) {
         throw new Error("Insufficient locked balance");
       }
       // Refund wallet balance
