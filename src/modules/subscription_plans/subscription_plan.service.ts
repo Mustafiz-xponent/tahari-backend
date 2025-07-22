@@ -98,6 +98,18 @@ export async function getSubscriptionPlanById(
       include: { product: true },
     });
     if (!subscriptionPlan) throw new Error("Subscription plan not found");
+    const product = subscriptionPlan?.product;
+    if (product?.imageUrls?.length) {
+      const accessibleImageUrls = await getBatchAccessibleImageUrls(
+        product.imageUrls,
+        product.isPrivateImages ?? false
+      );
+      // Attach accessibleImageUrls to the product
+      subscriptionPlan.product = {
+        ...product,
+        accessibleImageUrls,
+      } as typeof product & { accessibleImageUrls: string[] };
+    }
     return subscriptionPlan;
   } catch (error) {
     throw new Error(
