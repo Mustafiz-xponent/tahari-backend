@@ -74,16 +74,14 @@ export const getSubscriptionById = async (
   res: Response
 ): Promise<void> => {
   try {
-    const subscriptionId = subscriptionIdSchema.parse(req.params.id);
+    const subscriptionId = BigInt(req.params.id);
     const subscription = await subscriptionService.getSubscriptionById(
       subscriptionId
     );
-    if (!subscription) {
-      throw new Error("Subscription not found");
-    }
+
     res.json({
       success: true,
-      message: "Subscription fetched successfully",
+      message: "Subscription retrived successfully",
       data: subscription,
     });
   } catch (error) {
@@ -155,7 +153,7 @@ export const updateSubscription = async (
   }
 };
 /**
- * Pause user subscription by Subscription Id
+ * Pause customer subscription by Subscription Id
  */
 export const pauseSubscription = async (
   req: Request,
@@ -163,8 +161,10 @@ export const pauseSubscription = async (
 ): Promise<void> => {
   try {
     const subscriptionId = req.params.id;
+    const userId = req.user?.userId;
     const subscription = await subscriptionService.pauseSubscription(
-      BigInt(subscriptionId)
+      BigInt(subscriptionId),
+      userId
     );
     res.json({
       success: true,
@@ -176,7 +176,7 @@ export const pauseSubscription = async (
   }
 };
 /**
- * Cancel user subscription by Subscription Id
+ * Cancel customer subscription by Subscription Id
  */
 export const cancelSubscription = async (
   req: Request,
@@ -184,8 +184,10 @@ export const cancelSubscription = async (
 ): Promise<void> => {
   try {
     const subscriptionId = req.params.id;
+    const userId = req.user?.userId;
     const subscription = await subscriptionService.cancelSubscription(
-      BigInt(subscriptionId)
+      BigInt(subscriptionId),
+      userId
     );
     res.json({
       success: true,
@@ -196,6 +198,29 @@ export const cancelSubscription = async (
     handleErrorResponse(error, res, "cancel subscription");
   }
 };
+/**
+ * Resume customer subscription by Subscription Id
+ */
+// export const resumeSubscription = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const subscriptionId = req.params.id;
+//     const userId = req.user?.userId;
+//     const subscription = await subscriptionService.resumeSubscription(
+//       BigInt(subscriptionId),
+//       userId
+//     );
+//     res.json({
+//       success: true,
+//       message: "Subscription resumed successfully",
+//       data: subscription,
+//     });
+//   } catch (error) {
+//     handleErrorResponse(error, res, "resume subscription");
+//   }
+// };
 /**
  * Delete a subscription by ID
  */

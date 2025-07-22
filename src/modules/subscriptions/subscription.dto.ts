@@ -11,25 +11,30 @@ const subscriptionStatusEnum = z.enum([
   "EXPIRED",
   "PENDING",
 ]);
-
+const zBigIntId = (fieldName: string) =>
+  z
+    .union([z.string(), z.number()])
+    .transform(BigInt)
+    .refine((val) => val > 0n, {
+      message: `${fieldName} must be a positive integer`,
+    });
 /**
  * Zod schema for creating a new subscription.
  */
 export const zCreateSubscriptionDto = {
   body: z.object({
-    planId: z
-      .union([z.string(), z.number()])
-      .transform(BigInt)
-      .refine((val) => val > 0n, {
-        message: "Plan ID must be a positive integer",
-      }),
+    planId: zBigIntId("Plan ID"),
     paymentMethod: z.enum(["WALLET", "COD"]),
     shippingAddress: z.string().min(1, "Shipping address is required"),
   }),
 };
 
 export type CreateSubscriptionDto = z.infer<typeof zCreateSubscriptionDto.body>;
-
+export const zGetSubscriptionDto = {
+  params: z.object({
+    id: zBigIntId("Subscription ID"),
+  }),
+};
 /**
  * Zod schema for updating a subscription.
  */
@@ -38,20 +43,8 @@ export const zUpdateSubscriptionDto = z.object({
   endDate: z.string().datetime().optional(),
   status: subscriptionStatusEnum.optional(),
   renewalDate: z.string().datetime().optional(),
-  customerId: z
-    .union([z.string(), z.number()])
-    .transform(BigInt)
-    .refine((val) => val > 0n, {
-      message: "Customer ID must be a positive integer",
-    })
-    .optional(),
-  planId: z
-    .union([z.string(), z.number()])
-    .transform(BigInt)
-    .refine((val) => val > 0n, {
-      message: "Plan ID must be a positive integer",
-    })
-    .optional(),
+  customerId: zBigIntId("Customer ID").optional(),
+  planId: zBigIntId("Plan ID").optional(),
 });
 export type UpdateSubscriptionDto = z.infer<typeof zUpdateSubscriptionDto>;
 
@@ -61,22 +54,17 @@ export type UpdateSubscriptionDto = z.infer<typeof zUpdateSubscriptionDto>;
 
 export const zPauseSubscriptionDto = {
   params: z.object({
-    id: z
-      .union([z.string(), z.number()])
-      .transform(BigInt)
-      .refine((val) => val > 0n, {
-        message: "Subscription ID must be a positive integer",
-      }),
+    id: zBigIntId("Subscription ID"),
+  }),
+};
+export const zResumeSubscriptionDto = {
+  params: z.object({
+    id: zBigIntId("Subscription ID"),
   }),
 };
 
 export const zCancelSubscriptionDto = {
   params: z.object({
-    id: z
-      .union([z.string(), z.number()])
-      .transform(BigInt)
-      .refine((val) => val > 0n, {
-        message: "Subscription ID must be a positive integer",
-      }),
+    id: zBigIntId("Subscription ID"),
   }),
 };

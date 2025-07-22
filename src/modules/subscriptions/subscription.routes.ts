@@ -10,7 +10,9 @@ import validator from "@/middlewares/validator";
 import {
   zCancelSubscriptionDto,
   zCreateSubscriptionDto,
+  zGetSubscriptionDto,
   zPauseSubscriptionDto,
+  zResumeSubscriptionDto,
 } from "@/modules/subscriptions/subscription.dto";
 
 const router = Router();
@@ -40,10 +42,11 @@ router.patch(
 );
 // Route to resume a subscription
 // router.patch(
-//   "/resume/:id",
-//   authMiddleware,
-//   authorizeRoles("CUSTOMER"),
-//   SubscriptionController.resumeSubscription
+// "/resume/:id",
+// authMiddleware,
+// authorizeRoles("CUSTOMER"),
+// validator(zResumeSubscriptionDto),
+// SubscriptionController.resumeSubscription
 // );
 // Route to cancel a subscription
 router.patch(
@@ -62,7 +65,13 @@ router.get(
 );
 
 // Route to get a subscription by ID
-router.get("/:id", authMiddleware, SubscriptionController.getSubscriptionById);
+router.get(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  validator(zGetSubscriptionDto),
+  SubscriptionController.getSubscriptionById
+);
 
 // Route to update a subscription's details
 router.put("/:id", authMiddleware, SubscriptionController.updateSubscription);

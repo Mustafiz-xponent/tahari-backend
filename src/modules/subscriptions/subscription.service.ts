@@ -17,7 +17,11 @@ import {
   hasInsufficientStock,
   updateProductStock,
 } from "@/utils/processSubscription";
-import { pauseOrCancelSubscription } from "@/utils/subscriptionAction";
+import {
+  pauseOrCancelSubscription,
+  // processResumeSubscription,
+} from "@/utils/subscriptionAction";
+import { getBatchAccessibleImageUrls } from "@/utils/fileUpload/s3Aws";
 
 /**
  * Create a new subscription
@@ -199,8 +203,24 @@ export async function getSubscriptionById(
   try {
     const subscription = await prisma.subscription.findUnique({
       where: { subscriptionId: Number(subscriptionId) },
+      include: { subscriptionPlan: { include: { product: true } } },
     });
+    if (!subscription) {
+      throw new Error("Subscription not found");
+    }
 
+    const product = subscription.subscriptionPlan?.product;
+    if (product?.imageUrls?.length) {
+      const accessibleImageUrls = await getBatchAccessibleImageUrls(
+        product.imageUrls,
+        product.isPrivateImages ?? false
+      );
+      // Attach accessibleImageUrls to the product
+      subscription.subscriptionPlan.product = {
+        ...product,
+        accessibleImageUrls,
+      } as typeof product & { accessibleImageUrls: string[] };
+    }
     return subscription;
   } catch (error) {
     throw new Error(`Failed to fetch subscription: ${getErrorMessage(error)}`);
@@ -223,15 +243,32 @@ export async function getCustomerSubscriptions(
 
     const subscriptions = await prisma.subscription.findMany({
       where: { customerId: customer.customerId, ...(status && { status }) },
+      include: { subscriptionPlan: { include: { product: true } } },
       take: limit,
       skip: skip,
       orderBy: {
         createdAt: sort === "asc" ? "asc" : "desc",
       },
     });
-
+    // Enrich each subscription's product with accessibleImageUrls
+    const processedSubscriptions = await Promise.all(
+      subscriptions.map(async (subscription) => {
+        const product = subscription.subscriptionPlan?.product;
+        if (product?.imageUrls?.length) {
+          const accessibleImageUrls = await getBatchAccessibleImageUrls(
+            product.imageUrls,
+            product.isPrivateImages ?? false
+          );
+          subscription.subscriptionPlan.product = {
+            ...product,
+            accessibleImageUrls,
+          } as typeof product & { accessibleImageUrls: string[] };
+        }
+        return subscription;
+      })
+    );
     return {
-      subscriptions,
+      subscriptions: processedSubscriptions,
       currentPage: page,
       totalPages: Math.ceil(subscriptions.length / limit),
       totalCount: subscriptions.length,
@@ -286,7 +323,8 @@ export async function updateSubscription(
  * Pause a subscription by its ID
  */
 export async function pauseSubscription(
-  subscriptionId: BigInt
+  subscriptionId: bigint,
+  userId: bigint
 ): Promise<Subscription> {
   try {
     const bufferDays = 2;
@@ -299,6 +337,12 @@ export async function pauseSubscription(
       },
     });
     if (!subscription) throw new Error("Subscription not found");
+    const customer = await prisma.customer.findUnique({
+      where: { userId: Number(userId) },
+    });
+    if (customer?.customerId !== subscription.customerId) {
+      throw new Error(`You are not permitted to pause this subscription`);
+    }
     if (
       subscription.status === "PAUSED" ||
       subscription.status === "CANCELLED"
@@ -308,7 +352,8 @@ export async function pauseSubscription(
     const result = await pauseOrCancelSubscription(
       subscription,
       "PAUSED",
-      bufferDays
+      bufferDays,
+      userId
     );
     return result;
   } catch (error) {
@@ -316,10 +361,46 @@ export async function pauseSubscription(
   }
 }
 /**
+ * Resume a subscription by its ID
+ */
+// export async function resumeSubscription(
+//   subscriptionId: bigint,
+//   userId: bigint
+// ): Promise<Subscription> {
+//   try {
+//     const subscription = await prisma.subscription.findUnique({
+//       where: { subscriptionId: Number(subscriptionId) },
+//       include: {
+//         subscriptionDeliveries: true,
+//         subscriptionPlan: true,
+//         customer: { include: { wallet: true } },
+//       },
+//     });
+//     if (!subscription) throw new Error("Subscription not found");
+//     const customer = await prisma.customer.findUnique({
+//       where: { userId: Number(userId) },
+//     });
+//     if (customer?.customerId !== subscription.customerId) {
+//       throw new Error(`You are not permitted to resume this subscription`);
+//     }
+//     if (
+//       subscription.status === "ACTIVE" ||
+//       subscription.status === "CANCELLED"
+//     ) {
+//       throw new Error(`Subscription already ${subscription.status}`);
+//     }
+//     const result = await processResumeSubscription(subscription, userId);
+//     return result;
+//   } catch (error) {
+//     throw new Error(`Failed to resume subscription: ${getErrorMessage(error)}`);
+//   }
+// }
+/**
  * Cancel a subscription by its ID
  */
 export async function cancelSubscription(
-  subscriptionId: BigInt
+  subscriptionId: bigint,
+  userId: bigint
 ): Promise<Subscription> {
   try {
     const bufferDays = 2;
@@ -332,6 +413,12 @@ export async function cancelSubscription(
       },
     });
     if (!subscription) throw new Error("Subscription not found");
+    const customer = await prisma.customer.findUnique({
+      where: { userId: Number(userId) },
+    });
+    if (customer?.customerId !== subscription.customerId) {
+      throw new Error(`You are not permitted to cancel this subscription`);
+    }
     if (subscription.status === "CANCELLED") {
       throw new Error("Subscription already cancelled");
     }
@@ -345,7 +432,8 @@ export async function cancelSubscription(
       result = await pauseOrCancelSubscription(
         subscription,
         "CANCELLED",
-        bufferDays
+        bufferDays,
+        userId
       );
     }
 

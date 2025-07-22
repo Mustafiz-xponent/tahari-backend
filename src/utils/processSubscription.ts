@@ -127,7 +127,7 @@ export const canLockNextPayment = (wallet: any, price: Decimal): boolean => {
   );
 };
 
-const createNotification = async (
+export const createNotification = async (
   message: string,
   receiverId: bigint,
   tx: Prisma.TransactionClient
