@@ -13,6 +13,7 @@ import {
   canLockNextPayment,
   createOrderWithItems,
   createSubscriptionDelivery,
+  getNextDeliveryDate,
   getNextRenewalDate,
   hasInsufficientStock,
   updateProductStock,
@@ -62,6 +63,7 @@ export async function createSubscription(
     const now = new Date();
     const frequency = plan.frequency;
     const renewalDate = getNextRenewalDate(now, frequency);
+    const nextDeliveryDate = getNextDeliveryDate(now, frequency);
 
     return await prisma.$transaction(async (tx) => {
       const subscription = await tx.subscription.create({
@@ -72,6 +74,7 @@ export async function createSubscription(
           paymentMethod: data.paymentMethod,
           planPrice: plan.price,
           customerId: customer.customerId,
+          nextDeliveryDate,
           planId: data.planId,
           shippingAddress: data.shippingAddress,
         },

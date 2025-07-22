@@ -184,7 +184,7 @@ const pauseSubscription = async (
 ) => {
   await tx.subscription.update({
     where: { subscriptionId },
-    data: { status: "PAUSED", isProcessing: false },
+    data: { status: "PAUSED", isProcessing: false, nextDeliveryDate: null },
   });
 };
 export const updateProductStock = async (
@@ -320,6 +320,7 @@ const handleRenewalWalletPayment = async (
   const wallet = customer.wallet!;
   const frequency = subscription.subscriptionPlan.frequency;
   const nextRenewal = getNextRenewalDate(today, frequency);
+  const nextDeliveryDate = getNextDeliveryDate(today, frequency);
 
   const product = await getProduct(subscription, tx);
 
@@ -340,6 +341,7 @@ const handleRenewalWalletPayment = async (
         renewalDate: nextRenewal,
         planPrice: price, // update plan price with latest plan price
         isProcessing: false,
+        nextDeliveryDate,
       },
     });
 
@@ -539,6 +541,7 @@ export const handleCODPayment = async (
     // Update subscription for next delivery
     const frequency = subscription.subscriptionPlan.frequency;
     const nextRenewal = getNextRenewalDate(today, frequency);
+    const nextDeliveryDate = getNextDeliveryDate(today, frequency);
 
     await tx.subscription.update({
       where: { subscriptionId: subscription.subscriptionId },
@@ -546,6 +549,7 @@ export const handleCODPayment = async (
         renewalDate: nextRenewal,
         planPrice: subscriptionPlan.price, // update plan price with latest plan price
         isProcessing: false,
+        nextDeliveryDate,
       },
     });
 

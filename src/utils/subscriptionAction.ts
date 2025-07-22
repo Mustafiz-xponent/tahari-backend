@@ -5,6 +5,7 @@ import {
   createNotification,
   createOrderWithItems,
   createSubscriptionDelivery,
+  getNextDeliveryDate,
   getNextRenewalDate,
 } from "@/utils/processSubscription";
 
@@ -41,7 +42,7 @@ export async function pauseOrCancelSubscription(
     // Update subscription
     const updatedSubscription = await tx.subscription.update({
       where: { subscriptionId: subscription.subscriptionId },
-      data: { status: action },
+      data: { status: action, nextDeliveryDate: null },
     });
     // Cancel delivery
     await tx.subscriptionDelivery.update({

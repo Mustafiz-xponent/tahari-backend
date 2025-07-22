@@ -427,6 +427,7 @@ model Subscription {
   renewalDate            DateTime?
   createdAt              DateTime               @default(now())
   updatedAt              DateTime               @updatedAt
+  nextDeliveryDate       DateTime?
   customerId             BigInt
   planId                 BigInt
   customer               Customer               @relation(fields: [customerId], references: [customerId])
