@@ -62,6 +62,7 @@ enum PaymentStatus {
   COMPLETED
   FAILED
   REFUNDED
+  LOCKED
 }
 
 enum TransactionType {

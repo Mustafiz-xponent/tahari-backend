@@ -14,7 +14,6 @@ import {
   startOfMonth,
 } from "date-fns";
 import logger from "@/utils/logger";
-import * as notificationService from "@/modules/notifications/notification.service";
 import { Prisma } from "@prisma/client";
 import prisma from "@/prisma-client/prismaClient";
 
@@ -233,7 +232,7 @@ export const createOrderWithItems = async (
   const order = await tx.order.create({
     data: {
       status: "CONFIRMED",
-      paymentStatus: paymentMethod === "WALLET" ? "COMPLETED" : "PENDING",
+      paymentStatus: paymentMethod === "WALLET" ? "LOCKED" : "PENDING",
       paymentMethod,
       totalAmount: price,
       isSubscription: true,
@@ -358,7 +357,7 @@ const handleRenewalWalletPayment = async (
       data: {
         amount: price,
         transactionType: "PURCHASE",
-        transactionStatus: "PENDING",
+        transactionStatus: "LOCKED",
         description: `LOCK_FUNDS_FOR_SUBSCRIPTION:#${subscription.subscriptionId}_PLAN:#${subscription.subscriptionPlan.planId}_ORDER:#${order.orderId}`, // Required description for further processing
         walletId: wallet.walletId,
         orderId: order.orderId,
@@ -369,7 +368,7 @@ const handleRenewalWalletPayment = async (
       data: {
         amount: order.totalAmount,
         paymentMethod: "WALLET",
-        paymentStatus: "PENDING",
+        paymentStatus: "LOCKED",
         orderId: order.orderId,
         transactionId: `ORDER_${order.orderId}_${Date.now()}`,
         walletTransactionId: walletTransaction.transactionId,
@@ -440,7 +439,7 @@ export const handleWalletPayment = async (
         where: {
           walletId: wallet.walletId,
           transactionType: "PURCHASE",
-          transactionStatus: "PENDING",
+          transactionStatus: "LOCKED",
           description: {
             contains: `LOCK_FUNDS_FOR_SUBSCRIPTION:#${subscription.subscriptionId}`,
           },
@@ -467,6 +466,13 @@ export const handleWalletPayment = async (
         data: {
           paymentStatus: "COMPLETED",
         },
+      });
+      // Update order payment status
+      await tx.order.update({
+        where: {
+          orderId: Number(walletTransaction.orderId),
+        },
+        data: { paymentStatus: "COMPLETED" },
       });
     });
 

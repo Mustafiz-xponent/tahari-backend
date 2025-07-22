@@ -411,7 +411,8 @@ exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   PENDING: 'PENDING',
   COMPLETED: 'COMPLETED',
   FAILED: 'FAILED',
-  REFUNDED: 'REFUNDED'
+  REFUNDED: 'REFUNDED',
+  LOCKED: 'LOCKED'
 };
 
 exports.TransactionType = exports.$Enums.TransactionType = {

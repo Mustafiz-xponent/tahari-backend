@@ -44,7 +44,7 @@ export async function pauseOrCancelSubscription(
     // Cancel order
     const order = await tx.order.update({
       where: { orderId: canPauseOrCancel.nextDelivery?.orderId },
-      data: { status: "CANCELLED" },
+      data: { status: "CANCELLED", paymentStatus: "REFUNDED" },
     });
     // Create cancelled order tracking
     await tx.orderTracking.create({

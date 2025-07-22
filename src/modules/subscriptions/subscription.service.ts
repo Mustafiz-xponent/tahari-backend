@@ -110,7 +110,7 @@ export async function createSubscription(
             walletId: customer.wallet.walletId,
             amount: plan.price,
             transactionType: "PURCHASE",
-            transactionStatus: "PENDING",
+            transactionStatus: "LOCKED",
             orderId: order.orderId,
             description: `LOCK_FUNDS_FOR_SUBSCRIPTION:#${subscription.subscriptionId}_PLAN:#${subscription.subscriptionPlan.planId}_ORDER:#${order.orderId}`, // Required description for further processing!!!
           },
@@ -120,7 +120,7 @@ export async function createSubscription(
           data: {
             amount: order.totalAmount,
             paymentMethod: "WALLET",
-            paymentStatus: "PENDING",
+            paymentStatus: "LOCKED",
             orderId: order.orderId,
             transactionId: `ORDER_${order.orderId}_${Date.now()}`,
             walletTransactionId: walletTransaction.transactionId,
