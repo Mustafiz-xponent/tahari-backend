@@ -10,6 +10,7 @@ import {
   UpdateSubscriptionPlanDto,
 } from "@/modules/subscription_plans/subscription_plan.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
+import { getBatchAccessibleImageUrls } from "@/utils/fileUpload/s3Aws";
 
 /**
  * Create a new subscription plan
@@ -57,7 +58,24 @@ export async function getAllSubscriptionPlans(): Promise<SubscriptionPlan[]> {
     const subscriptionPlans = await prisma.subscriptionPlan.findMany({
       include: { product: true },
     });
-    return subscriptionPlans;
+    // Enrich each subscription plan  product with accessibleImageUrls
+    const processedSubscriptionPlans = await Promise.all(
+      subscriptionPlans.map(async (subscriptionPlan) => {
+        const product = subscriptionPlan.product;
+        if (product?.imageUrls?.length) {
+          const accessibleImageUrls = await getBatchAccessibleImageUrls(
+            product.imageUrls,
+            product.isPrivateImages ?? false
+          );
+          subscriptionPlan.product = {
+            ...product,
+            accessibleImageUrls,
+          } as typeof product & { accessibleImageUrls: string[] };
+        }
+        return subscriptionPlan;
+      })
+    );
+    return processedSubscriptionPlans;
   } catch (error) {
     throw new Error(
       `Failed to fetch subscription plans: ${getErrorMessage(error)}`

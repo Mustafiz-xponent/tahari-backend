@@ -205,9 +205,7 @@ export async function getSubscriptionById(
       where: { subscriptionId: Number(subscriptionId) },
       include: { subscriptionPlan: { include: { product: true } } },
     });
-    if (!subscription) {
-      throw new Error("Subscription not found");
-    }
+    if (!subscription) throw new Error("Subscription not found");
 
     const product = subscription.subscriptionPlan?.product;
     if (product?.imageUrls?.length) {
