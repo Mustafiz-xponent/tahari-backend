@@ -209,7 +209,7 @@ export async function getSubscriptionById(
 /**
  * Retrieve customer subscriptions
  */
-export async function getUserSubscriptions(
+export async function getCustomerSubscriptions(
   userId: BigInt,
   paginationParams: { page: number; limit: number; skip: number; sort: string },
   status: SubscriptionStatus

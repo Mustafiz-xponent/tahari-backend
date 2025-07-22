@@ -93,7 +93,7 @@ export const getSubscriptionById = async (
 /**
  * Get users subscription
  */
-export const getUserSubscriptions = async (
+export const getCustomerSubscriptions = async (
   req: Request<{}, {}, {}, IQueryParams>,
   res: Response
 ): Promise<void> => {
@@ -108,7 +108,7 @@ export const getUserSubscriptions = async (
     const sort = req.query.sort === "asc" ? "asc" : "desc";
     const status = req.query.status?.toUpperCase() as SubscriptionStatus;
     const paginationParams = { page, limit, skip, sort };
-    const result = await subscriptionService.getUserSubscriptions(
+    const result = await subscriptionService.getCustomerSubscriptions(
       userId,
       paginationParams,
       status

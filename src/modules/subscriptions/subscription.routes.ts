@@ -23,12 +23,12 @@ router.post(
   validator(zCreateSubscriptionDto),
   SubscriptionController.createSubscription
 );
-// Route to get user subscriptions
+// Route to get customer subscriptions
 router.get(
-  "/user",
+  "/customer",
   authMiddleware,
   authorizeRoles("CUSTOMER"),
-  SubscriptionController.getUserSubscriptions
+  SubscriptionController.getCustomerSubscriptions
 );
 // Route to pause a subscription
 router.patch(
