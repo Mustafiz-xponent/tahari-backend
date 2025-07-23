@@ -304,9 +304,9 @@ exports.Prisma.SubscriptionScalarFieldEnum = {
   planPrice: 'planPrice',
   shippingAddress: 'shippingAddress',
   renewalDate: 'renewalDate',
+  nextDeliveryDate: 'nextDeliveryDate',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  nextDeliveryDate: 'nextDeliveryDate',
   customerId: 'customerId',
   planId: 'planId'
 };

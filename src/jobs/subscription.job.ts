@@ -211,7 +211,6 @@ export const renewSubscriptions = async (today: Date = new Date()) => {
 
 // Cron job starter
 export const startSubscriptionRenewalJob = () => {
-  logger.info("Starting subscription renewal job");
   cron.schedule(
     CONFIG.CRON_SCHEDULE,
     async () => {

@@ -22692,9 +22692,9 @@ export namespace Prisma {
     planPrice: Decimal | null
     shippingAddress: string | null
     renewalDate: Date | null
+    nextDeliveryDate: Date | null
     createdAt: Date | null
     updatedAt: Date | null
-    nextDeliveryDate: Date | null
     customerId: bigint | null
     planId: bigint | null
   }
@@ -22709,9 +22709,9 @@ export namespace Prisma {
     planPrice: Decimal | null
     shippingAddress: string | null
     renewalDate: Date | null
+    nextDeliveryDate: Date | null
     createdAt: Date | null
     updatedAt: Date | null
-    nextDeliveryDate: Date | null
     customerId: bigint | null
     planId: bigint | null
   }
@@ -22726,9 +22726,9 @@ export namespace Prisma {
     planPrice: number
     shippingAddress: number
     renewalDate: number
+    nextDeliveryDate: number
     createdAt: number
     updatedAt: number
-    nextDeliveryDate: number
     customerId: number
     planId: number
     _all: number
@@ -22759,9 +22759,9 @@ export namespace Prisma {
     planPrice?: true
     shippingAddress?: true
     renewalDate?: true
+    nextDeliveryDate?: true
     createdAt?: true
     updatedAt?: true
-    nextDeliveryDate?: true
     customerId?: true
     planId?: true
   }
@@ -22776,9 +22776,9 @@ export namespace Prisma {
     planPrice?: true
     shippingAddress?: true
     renewalDate?: true
+    nextDeliveryDate?: true
     createdAt?: true
     updatedAt?: true
-    nextDeliveryDate?: true
     customerId?: true
     planId?: true
   }
@@ -22793,9 +22793,9 @@ export namespace Prisma {
     planPrice?: true
     shippingAddress?: true
     renewalDate?: true
+    nextDeliveryDate?: true
     createdAt?: true
     updatedAt?: true
-    nextDeliveryDate?: true
     customerId?: true
     planId?: true
     _all?: true
@@ -22897,9 +22897,9 @@ export namespace Prisma {
     planPrice: Decimal
     shippingAddress: string
     renewalDate: Date | null
+    nextDeliveryDate: Date | null
     createdAt: Date
     updatedAt: Date
-    nextDeliveryDate: Date | null
     customerId: bigint
     planId: bigint
     _count: SubscriptionCountAggregateOutputType | null
@@ -22933,9 +22933,9 @@ export namespace Prisma {
     planPrice?: boolean
     shippingAddress?: boolean
     renewalDate?: boolean
+    nextDeliveryDate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    nextDeliveryDate?: boolean
     customerId?: boolean
     planId?: boolean
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
@@ -22954,9 +22954,9 @@ export namespace Prisma {
     planPrice?: boolean
     shippingAddress?: boolean
     renewalDate?: boolean
+    nextDeliveryDate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    nextDeliveryDate?: boolean
     customerId?: boolean
     planId?: boolean
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
@@ -22973,9 +22973,9 @@ export namespace Prisma {
     planPrice?: boolean
     shippingAddress?: boolean
     renewalDate?: boolean
+    nextDeliveryDate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    nextDeliveryDate?: boolean
     customerId?: boolean
     planId?: boolean
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
@@ -22992,14 +22992,14 @@ export namespace Prisma {
     planPrice?: boolean
     shippingAddress?: boolean
     renewalDate?: boolean
+    nextDeliveryDate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    nextDeliveryDate?: boolean
     customerId?: boolean
     planId?: boolean
   }
 
-  export type SubscriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"subscriptionId" | "startDate" | "endDate" | "status" | "paymentMethod" | "isProcessing" | "planPrice" | "shippingAddress" | "renewalDate" | "createdAt" | "updatedAt" | "nextDeliveryDate" | "customerId" | "planId", ExtArgs["result"]["subscription"]>
+  export type SubscriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"subscriptionId" | "startDate" | "endDate" | "status" | "paymentMethod" | "isProcessing" | "planPrice" | "shippingAddress" | "renewalDate" | "nextDeliveryDate" | "createdAt" | "updatedAt" | "customerId" | "planId", ExtArgs["result"]["subscription"]>
   export type SubscriptionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
     subscriptionPlan?: boolean | SubscriptionPlanDefaultArgs<ExtArgs>
@@ -23032,9 +23032,9 @@ export namespace Prisma {
       planPrice: Prisma.Decimal
       shippingAddress: string
       renewalDate: Date | null
+      nextDeliveryDate: Date | null
       createdAt: Date
       updatedAt: Date
-      nextDeliveryDate: Date | null
       customerId: bigint
       planId: bigint
     }, ExtArgs["result"]["subscription"]>
@@ -23472,9 +23472,9 @@ export namespace Prisma {
     readonly planPrice: FieldRef<"Subscription", 'Decimal'>
     readonly shippingAddress: FieldRef<"Subscription", 'String'>
     readonly renewalDate: FieldRef<"Subscription", 'DateTime'>
+    readonly nextDeliveryDate: FieldRef<"Subscription", 'DateTime'>
     readonly createdAt: FieldRef<"Subscription", 'DateTime'>
     readonly updatedAt: FieldRef<"Subscription", 'DateTime'>
-    readonly nextDeliveryDate: FieldRef<"Subscription", 'DateTime'>
     readonly customerId: FieldRef<"Subscription", 'BigInt'>
     readonly planId: FieldRef<"Subscription", 'BigInt'>
   }
@@ -29941,9 +29941,9 @@ export namespace Prisma {
     planPrice: 'planPrice',
     shippingAddress: 'shippingAddress',
     renewalDate: 'renewalDate',
+    nextDeliveryDate: 'nextDeliveryDate',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    nextDeliveryDate: 'nextDeliveryDate',
     customerId: 'customerId',
     planId: 'planId'
   };
@@ -31581,9 +31581,9 @@ export namespace Prisma {
     planPrice?: DecimalFilter<"Subscription"> | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFilter<"Subscription"> | string
     renewalDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
+    nextDeliveryDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
-    nextDeliveryDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     customerId?: BigIntFilter<"Subscription"> | bigint | number
     planId?: BigIntFilter<"Subscription"> | bigint | number
     customer?: XOR<CustomerScalarRelationFilter, CustomerWhereInput>
@@ -31601,9 +31601,9 @@ export namespace Prisma {
     planPrice?: SortOrder
     shippingAddress?: SortOrder
     renewalDate?: SortOrderInput | SortOrder
+    nextDeliveryDate?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    nextDeliveryDate?: SortOrderInput | SortOrder
     customerId?: SortOrder
     planId?: SortOrder
     customer?: CustomerOrderByWithRelationInput
@@ -31624,9 +31624,9 @@ export namespace Prisma {
     planPrice?: DecimalFilter<"Subscription"> | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFilter<"Subscription"> | string
     renewalDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
+    nextDeliveryDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
-    nextDeliveryDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     customerId?: BigIntFilter<"Subscription"> | bigint | number
     planId?: BigIntFilter<"Subscription"> | bigint | number
     customer?: XOR<CustomerScalarRelationFilter, CustomerWhereInput>
@@ -31644,9 +31644,9 @@ export namespace Prisma {
     planPrice?: SortOrder
     shippingAddress?: SortOrder
     renewalDate?: SortOrderInput | SortOrder
+    nextDeliveryDate?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    nextDeliveryDate?: SortOrderInput | SortOrder
     customerId?: SortOrder
     planId?: SortOrder
     _count?: SubscriptionCountOrderByAggregateInput
@@ -31669,9 +31669,9 @@ export namespace Prisma {
     planPrice?: DecimalWithAggregatesFilter<"Subscription"> | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringWithAggregatesFilter<"Subscription"> | string
     renewalDate?: DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
+    nextDeliveryDate?: DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Subscription"> | Date | string
-    nextDeliveryDate?: DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
     customerId?: BigIntWithAggregatesFilter<"Subscription"> | bigint | number
     planId?: BigIntWithAggregatesFilter<"Subscription"> | bigint | number
   }
@@ -33361,9 +33361,9 @@ export namespace Prisma {
     planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
+    nextDeliveryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    nextDeliveryDate?: Date | string | null
     customer: CustomerCreateNestedOneWithoutSubscriptionsInput
     subscriptionPlan: SubscriptionPlanCreateNestedOneWithoutSubscriptionsInput
     subscriptionDeliveries?: SubscriptionDeliveryCreateNestedManyWithoutSubscriptionInput
@@ -33379,9 +33379,9 @@ export namespace Prisma {
     planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
+    nextDeliveryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    nextDeliveryDate?: Date | string | null
     customerId: bigint | number
     planId: bigint | number
     subscriptionDeliveries?: SubscriptionDeliveryUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -33397,9 +33397,9 @@ export namespace Prisma {
     planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     customer?: CustomerUpdateOneRequiredWithoutSubscriptionsNestedInput
     subscriptionPlan?: SubscriptionPlanUpdateOneRequiredWithoutSubscriptionsNestedInput
     subscriptionDeliveries?: SubscriptionDeliveryUpdateManyWithoutSubscriptionNestedInput
@@ -33415,9 +33415,9 @@ export namespace Prisma {
     planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     customerId?: BigIntFieldUpdateOperationsInput | bigint | number
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
     subscriptionDeliveries?: SubscriptionDeliveryUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -33433,9 +33433,9 @@ export namespace Prisma {
     planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
+    nextDeliveryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    nextDeliveryDate?: Date | string | null
     customerId: bigint | number
     planId: bigint | number
   }
@@ -33450,9 +33450,9 @@ export namespace Prisma {
     planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SubscriptionUncheckedUpdateManyInput = {
@@ -33465,9 +33465,9 @@ export namespace Prisma {
     planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     customerId?: BigIntFieldUpdateOperationsInput | bigint | number
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
   }
@@ -35239,9 +35239,9 @@ export namespace Prisma {
     planPrice?: SortOrder
     shippingAddress?: SortOrder
     renewalDate?: SortOrder
+    nextDeliveryDate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    nextDeliveryDate?: SortOrder
     customerId?: SortOrder
     planId?: SortOrder
   }
@@ -35263,9 +35263,9 @@ export namespace Prisma {
     planPrice?: SortOrder
     shippingAddress?: SortOrder
     renewalDate?: SortOrder
+    nextDeliveryDate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    nextDeliveryDate?: SortOrder
     customerId?: SortOrder
     planId?: SortOrder
   }
@@ -35280,9 +35280,9 @@ export namespace Prisma {
     planPrice?: SortOrder
     shippingAddress?: SortOrder
     renewalDate?: SortOrder
+    nextDeliveryDate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    nextDeliveryDate?: SortOrder
     customerId?: SortOrder
     planId?: SortOrder
   }
@@ -38459,9 +38459,9 @@ export namespace Prisma {
     planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
+    nextDeliveryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    nextDeliveryDate?: Date | string | null
     subscriptionPlan: SubscriptionPlanCreateNestedOneWithoutSubscriptionsInput
     subscriptionDeliveries?: SubscriptionDeliveryCreateNestedManyWithoutSubscriptionInput
   }
@@ -38476,9 +38476,9 @@ export namespace Prisma {
     planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
+    nextDeliveryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    nextDeliveryDate?: Date | string | null
     planId: bigint | number
     subscriptionDeliveries?: SubscriptionDeliveryUncheckedCreateNestedManyWithoutSubscriptionInput
   }
@@ -38631,9 +38631,9 @@ export namespace Prisma {
     planPrice?: DecimalFilter<"Subscription"> | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFilter<"Subscription"> | string
     renewalDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
+    nextDeliveryDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
-    nextDeliveryDate?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     customerId?: BigIntFilter<"Subscription"> | bigint | number
     planId?: BigIntFilter<"Subscription"> | bigint | number
   }
@@ -41527,9 +41527,9 @@ export namespace Prisma {
     planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
+    nextDeliveryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    nextDeliveryDate?: Date | string | null
     customer: CustomerCreateNestedOneWithoutSubscriptionsInput
     subscriptionDeliveries?: SubscriptionDeliveryCreateNestedManyWithoutSubscriptionInput
   }
@@ -41544,9 +41544,9 @@ export namespace Prisma {
     planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
+    nextDeliveryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    nextDeliveryDate?: Date | string | null
     customerId: bigint | number
     subscriptionDeliveries?: SubscriptionDeliveryUncheckedCreateNestedManyWithoutSubscriptionInput
   }
@@ -41646,9 +41646,9 @@ export namespace Prisma {
     planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
+    nextDeliveryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    nextDeliveryDate?: Date | string | null
     customer: CustomerCreateNestedOneWithoutSubscriptionsInput
     subscriptionPlan: SubscriptionPlanCreateNestedOneWithoutSubscriptionsInput
   }
@@ -41663,9 +41663,9 @@ export namespace Prisma {
     planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
+    nextDeliveryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    nextDeliveryDate?: Date | string | null
     customerId: bigint | number
     planId: bigint | number
   }
@@ -41743,9 +41743,9 @@ export namespace Prisma {
     planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     customer?: CustomerUpdateOneRequiredWithoutSubscriptionsNestedInput
     subscriptionPlan?: SubscriptionPlanUpdateOneRequiredWithoutSubscriptionsNestedInput
   }
@@ -41760,9 +41760,9 @@ export namespace Prisma {
     planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     customerId?: BigIntFieldUpdateOperationsInput | bigint | number
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
   }
@@ -42409,9 +42409,9 @@ export namespace Prisma {
     planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
+    nextDeliveryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    nextDeliveryDate?: Date | string | null
     planId: bigint | number
   }
 
@@ -42482,9 +42482,9 @@ export namespace Prisma {
     planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscriptionPlan?: SubscriptionPlanUpdateOneRequiredWithoutSubscriptionsNestedInput
     subscriptionDeliveries?: SubscriptionDeliveryUpdateManyWithoutSubscriptionNestedInput
   }
@@ -42499,9 +42499,9 @@ export namespace Prisma {
     planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
     subscriptionDeliveries?: SubscriptionDeliveryUncheckedUpdateManyWithoutSubscriptionNestedInput
   }
@@ -42516,9 +42516,9 @@ export namespace Prisma {
     planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     planId?: BigIntFieldUpdateOperationsInput | bigint | number
   }
 
@@ -43510,9 +43510,9 @@ export namespace Prisma {
     planPrice?: Decimal | DecimalJsLike | number | string
     shippingAddress: string
     renewalDate?: Date | string | null
+    nextDeliveryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    nextDeliveryDate?: Date | string | null
     customerId: bigint | number
   }
 
@@ -43526,9 +43526,9 @@ export namespace Prisma {
     planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     customer?: CustomerUpdateOneRequiredWithoutSubscriptionsNestedInput
     subscriptionDeliveries?: SubscriptionDeliveryUpdateManyWithoutSubscriptionNestedInput
   }
@@ -43543,9 +43543,9 @@ export namespace Prisma {
     planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     customerId?: BigIntFieldUpdateOperationsInput | bigint | number
     subscriptionDeliveries?: SubscriptionDeliveryUncheckedUpdateManyWithoutSubscriptionNestedInput
   }
@@ -43560,9 +43560,9 @@ export namespace Prisma {
     planPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shippingAddress?: StringFieldUpdateOperationsInput | string
     renewalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nextDeliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     customerId?: BigIntFieldUpdateOperationsInput | bigint | number
   }
 

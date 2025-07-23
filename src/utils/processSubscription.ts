@@ -111,11 +111,9 @@ export const hasInsufficientStock = (
   return product.packageSize * quantity > product.stockQuantity;
 };
 
-export const hasInsufficientWalletBalance = (
-  wallet: any,
-  price: Decimal
-): boolean => {
+const hasInsufficientWalletBalance = (wallet: any, price: Decimal): boolean => {
   return (
+    // TODO: only check to balance while wallet deduction placed to update order
     wallet.balance.toNumber() < price.toNumber() ||
     wallet.lockedBalance.toNumber() < price.toNumber()
   );
@@ -417,7 +415,7 @@ export const handleWalletPayment = async (
 
   try {
     const wallet = customer.wallet!;
-
+    // TODO: Shift wallet deduction to update order service
     await prisma.$transaction(async (tx) => {
       // deduct wallet balance for previous cycle
       await tx.wallet.update({

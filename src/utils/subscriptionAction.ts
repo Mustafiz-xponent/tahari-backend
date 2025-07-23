@@ -23,7 +23,7 @@ export const canPauseOrCancelSubscription = async (
   });
   if (!nextDelivery) return { canProceed: true, nextDelivery: null };
   const daysLeft = differenceInCalendarDays(nextDelivery.deliveryDate, today);
-  return { canProceed: daysLeft <= bufferDays, nextDelivery };
+  return { canProceed: daysLeft > bufferDays, nextDelivery };
 };
 export async function pauseOrCancelSubscription(
   subscription: any,
@@ -32,12 +32,12 @@ export async function pauseOrCancelSubscription(
   userId: bigint
 ): Promise<Subscription> {
   return await prisma.$transaction(async (tx) => {
-    const canPauseOrCancel = await canPauseOrCancelSubscription(
+    const { canProceed, nextDelivery } = await canPauseOrCancelSubscription(
       subscription.subscriptionId,
       bufferDays
     );
 
-    if (canPauseOrCancel.canProceed) {
+    if (!canProceed) {
       throw new Error(
         `Can't ${action} subscription within ${bufferDays} days of next delivery`
       );
@@ -47,77 +47,75 @@ export async function pauseOrCancelSubscription(
       where: { subscriptionId: subscription.subscriptionId },
       data: { status: action, nextDeliveryDate: null },
     });
-    // Cancel delivery
-    await tx.subscriptionDelivery.update({
-      where: { deliveryId: canPauseOrCancel.nextDelivery?.deliveryId },
-      data: { status: "CANCELLED" },
-    });
-    // Cancel order
-    const order = await tx.order.update({
-      where: { orderId: canPauseOrCancel.nextDelivery?.orderId },
-      data: { status: "CANCELLED", paymentStatus: "REFUNDED" },
-    });
-    // Create cancelled order tracking
-    await tx.orderTracking.create({
-      data: {
-        orderId: Number(canPauseOrCancel.nextDelivery?.orderId),
-        status: "CANCELLED",
-        description: `Cancelled due to subscription ${action.toLowerCase()}`,
-      },
-    });
-    // update payment record
-    const paymentStatus =
-      subscription.paymentMethod === "WALLET" ? "REFUNDED" : "FAILED";
-    await tx.payment.update({
-      where: { orderId: Number(canPauseOrCancel.nextDelivery?.orderId) },
-      data: { paymentStatus },
-    });
-    if (subscription.paymentMethod === "WALLET") {
-      const walletId = subscription.customer.wallet.walletId;
-      console.log(
-        subscription.customer.wallet.lockedBalance,
-        order.totalAmount
-      );
-      if (
-        Number(subscription.customer.wallet.lockedBalance) <
-        Number(order.totalAmount)
-      ) {
-        throw new Error("Insufficient locked balance");
+    if (nextDelivery) {
+      // Cancel delivery
+      await tx.subscriptionDelivery.update({
+        where: { deliveryId: nextDelivery?.deliveryId },
+        data: { status: "CANCELLED" },
+      });
+      // Cancel order
+      const order = await tx.order.update({
+        where: { orderId: nextDelivery?.orderId },
+        data: { status: "CANCELLED", paymentStatus: "REFUNDED" },
+      });
+      // Create cancelled order tracking
+      await tx.orderTracking.create({
+        data: {
+          orderId: Number(nextDelivery?.orderId),
+          status: "CANCELLED",
+          description: `Cancelled due to subscription ${action.toLowerCase()}`,
+        },
+      });
+      // update payment record
+      const paymentStatus =
+        subscription.paymentMethod === "WALLET" ? "REFUNDED" : "FAILED";
+      await tx.payment.update({
+        where: { orderId: Number(nextDelivery?.orderId) },
+        data: { paymentStatus },
+      });
+      if (subscription.paymentMethod === "WALLET") {
+        const walletId = subscription.customer.wallet.walletId;
+        if (
+          Number(subscription.customer.wallet.lockedBalance) <
+          Number(order.totalAmount)
+        ) {
+          throw new Error("Insufficient locked balance");
+        }
+        // Refund wallet balance
+        await tx.wallet.update({
+          where: { walletId },
+          data: { lockedBalance: { decrement: order.totalAmount } },
+        });
+        // Update wallet transaction record
+        await tx.walletTransaction.update({
+          where: { orderId: nextDelivery?.orderId },
+          data: {
+            transactionType: "REFUND",
+            transactionStatus: "REFUNDED",
+            description: `Refund for Order #${nextDelivery?.orderId}`,
+          },
+        });
+        // get product details
+        const product = await tx.product.findUnique({
+          where: { productId: subscription.subscriptionPlan.productId },
+          select: { stockQuantity: true, packageSize: true },
+        });
+        // update product stock
+        await tx.product.update({
+          where: { productId: subscription.subscriptionPlan.productId },
+          data: { stockQuantity: { increment: product?.packageSize } },
+        });
+        // update stock transaction
+        await tx.stockTransaction.create({
+          data: {
+            quantity: Number(product?.packageSize),
+            transactionType: "IN",
+            productId: subscription.subscriptionPlan.productId,
+            orderId: order.orderId,
+            description: `Stock increased for Order #${nextDelivery?.orderId} ${action}`,
+          },
+        });
       }
-      // Refund wallet balance
-      await tx.wallet.update({
-        where: { walletId },
-        data: { lockedBalance: { decrement: order.totalAmount } },
-      });
-      // Update wallet transaction record
-      await tx.walletTransaction.update({
-        where: { orderId: canPauseOrCancel.nextDelivery?.orderId },
-        data: {
-          transactionType: "REFUND",
-          transactionStatus: "REFUNDED",
-          description: `Refund for Order #${canPauseOrCancel.nextDelivery?.orderId}`,
-        },
-      });
-      // get product details
-      const product = await tx.product.findUnique({
-        where: { productId: subscription.subscriptionPlan.productId },
-        select: { stockQuantity: true, packageSize: true },
-      });
-      // update product stock
-      await tx.product.update({
-        where: { productId: subscription.subscriptionPlan.productId },
-        data: { stockQuantity: { increment: product?.packageSize } },
-      });
-      // update stock transaction
-      await tx.stockTransaction.create({
-        data: {
-          quantity: Number(product?.packageSize),
-          transactionType: "IN",
-          productId: subscription.subscriptionPlan.productId,
-          orderId: order.orderId,
-          description: `Stock increased for Order #${canPauseOrCancel.nextDelivery?.orderId} ${action}`,
-        },
-      });
     }
     let message: string = "";
     if (action === "PAUSED") {
@@ -141,14 +139,14 @@ export async function processResumeSubscription(
     const wallet = customer.wallet;
     const product = plan.product;
     const paymentMethod = subscription.paymentMethod;
-    // Check product stock
-    if (hasInsufficientStock(product, 1)) {
-      throw new Error(`Insufficient product stock`);
-    }
     const now = new Date();
     const frequency = plan.frequency;
     const renewalDate = getNextRenewalDate(now, frequency);
     const nextDeliveryDate = getNextDeliveryDate(now, frequency);
+    // Check product stock
+    if (hasInsufficientStock(product, 1)) {
+      throw new Error(`Insufficient product stock`);
+    }
     // Update subscription
     const updatedSubscription = await tx.subscription.update({
       where: { subscriptionId: subscription.subscriptionId },
@@ -212,7 +210,7 @@ export async function processResumeSubscription(
         },
       });
       // Update product stock
-      await updateProductStock(plan.product, tx, order.orderId);
+      await updateProductStock(product, tx, order.orderId);
     } else if (paymentMethod === "COD") {
       // Create pending payment record
       await tx.payment.create({

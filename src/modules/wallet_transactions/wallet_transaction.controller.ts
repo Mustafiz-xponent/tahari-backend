@@ -112,11 +112,7 @@ export const getCustomerWalletTransactions = async (
     const userId = BigInt(req?.user?.userId!);
 
     const result = await walletTransactionService.getCustomerWalletTransactions(
-      {
-        userId,
-        paginationParams,
-        filterParams,
-      }
+      { userId, paginationParams, filterParams }
     );
 
     res.json({
