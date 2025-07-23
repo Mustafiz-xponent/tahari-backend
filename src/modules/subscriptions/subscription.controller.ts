@@ -201,26 +201,26 @@ export const cancelSubscription = async (
 /**
  * Resume customer subscription by Subscription Id
  */
-// export const resumeSubscription = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const subscriptionId = req.params.id;
-//     const userId = req.user?.userId;
-//     const subscription = await subscriptionService.resumeSubscription(
-//       BigInt(subscriptionId),
-//       userId
-//     );
-//     res.json({
-//       success: true,
-//       message: "Subscription resumed successfully",
-//       data: subscription,
-//     });
-//   } catch (error) {
-//     handleErrorResponse(error, res, "resume subscription");
-//   }
-// };
+export const resumeSubscription = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const subscriptionId = req.params.id;
+    const userId = req.user?.userId;
+    const subscription = await subscriptionService.resumeSubscription(
+      BigInt(subscriptionId),
+      userId
+    );
+    res.json({
+      success: true,
+      message: "Subscription resumed successfully",
+      data: subscription,
+    });
+  } catch (error) {
+    handleErrorResponse(error, res, "resume subscription");
+  }
+};
 /**
  * Delete a subscription by ID
  */

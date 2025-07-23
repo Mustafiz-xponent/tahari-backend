@@ -20,9 +20,10 @@ import {
 } from "@/utils/processSubscription";
 import {
   pauseOrCancelSubscription,
-  // processResumeSubscription,
+  processResumeSubscription,
 } from "@/utils/subscriptionAction";
 import { getBatchAccessibleImageUrls } from "@/utils/fileUpload/s3Aws";
+import { createNotification } from "@/utils/processPayment";
 
 /**
  * Create a new subscription
@@ -56,7 +57,11 @@ export async function createSubscription(
     });
     if (!customer) throw new Error("Customer not found");
     const isPlanPurchased = await prisma.subscription.findFirst({
-      where: { planId: data.planId, customerId: customer.customerId },
+      where: {
+        planId: data.planId,
+        customerId: customer.customerId,
+        NOT: { status: "CANCELLED" },
+      },
     });
     if (isPlanPurchased) throw new Error("Plan already purchased");
     //  Create subscription
@@ -364,38 +369,38 @@ export async function pauseSubscription(
 /**
  * Resume a subscription by its ID
  */
-// export async function resumeSubscription(
-//   subscriptionId: bigint,
-//   userId: bigint
-// ): Promise<Subscription> {
-//   try {
-//     const subscription = await prisma.subscription.findUnique({
-//       where: { subscriptionId: Number(subscriptionId) },
-//       include: {
-//         subscriptionDeliveries: true,
-//         subscriptionPlan: true,
-//         customer: { include: { wallet: true } },
-//       },
-//     });
-//     if (!subscription) throw new Error("Subscription not found");
-//     const customer = await prisma.customer.findUnique({
-//       where: { userId: Number(userId) },
-//     });
-//     if (customer?.customerId !== subscription.customerId) {
-//       throw new Error(`You are not permitted to resume this subscription`);
-//     }
-//     if (
-//       subscription.status === "ACTIVE" ||
-//       subscription.status === "CANCELLED"
-//     ) {
-//       throw new Error(`Subscription already ${subscription.status}`);
-//     }
-//     const result = await processResumeSubscription(subscription, userId);
-//     return result;
-//   } catch (error) {
-//     throw new Error(`Failed to resume subscription: ${getErrorMessage(error)}`);
-//   }
-// }
+export async function resumeSubscription(
+  subscriptionId: bigint,
+  userId: bigint
+): Promise<Subscription> {
+  try {
+    const subscription = await prisma.subscription.findUnique({
+      where: { subscriptionId: Number(subscriptionId) },
+      include: {
+        subscriptionDeliveries: true,
+        subscriptionPlan: { include: { product: true } },
+        customer: { include: { wallet: true } },
+      },
+    });
+    if (!subscription) throw new Error("Subscription not found");
+    const customer = await prisma.customer.findUnique({
+      where: { userId: Number(userId) },
+    });
+    if (customer?.customerId !== subscription.customerId) {
+      throw new Error(`You are not permitted to resume this subscription`);
+    }
+    if (
+      subscription.status === "ACTIVE" ||
+      subscription.status === "CANCELLED"
+    ) {
+      throw new Error(`Subscription already ${subscription.status}`);
+    }
+    const result = await processResumeSubscription(subscription, userId);
+    return result;
+  } catch (error) {
+    throw new Error(`Failed to resume subscription: ${getErrorMessage(error)}`);
+  }
+}
 /**
  * Cancel a subscription by its ID
  */
@@ -425,9 +430,14 @@ export async function cancelSubscription(
     }
     let result;
     if (subscription.status === "PAUSED") {
-      result = await prisma.subscription.update({
-        where: { subscriptionId: subscription.subscriptionId },
-        data: { status: "CANCELLED" },
+      return await prisma.$transaction(async (tx) => {
+        result = await tx.subscription.update({
+          where: { subscriptionId: subscription.subscriptionId },
+          data: { status: "CANCELLED" },
+        });
+        const message = `আপনার সাবস্ক্রিপশনটি বাতিল করা হয়েছে।`;
+        await createNotification(message, "SUBSCRIPTION", userId, tx);
+        return result;
       });
     } else {
       result = await pauseOrCancelSubscription(

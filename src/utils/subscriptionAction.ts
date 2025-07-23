@@ -2,10 +2,13 @@ import { Subscription } from "@/generated/prisma/client";
 import prisma from "@/prisma-client/prismaClient";
 import { differenceInCalendarDays } from "date-fns";
 import {
+  canLockNextPayment,
   createOrderWithItems,
   createSubscriptionDelivery,
   getNextDeliveryDate,
   getNextRenewalDate,
+  hasInsufficientStock,
+  updateProductStock,
 } from "@/utils/processSubscription";
 import { createNotification } from "@/utils/processPayment";
 
@@ -128,89 +131,104 @@ export async function pauseOrCancelSubscription(
   });
 }
 
-// export async function processResumeSubscription(
-//   subscription: any,
-//   userId: bigint
-// ): Promise<Subscription> {
-//   return await prisma.$transaction(async (tx) => {
-//     // Update subscription
-//     const nextRenewalDate = getNextRenewalDate(
-//       new Date(),
-//       subscription.subscriptionplan.frequency
-//     );
-//     const updatedSubscription = await tx.subscription.update({
-//       where: { subscriptionId: subscription.subscriptionId },
-//       data: {
-//         status: "ACTIVE",
-//         planPrice: subscription.subscriptionplan.price,
-//         renewalDate: nextRenewalDate,
-//       },
-//     });
-
-//     const order = await createOrderWithItems(
-//       subscription,
-//       subscription.customer,
-//       subscription.subscriptionplan.product,
-//       subscription.subscriptionplan.price,
-//       subscription.paymentMethod,
-//       tx
-//     );
-//     // Create subscription delivery
-//     await createSubscriptionDelivery(
-//       subscription,
-//       order,
-//       new Date(),
-//       subscription.customer,
-//       subscription.paymentMethod,
-//       tx
-//     );
-//     // update payment record
-//     const paymentStatus =
-//       subscription.paymentMethod === "WALLET" ? "REFUNDED" : "FAILED";
-//     await tx.payment.update({
-//       where: { orderId: Number(canPauseOrCancel.nextDelivery?.orderId) },
-//       data: { paymentStatus },
-//     });
-//     if (subscription.paymentMethod === "WALLET") {
-//       const walletId = subscription.customer.wallet.walletId;
-//       if (subscription.customer.wallet.lockedBalance < order.totalAmount) {
-//         throw new Error("Insufficient locked balance");
-//       }
-//       // Refund wallet balance
-//       await tx.wallet.update({
-//         where: { walletId },
-//         data: { lockedBalance: { decrement: order.totalAmount } },
-//       });
-//       // Update wallet transaction record
-//       await tx.walletTransaction.update({
-//         where: { orderId: canPauseOrCancel.nextDelivery?.orderId },
-//         data: {
-//           transactionType: "REFUND",
-//           transactionStatus: "REFUNDED",
-//           description: `Refund for Order #${canPauseOrCancel.nextDelivery?.orderId}`,
-//         },
-//       });
-//       // get product details
-//       const product = await tx.product.findUnique({
-//         where: { productId: subscription.subscriptionPlan.productId },
-//         select: { stockQuantity: true, packageSize: true },
-//       });
-//       // update product stock
-//       await tx.product.update({
-//         where: { productId: subscription.subscriptionPlan.productId },
-//         data: { stockQuantity: { increment: product?.packageSize } },
-//       });
-//       // update stock transaction
-//       await tx.stockTransaction.create({
-//         data: {
-//           quantity: Number(product?.packageSize),
-//           transactionType: "IN",
-//           productId: subscription.subscriptionPlan.productId,
-//           orderId: order.orderId,
-//           description: `Stock increased for Order #${canPauseOrCancel.nextDelivery?.orderId} ${action}`,
-//         },
-//       });
-//     }
-//     return updatedSubscription;
-//   });
-// }
+export async function processResumeSubscription(
+  subscription: any,
+  userId: bigint
+): Promise<Subscription> {
+  return await prisma.$transaction(async (tx) => {
+    const plan = subscription.subscriptionPlan;
+    const customer = subscription.customer;
+    const wallet = customer.wallet;
+    const product = plan.product;
+    const paymentMethod = subscription.paymentMethod;
+    // Check product stock
+    if (hasInsufficientStock(product, 1)) {
+      throw new Error(`Insufficient product stock`);
+    }
+    const now = new Date();
+    const frequency = plan.frequency;
+    const renewalDate = getNextRenewalDate(now, frequency);
+    const nextDeliveryDate = getNextDeliveryDate(now, frequency);
+    // Update subscription
+    const updatedSubscription = await tx.subscription.update({
+      where: { subscriptionId: subscription.subscriptionId },
+      data: {
+        renewalDate: renewalDate,
+        status: "ACTIVE",
+        planPrice: plan.price,
+        nextDeliveryDate,
+      },
+    });
+    // Create order with items
+    const order = await createOrderWithItems(
+      subscription,
+      customer,
+      product,
+      plan.price,
+      paymentMethod,
+      tx
+    );
+    // Create subscription delivery
+    await createSubscriptionDelivery(
+      subscription,
+      order,
+      now,
+      customer,
+      paymentMethod,
+      tx
+    );
+    //
+    if (paymentMethod === "WALLET") {
+      if (!canLockNextPayment(wallet, plan.price)) {
+        throw new Error("Insufficient wallet balance to lock funds.");
+      }
+      // Lock funds
+      await tx.wallet.update({
+        where: { walletId: wallet.walletId },
+        data: {
+          lockedBalance: { increment: plan.price },
+        },
+      });
+      // Record wallet transaction for lock
+      const walletTransaction = await tx.walletTransaction.create({
+        data: {
+          walletId: wallet.walletId,
+          amount: plan.price,
+          transactionType: "PURCHASE",
+          transactionStatus: "LOCKED",
+          orderId: order.orderId,
+          description: `LOCK_FUNDS_FOR_SUBSCRIPTION:#${subscription.subscriptionId}_PLAN:#${subscription.subscriptionPlan.planId}_ORDER:#${order.orderId}`, // Required description for further processing!!!
+        },
+      });
+      // Create payment record
+      await tx.payment.create({
+        data: {
+          amount: order.totalAmount,
+          paymentMethod: "WALLET",
+          paymentStatus: "LOCKED",
+          orderId: order.orderId,
+          transactionId: `ORDER_${order.orderId}_${Date.now()}`,
+          walletTransactionId: walletTransaction.transactionId,
+        },
+      });
+      // Update product stock
+      await updateProductStock(plan.product, tx, order.orderId);
+    } else if (paymentMethod === "COD") {
+      // Create pending payment record
+      await tx.payment.create({
+        data: {
+          amount: order.totalAmount,
+          paymentMethod: "COD",
+          paymentStatus: "PENDING",
+          orderId: order.orderId,
+          transactionId: `ORDER_${order.orderId}_${Date.now()}`,
+        },
+      });
+    } else {
+      throw new Error("Invalid payment method");
+    }
+    const message = `আপনার সাবস্ক্রিপশনটি পুনরায় চালু করা হয়েছে।`;
+    await createNotification(message, "SUBSCRIPTION", userId, tx);
+    return updatedSubscription;
+  });
+}

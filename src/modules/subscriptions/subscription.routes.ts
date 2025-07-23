@@ -41,13 +41,13 @@ router.patch(
   SubscriptionController.pauseSubscription
 );
 // Route to resume a subscription
-// router.patch(
-// "/resume/:id",
-// authMiddleware,
-// authorizeRoles("CUSTOMER"),
-// validator(zResumeSubscriptionDto),
-// SubscriptionController.resumeSubscription
-// );
+router.patch(
+  "/resume/:id",
+  authMiddleware,
+  authorizeRoles("CUSTOMER"),
+  validator(zResumeSubscriptionDto),
+  SubscriptionController.resumeSubscription
+);
 // Route to cancel a subscription
 router.patch(
   "/cancel/:id",
