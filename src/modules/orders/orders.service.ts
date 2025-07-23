@@ -10,6 +10,7 @@ import { getErrorMessage } from "@/utils/errorHandler";
 import { getBatchAccessibleImageUrls } from "@/utils/fileUpload/s3Aws";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
 import { createNotification } from "@/utils/processPayment";
+import { hasInsufficientWalletBalance } from "@/utils/processSubscription";
 
 interface CustomerOrdersResult {
   orders: Order[];
@@ -152,10 +153,11 @@ export async function updateOrder(
 ): Promise<Order> {
   try {
     // Get current order
+    // TODO: handle cod cancellation
     const currentOrder = await prisma.order.findUnique({
       where: { orderId },
       include: {
-        customer: true,
+        customer: { include: { wallet: true } },
         orderItems: true,
       },
     });
@@ -163,6 +165,7 @@ export async function updateOrder(
 
     return await prisma.$transaction(async (tx) => {
       // Update order
+      // todo: update payment status if delivered or cancelled
       const updatedOrder = await tx.order.update({
         where: { orderId },
         data: {
@@ -230,11 +233,7 @@ export async function updateOrder(
           tx
         );
       }
-      // TODO:  If payment status changed to COMPLETED AND payment method is COD → do stock ops
-      if (
-        data.paymentStatus === "COMPLETED" &&
-        currentOrder.paymentMethod === "COD"
-      ) {
+      if (data.status === "DELIVERED" && currentOrder.paymentMethod === "COD") {
         await Promise.all(
           currentOrder.orderItems.map(async (item) => {
             await tx.product.update({
@@ -267,7 +266,6 @@ export async function updateOrder(
         });
       }
       if (currentOrder.isSubscription) {
-        // TODO: deduct wallet balance related to subscription
         // Update subscription delivery
         await tx.subscriptionDelivery.update({
           where: { orderId },
@@ -275,6 +273,43 @@ export async function updateOrder(
             status: data.status,
           },
         });
+        //
+        if (
+          currentOrder.paymentMethod === "WALLET" &&
+          data.status === "DELIVERED"
+        ) {
+          if (
+            !hasInsufficientWalletBalance(
+              currentOrder.customer.wallet,
+              currentOrder.totalAmount
+            )
+          ) {
+            throw new Error(`Insufficient wallet balance`);
+          }
+          // deduct wallet balance
+          await tx.wallet.update({
+            where: { walletId: currentOrder.customer.wallet?.walletId },
+            data: {
+              lockedBalance: { decrement: currentOrder.totalAmount },
+              balance: { decrement: currentOrder.totalAmount },
+            },
+          });
+          // update wallet transaction record
+          await tx.walletTransaction.update({
+            where: {
+              orderId: currentOrder.orderId,
+            },
+            data: {
+              transactionStatus: "COMPLETED",
+              description: `Payment completed for order #${currentOrder.orderId}`,
+            },
+          });
+          // update payment record
+          await tx.payment.update({
+            where: { orderId },
+            data: { paymentStatus: "COMPLETED" },
+          });
+        }
       }
 
       return updatedOrder;

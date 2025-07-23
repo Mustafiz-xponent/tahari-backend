@@ -17,7 +17,12 @@ const orderStatusEnum = z.enum([
 ]);
 
 // Enum-like validation for PaymentStatus
-const paymentStatusEnum = z.enum(["PENDING", "COMPLETED", "FAILED","REFUNDED"]);
+const paymentStatusEnum = z.enum([
+  "PENDING",
+  "COMPLETED",
+  "FAILED",
+  "REFUNDED",
+]);
 
 /**
  * Zod schema for creating a new order.
@@ -58,10 +63,7 @@ export type CreateOrderDto = z.infer<typeof zCreateOrderDto>;
  */
 export const zUpdateOrderDto = z.object({
   status: orderStatusEnum.optional(),
-  totalAmount: z
-    .number()
-    .nonnegative("Total amount must be non-negative")
-    .optional(),
+
   paymentMethod: z
     .string()
     .min(1, "Payment method must not be empty")
@@ -71,22 +73,26 @@ export const zUpdateOrderDto = z.object({
     .string()
     .min(1, "Shipping address must not be empty")
     .optional(),
-  customerId: z
-    .union([z.string(), z.number()])
-    .transform(BigInt)
-    .refine((val) => val > 0n, {
-      message: "Customer ID must be a positive integer",
-    })
-    .optional(),
-  isSubscription: z.boolean().optional(),
-  isPreorder: z.boolean().optional(),
-  preorderDeliveryDate: z
-    .string()
-    .datetime()
-    .refine((val) => new Date(val) > new Date(), {
-      message: "Preorder delivery date must be in the future",
-    })
-    .optional(),
+  // totalAmount: z
+  //   .number()
+  //   .nonnegative("Total amount must be non-negative")
+  //   .optional(),
+  // customerId: z
+  //   .union([z.string(), z.number()])
+  //   .transform(BigInt)
+  //   .refine((val) => val > 0n, {
+  //     message: "Customer ID must be a positive integer",
+  //   })
+  //   .optional(),
+  // isSubscription: z.boolean().optional(),
+  // isPreorder: z.boolean().optional(),
+  // preorderDeliveryDate: z
+  //   .string()
+  //   .datetime()
+  //   .refine((val) => new Date(val) > new Date(), {
+  //     message: "Preorder delivery date must be in the future",
+  //   })
+  //   .optional(),
 });
 
 /**

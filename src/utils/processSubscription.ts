@@ -111,8 +111,14 @@ export const hasInsufficientStock = (
   return product.packageSize * quantity > product.stockQuantity;
 };
 
-const hasInsufficientWalletBalance = (wallet: any, price: Decimal): boolean => {
-  return wallet.balance.toNumber() < price.toNumber();
+export const hasInsufficientWalletBalance = (
+  wallet: any,
+  price: Decimal
+): boolean => {
+  return (
+    wallet.balance.toNumber() - wallet.lockedBalance.toNumber() <
+    price.toNumber()
+  );
 };
 
 export const canLockNextPayment = (wallet: any, price: Decimal): boolean => {
@@ -398,71 +404,9 @@ export const handleWalletPayment = async (
   subscription: SubscriptionWithRelations,
   today: Date
 ): Promise<void> => {
-  const { customer, subscriptionPlan, planPrice: price } = subscription;
-
-  if (!customer.wallet) {
-    throw new Error(`Wallet not found for customer ${customer.customerId}`);
-  }
-
-  if (hasInsufficientWalletBalance(customer.wallet, price)) {
-    await pauseAndNotifyInsufficientBalance(subscription, customer);
-    return;
-  }
+  const { customer, subscriptionPlan } = subscription;
 
   try {
-    const wallet = customer.wallet!;
-    // TODO: Shift wallet deduction to update order service
-    await prisma.$transaction(async (tx) => {
-      // deduct wallet balance for previous cycle
-      await tx.wallet.update({
-        where: { walletId: Number(wallet.walletId) },
-        data: {
-          lockedBalance: { decrement: price },
-          balance: { decrement: price },
-        },
-      });
-      // find previous wallet transaction
-      const walletTransaction = await tx.walletTransaction.findFirst({
-        where: {
-          walletId: wallet.walletId,
-          transactionType: "PURCHASE",
-          transactionStatus: "LOCKED",
-          description: {
-            contains: `LOCK_FUNDS_FOR_SUBSCRIPTION:#${subscription.subscriptionId}`,
-          },
-        },
-      });
-      if (!walletTransaction) {
-        throw new Error("Wallet transaction not found");
-      }
-      // update wallet transaction
-      await tx.walletTransaction.update({
-        where: {
-          transactionId: walletTransaction?.transactionId,
-        },
-        data: {
-          transactionStatus: "COMPLETED",
-          description: `Payment completed for order #${walletTransaction?.orderId}`,
-        },
-      });
-      // update payment record
-      await tx.payment.update({
-        where: {
-          orderId: Number(walletTransaction.orderId),
-        },
-        data: {
-          paymentStatus: "COMPLETED",
-        },
-      });
-      // Update order payment status
-      await tx.order.update({
-        where: {
-          orderId: Number(walletTransaction.orderId),
-        },
-        data: { paymentStatus: "COMPLETED" },
-      });
-    });
-
     // Handle next renewal payment cycle
     await prisma.$transaction(async (tx) => {
       await handleRenewalWalletPayment(
