@@ -19,6 +19,7 @@ import {
   UpdateProductDto,
 } from "@/modules/products/product.dto";
 import logger from "@/utils/logger";
+import { Prisma } from "@prisma/client";
 
 // Add interface for product with accessible URLs
 interface ProductWithAccessibleImages extends Omit<Product, "imageUrls"> {
@@ -174,12 +175,25 @@ export async function getAllProducts(
   includeRelations = false,
   generateAccessibleUrls = true,
   urlExpiresIn = 300,
-  paginationParams?: PaginationParams
+  paginationParams?: PaginationParams,
+  filters?: { isSubscription?: string; isPreorder?: string }
 ): Promise<PaginatedProductResult> {
   try {
+    const whereClause: { isSubscription?: boolean; isPreorder?: boolean } = {};
+    if (filters?.isSubscription === "true") {
+      whereClause.isSubscription = true;
+    } else if (filters?.isSubscription === "false") {
+      whereClause.isSubscription = false;
+    }
+    if (filters?.isPreorder === "true") {
+      whereClause.isPreorder = true;
+    } else if (filters?.isPreorder === "false") {
+      whereClause.isPreorder = false;
+    }
     // If no pagination params provided, return all products (backward compatibility)
     if (!paginationParams) {
       const products = await prisma.product.findMany({
+        where: whereClause,
         include: includeRelations
           ? {
               category: true,
@@ -204,10 +218,11 @@ export async function getAllProducts(
     const { limit, skip, page } = paginationParams;
 
     // Get total count for pagination metadata
-    const totalCount = await prisma.product.count();
+    const totalCount = await prisma.product.count({ where: whereClause });
 
     // Get paginated products
     const products = await prisma.product.findMany({
+      where: whereClause,
       include: includeRelations
         ? {
             category: true,

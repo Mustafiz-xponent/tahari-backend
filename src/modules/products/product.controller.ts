@@ -20,10 +20,12 @@ const productIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
 });
 
 // Types for pagination
-interface PaginationQuery {
+interface AllProductsQuery {
   page?: string;
   limit?: string;
   include?: string;
+  isPreorder?: string;
+  isSubscription?: string;
 }
 
 interface PaginationParams {
@@ -91,7 +93,7 @@ export const createProduct = [
  * Get all products with optional relations and pagination
  */
 export const getAllProducts = async (
-  req: Request<{}, {}, {}, PaginationQuery>,
+  req: Request<{}, {}, {}, AllProductsQuery>,
   res: Response
 ): Promise<void> => {
   try {
@@ -99,6 +101,9 @@ export const getAllProducts = async (
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 10, 100); // Max 100 items per page
     const skip = (page - 1) * limit;
+    const isSubscription = req.query.isSubscription;
+    const isPreorder = req.query.isPreorder;
+    const filters = { isSubscription, isPreorder };
 
     // Validate pagination parameters
     if (page < 1) {
@@ -129,7 +134,8 @@ export const getAllProducts = async (
       includeRelations,
       true, // generateAccessibleUrls
       300, // urlExpiresIn
-      paginationParams
+      paginationParams,
+      filters
     );
 
     res.json({
