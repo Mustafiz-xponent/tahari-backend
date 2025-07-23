@@ -9,7 +9,7 @@ import { CreateOrderDto, UpdateOrderDto } from "@/modules/orders/orders.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { getBatchAccessibleImageUrls } from "@/utils/fileUpload/s3Aws";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
-import * as notificationService from "@/modules/notifications/notification.service";
+import { createNotification } from "@/utils/processPayment";
 
 interface CustomerOrdersResult {
   orders: Order[];
@@ -244,16 +244,14 @@ export async function updateOrder(
             },
           });
         }
-        if (currentOrder.customer.userId) {
-          const message = getOrderStatusMessage(data.status, orderId)
-            .replace(/\s+/g, " ")
-            .trim();
-          await notificationService.createNotification({
-            message,
-            receiverId: currentOrder.customer.userId,
-            type: "ORDER",
-          });
-        }
+
+        const message = getOrderStatusMessage(data.status, orderId);
+        await createNotification(
+          message,
+          "ORDER",
+          currentOrder.customer.userId,
+          tx
+        );
       }
       //  If payment status changed to COMPLETED AND payment method is COD → do stock ops
       if (

@@ -2,12 +2,12 @@ import { Subscription } from "@/generated/prisma/client";
 import prisma from "@/prisma-client/prismaClient";
 import { differenceInCalendarDays } from "date-fns";
 import {
-  createNotification,
   createOrderWithItems,
   createSubscriptionDelivery,
   getNextDeliveryDate,
   getNextRenewalDate,
 } from "@/utils/processSubscription";
+import { createNotification } from "@/utils/processPayment";
 
 export const canPauseOrCancelSubscription = async (
   subscriptionId: bigint,
@@ -116,13 +116,14 @@ export async function pauseOrCancelSubscription(
         },
       });
     }
-    let message;
+    let message: string = "";
     if (action === "PAUSED") {
       message = `আপনার সাবস্ক্রিপশনটি সাময়িকভাবে স্থগিত করা হয়েছে।`;
-    } else {
+    }
+    if (action === "CANCELLED") {
       message = `আপনার সাবস্ক্রিপশনটি বাতিল করা হয়েছে।`;
     }
-    await createNotification(message, userId, tx);
+    await createNotification(message, "SUBSCRIPTION", userId, tx);
     return updatedSubscription;
   });
 }

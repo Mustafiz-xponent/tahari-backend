@@ -1,10 +1,11 @@
 import { CreatePaymentDto } from "@/modules/payments/payment.dto";
 import prisma from "@/prisma-client/prismaClient";
-import { Payment } from "@/generated/prisma/client";
+import { NotificationType, Payment } from "@/generated/prisma/client";
 import { getErrorMessage } from "@/utils/errorHandler";
-import * as notificationService from "@/modules/notifications/notification.service";
 import axios from "axios";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
+import { getSocketId, io } from "@/utils/socket";
+import { Prisma } from "@prisma/client";
 
 export interface PaymentResult {
   payment?: Payment;
@@ -13,6 +14,24 @@ export interface PaymentResult {
 /**
  * Process payment through customer wallet
  */
+export const createNotification = async (
+  message: string,
+  type: NotificationType,
+  userId: bigint,
+  tx: Prisma.TransactionClient
+) => {
+  const notification = await tx.notification.create({
+    data: {
+      message: message.replace(/\s+/g, " ").trim(),
+      receiverId: userId,
+      type,
+    },
+  });
+  const receiverId = getSocketId(String(userId));
+  if (receiverId) {
+    io.to(receiverId).emit("newNotification", notification);
+  }
+};
 export async function processWalletPayment(
   data: CreatePaymentDto,
   order: any
@@ -107,14 +126,8 @@ export async function processWalletPayment(
         },
       });
     }
-    const message = getOrderStatusMessage(updatedOrder.status, data.orderId)
-      .replace(/\s+/g, " ")
-      .trim();
-    await notificationService.createNotification({
-      message,
-      receiverId: order.customer.userId,
-      type: "ORDER",
-    });
+    const message = getOrderStatusMessage(updatedOrder.status, data.orderId);
+    await createNotification(message, "ORDER", order.customer.userId, tx);
     return {
       payment,
     };
@@ -168,14 +181,9 @@ export async function processCodPayment(
           "Order created and confirmed. payment pending for Cash on Delivery",
       },
     });
-    await notificationService.createNotification({
-      message:
-        `ধন্যবাদ! আপনার অর্ডারটি নিশ্চিত হয়েছে। দয়া করে পণ্য গ্রহণের সময় পেমেন্ট করুন। (অর্ডার আইডিঃ #${data.orderId})`
-          .replace(/\s+/g, " ")
-          .trim(),
-      receiverId: order.customer.userId,
-      type: "ORDER",
-    });
+
+    const message = `ধন্যবাদ! আপনার অর্ডারটি নিশ্চিত হয়েছে। দয়া করে পণ্য গ্রহণের সময় পেমেন্ট করুন। (অর্ডার আইডিঃ #${data.orderId})`;
+    await createNotification(message, "ORDER", order.customer.userId, tx);
     return {
       payment,
     };

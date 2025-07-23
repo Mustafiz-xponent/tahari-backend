@@ -8,8 +8,10 @@ import { Wallet, WalletTransaction } from "@/generated/prisma/client";
 import { CreateWalletDto, UpdateWalletDto } from "@/modules/wallets/wallet.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { processSSLCommerzWalletDeposite } from "@/utils/processWalletDeposite";
-import { validateSSLCommerzPayment } from "@/utils/processPayment";
-import * as notificationService from "@/modules/notifications/notification.service";
+import {
+  createNotification,
+  validateSSLCommerzPayment,
+} from "@/utils/processPayment";
 
 /**
  * Create a new wallet
@@ -130,14 +132,15 @@ export async function handleDepositeSuccess(
             customer: true,
           },
         });
-        await notificationService.createNotification({
-          message:
-            `অভিনন্দন! আপনার ওয়ালেটে ${walletTransaction.amount} টাকা সফলভাবে জমা হয়েছে। ধন্যবাদ আমাদের সাথে থাকার জন্য। (লেনদেন আইডি: ${tranId})`
-              .replace(/\s+/g, " ")
-              .trim(),
-          receiverId: updatedWallet.customer.userId,
-          type: "WALLET",
-        });
+        // notify the user--
+        const message = `অভিনন্দন! আপনার ওয়ালেটে ${walletTransaction.amount} টাকা সফলভাবে জমা হয়েছে। ধন্যবাদ আমাদের সাথে থাকার জন্য। (লেনদেন আইডি: ${tranId})`;
+        await createNotification(
+          message,
+          "WALLET",
+          updatedWallet.customer.userId,
+          tx
+        );
+
         return {
           success: true,
           message: "Wallet deposite completed successfully.",
@@ -194,20 +197,21 @@ export async function handleDepositeFailure(failureData: any): Promise<void> {
     });
 
     if (walletTransaction) {
-      await prisma.walletTransaction.update({
-        where: { transactionId: walletTransaction.transactionId },
-        data: {
-          transactionStatus: "FAILED",
-          description: `Wallet deposite failed. TransactionId: ${tranId}`,
-        },
-      });
-      await notificationService.createNotification({
-        message:
-          `দুঃখিত! আপনার ওয়ালেটে টাকা জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন বা সহায়তার জন্য আমাদের সাথে যোগাযোগ করুন।`
-            .replace(/\s+/g, " ")
-            .trim(),
-        receiverId: walletTransaction.wallet.customer.userId,
-        type: "WALLET",
+      await prisma.$transaction(async (tx) => {
+        await tx.walletTransaction.update({
+          where: { transactionId: walletTransaction.transactionId },
+          data: {
+            transactionStatus: "FAILED",
+            description: `Wallet deposite failed. TransactionId: ${tranId}`,
+          },
+        });
+        const message = `দুঃখিত! আপনার ওয়ালেটে টাকা জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন বা সহায়তার জন্য আমাদের সাথে যোগাযোগ করুন।`;
+        await createNotification(
+          message,
+          "WALLET",
+          walletTransaction.wallet.customer.userId,
+          tx
+        );
       });
     }
   } catch (error) {
