@@ -27,7 +27,12 @@ router.get(
 router.get("/:id", OrderController.getOrderById);
 
 // Route to update an order's details
-router.put("/:id", OrderController.updateOrder);
+router.put(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  OrderController.updateOrder
+);
 
 // Route to delete an order
 router.delete("/:id", OrderController.deleteOrder);

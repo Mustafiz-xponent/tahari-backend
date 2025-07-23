@@ -147,49 +147,28 @@ export async function getOrderById(orderId: BigInt) {
  * @throws Error if the order is not found or update fails
  */
 export async function updateOrder(
-  orderId: BigInt,
+  orderId: bigint,
   data: UpdateOrderDto
 ): Promise<Order> {
   try {
+    // Get current order
+    const currentOrder = await prisma.order.findUnique({
+      where: { orderId },
+      include: {
+        customer: true,
+        orderItems: true,
+      },
+    });
+    if (!currentOrder) throw new Error("Order not found");
+
     return await prisma.$transaction(async (tx) => {
-      if (data.customerId) {
-        const customer = await tx.customer.findUnique({
-          where: { customerId: data.customerId },
-        });
-        if (!customer) throw new Error("Customer not found");
-      }
-
-      // Get current order status
-      const currentOrder = await tx.order.findUnique({
-        where: { orderId: Number(orderId) },
-        select: {
-          status: true,
-          paymentStatus: true,
-          paymentMethod: true,
-          orderItems: true,
-          customer: true,
-          isPreorder: true,
-          isSubscription: true,
-        },
-      });
-
-      if (!currentOrder) throw new Error("Order not found");
-
       // Update order
       const updatedOrder = await tx.order.update({
-        where: { orderId: Number(orderId) },
+        where: { orderId },
         data: {
           status: data.status,
-          totalAmount: data.totalAmount,
-          paymentMethod: data.paymentMethod,
           paymentStatus: data.paymentStatus,
           shippingAddress: data.shippingAddress,
-          customerId: data.customerId,
-          isSubscription: data.isSubscription,
-          isPreorder: data.isPreorder,
-          preorderDeliveryDate: data.preorderDeliveryDate
-            ? new Date(data.preorderDeliveryDate)
-            : undefined,
         },
       });
       if (data.status) {
@@ -216,7 +195,7 @@ export async function updateOrder(
           // Delete any forward tracking records
           await tx.orderTracking.deleteMany({
             where: {
-              orderId: Number(orderId),
+              orderId,
               status: {
                 in: orderStatusFlow.filter(
                   (status) => orderStatusFlow.indexOf(status) > newStatusIndex
@@ -230,21 +209,19 @@ export async function updateOrder(
       if (data.status && data.status !== currentOrder.status) {
         const alreadyTracked = await tx.orderTracking.findFirst({
           where: {
-            orderId: Number(orderId),
+            orderId,
             status: data.status,
           },
         });
-
         if (!alreadyTracked) {
           await tx.orderTracking.create({
             data: {
-              orderId: Number(orderId),
+              orderId,
               status: data.status,
               description: `Status updated to ${data.status}`,
             },
           });
         }
-
         const message = getOrderStatusMessage(data.status, orderId);
         await createNotification(
           message,
@@ -253,7 +230,7 @@ export async function updateOrder(
           tx
         );
       }
-      //  If payment status changed to COMPLETED AND payment method is COD → do stock ops
+      // TODO:  If payment status changed to COMPLETED AND payment method is COD → do stock ops
       if (
         data.paymentStatus === "COMPLETED" &&
         currentOrder.paymentMethod === "COD"
@@ -283,15 +260,17 @@ export async function updateOrder(
 
         // update payment record
         await tx.payment.update({
-          where: { orderId: Number(orderId), paymentMethod: "COD" },
+          where: { orderId, paymentMethod: "COD" },
           data: {
             paymentStatus: "COMPLETED",
           },
         });
       }
       if (currentOrder.isSubscription) {
+        // TODO: deduct wallet balance related to subscription
+        // Update subscription delivery
         await tx.subscriptionDelivery.update({
-          where: { orderId: Number(orderId) },
+          where: { orderId },
           data: {
             status: data.status,
           },

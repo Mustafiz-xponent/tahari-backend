@@ -112,11 +112,7 @@ export const hasInsufficientStock = (
 };
 
 const hasInsufficientWalletBalance = (wallet: any, price: Decimal): boolean => {
-  return (
-    // TODO: only check to balance while wallet deduction placed to update order
-    wallet.balance.toNumber() < price.toNumber() ||
-    wallet.lockedBalance.toNumber() < price.toNumber()
-  );
+  return wallet.balance.toNumber() < price.toNumber();
 };
 
 export const canLockNextPayment = (wallet: any, price: Decimal): boolean => {
