@@ -284,7 +284,7 @@ export async function updateOrder(
           data.status === "DELIVERED"
         ) {
           if (
-            !hasInsufficientWalletBalance(
+            hasInsufficientWalletBalance(
               currentOrder.customer.wallet,
               currentOrder.totalAmount
             )

@@ -129,26 +129,6 @@ export const canLockNextPayment = (wallet: any, price: Decimal): boolean => {
 };
 
 // Notification helper functions
-const pauseAndNotifyInsufficientBalance = async (
-  subscription: SubscriptionWithRelations,
-  customer: CustomerWithWallet
-) => {
-  await prisma.$transaction(async (tx) => {
-    await pauseSubscription(subscription.subscriptionId, tx);
-
-    await createNotification(
-      "আপনার সাবস্ক্রিপশন পর্যাপ্ত ওয়ালেট ব্যালেন্সের অভাবে সাময়িকভাবে বন্ধ হয়েছে। অনুগ্রহ করে রিচার্জ করুন।",
-      "SUBSCRIPTION",
-      customer.userId,
-      tx
-    );
-  });
-
-  logger.warn(
-    `Subscription ${subscription.subscriptionId} paused due to insufficient balance.`
-  );
-};
-
 const pauseAndNotifyInsufficientStock = async (
   subscription: SubscriptionWithRelations,
   customer: CustomerWithWallet,
@@ -250,7 +230,7 @@ export const createOrderWithItems = async (
       status: "CONFIRMED",
       description:
         paymentMethod === "WALLET"
-          ? "Order confirmed and payment completed via wallet"
+          ? "Order confirmed and payment locked in wallet"
           : "Order created and confirmed. payment pending for Cash on Delivery",
     },
   });
@@ -405,7 +385,6 @@ export const handleWalletPayment = async (
   today: Date
 ): Promise<void> => {
   const { customer, subscriptionPlan } = subscription;
-
   try {
     // Handle next renewal payment cycle
     await prisma.$transaction(async (tx) => {
