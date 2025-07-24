@@ -222,19 +222,23 @@ export const createOrderWithItems = async (
       productId: product.productId,
     },
   });
-
-  // Track the order
-  await tx.orderTracking.create({
-    data: {
-      orderId: order.orderId,
-      status: "CONFIRMED",
-      description:
-        paymentMethod === "WALLET"
-          ? "Order confirmed and payment locked in wallet"
-          : "Order created and confirmed. payment pending for Cash on Delivery",
-    },
+  await tx.orderTracking.createMany({
+    data: [
+      {
+        orderId: order.orderId,
+        status: "PENDING", // Created a pending tracking record for consistency
+        description: "Order created and waiting for confirmation",
+      },
+      {
+        orderId: order.orderId,
+        status: "CONFIRMED",
+        description:
+          paymentMethod === "WALLET"
+            ? "Order confirmed and payment locked in wallet"
+            : "Order confirmed. Payment pending for Cash on Delivery",
+      },
+    ],
   });
-
   return order;
 };
 export const createSubscriptionDelivery = async (
