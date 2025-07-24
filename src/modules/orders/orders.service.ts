@@ -161,7 +161,9 @@ export async function updateOrder(
       },
     });
     if (!currentOrder) throw new Error("Order not found");
-
+    if (currentOrder.status === "DELIVERED" && data.status) {
+      throw new Error("Cannot update status after it has been delivered.");
+    }
     return await prisma.$transaction(async (tx) => {
       // Update order
       const isDelivered = data.status === "DELIVERED";
