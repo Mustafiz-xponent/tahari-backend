@@ -268,8 +268,7 @@ export async function handleSSLCommerzFailure(failureData: any): Promise<void> {
       }
 
       if (payment.paymentStatus === "FAILED") {
-        // Already failed, nothing to do
-        return;
+        return; // Already failed, nothing to do
       }
 
       if (payment.paymentStatus !== "PENDING") {

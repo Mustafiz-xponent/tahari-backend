@@ -142,9 +142,7 @@ export async function processCodPayment(
 ): Promise<PaymentResult> {
   return await prisma.$transaction(async (tx) => {
     const existingPayment = await tx.payment.findFirst({
-      where: {
-        orderId: Number(data.orderId),
-      },
+      where: { orderId: Number(data.orderId) },
     });
 
     if (existingPayment) {
