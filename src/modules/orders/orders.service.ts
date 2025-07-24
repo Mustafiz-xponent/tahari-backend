@@ -153,7 +153,6 @@ export async function updateOrder(
 ): Promise<Order> {
   try {
     // Get current order
-    // TODO: handle cod cancellation
     const currentOrder = await prisma.order.findUnique({
       where: { orderId },
       include: {
@@ -165,12 +164,14 @@ export async function updateOrder(
 
     return await prisma.$transaction(async (tx) => {
       // Update order
-      // todo: update payment status if delivered or cancelled
+      const isDelivered = data.status === "DELIVERED";
       const updatedOrder = await tx.order.update({
         where: { orderId },
         data: {
           status: data.status,
-          paymentStatus: data.paymentStatus,
+          paymentStatus:
+            data.paymentStatus ??
+            (isDelivered ? "COMPLETED" : currentOrder.paymentStatus),
           shippingAddress: data.shippingAddress,
         },
       });
@@ -273,7 +274,6 @@ export async function updateOrder(
             status: data.status,
           },
         });
-        //
         if (
           currentOrder.paymentMethod === "WALLET" &&
           data.status === "DELIVERED"
