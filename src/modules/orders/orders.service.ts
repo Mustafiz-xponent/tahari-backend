@@ -173,6 +173,9 @@ export async function updateOrder(
             data.paymentStatus ??
             (isDelivered ? "COMPLETED" : currentOrder.paymentStatus),
           shippingAddress: data.shippingAddress,
+          preorderDeliveryDate: currentOrder.isPreorder
+            ? data.preorderDeliveryDate
+            : currentOrder.preorderDeliveryDate,
         },
       });
       if (data.status) {

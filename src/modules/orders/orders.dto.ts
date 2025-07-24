@@ -73,6 +73,13 @@ export const zUpdateOrderDto = z.object({
     .string()
     .min(1, "Shipping address must not be empty")
     .optional(),
+  preorderDeliveryDate: z
+    .string()
+    .datetime()
+    .refine((val) => new Date(val) > new Date(), {
+      message: "Preorder delivery date must be in the future",
+    })
+    .optional(),
   // totalAmount: z
   //   .number()
   //   .nonnegative("Total amount must be non-negative")
@@ -86,13 +93,6 @@ export const zUpdateOrderDto = z.object({
   //   .optional(),
   // isSubscription: z.boolean().optional(),
   // isPreorder: z.boolean().optional(),
-  // preorderDeliveryDate: z
-  //   .string()
-  //   .datetime()
-  //   .refine((val) => new Date(val) > new Date(), {
-  //     message: "Preorder delivery date must be in the future",
-  //   })
-  //   .optional(),
 });
 
 /**
