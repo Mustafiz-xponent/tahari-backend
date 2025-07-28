@@ -364,6 +364,21 @@ exports.Prisma.NotificationScalarFieldEnum = {
   receiverId: 'receiverId'
 };
 
+exports.Prisma.PromotionScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  imageUrl: 'imageUrl',
+  targetType: 'targetType',
+  productId: 'productId',
+  priority: 'priority',
+  route: 'route',
+  placement: 'placement',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -472,6 +487,19 @@ exports.NotificationType = exports.$Enums.NotificationType = {
   REFUND: 'REFUND'
 };
 
+exports.PromoTargetType = exports.$Enums.PromoTargetType = {
+  PRODUCT: 'PRODUCT',
+  SUBSCRIPTION_PLAN: 'SUBSCRIPTION_PLAN',
+  DEAL: 'DEAL',
+  OFFER: 'OFFER'
+};
+
+exports.PromoPlacement = exports.$Enums.PromoPlacement = {
+  HOME_TOP: 'HOME_TOP',
+  HOME_BOTTOM: 'HOME_BOTTOM',
+  HOME_MIDDLE: 'HOME_MIDDLE'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Admin: 'Admin',
@@ -494,7 +522,8 @@ exports.Prisma.ModelName = {
   SubscriptionDelivery: 'SubscriptionDelivery',
   Payment: 'Payment',
   Message: 'Message',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  Promotion: 'Promotion'
 };
 
 /**

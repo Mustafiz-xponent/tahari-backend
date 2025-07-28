@@ -4,9 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 // Enum for  User Role 
@@ -124,6 +124,19 @@ enum NotificationType {
   REFUND
 }
 
+enum PromoTargetType {
+  PRODUCT
+  SUBSCRIPTION_PLAN
+  DEAL
+  OFFER
+}
+
+enum PromoPlacement {
+  HOME_TOP
+  HOME_BOTTOM
+  HOME_MIDDLE
+}
+
 model User {
   userId           BigInt         @id @default(autoincrement())
   email            String?        @unique
@@ -233,6 +246,7 @@ model Product {
   stockTransactions        StockTransaction[]
   subscriptionPlans        SubscriptionPlan[]
   orderItems               OrderItem[]
+  promotions               Promotion[]
   // deal                     Deal?               @relation(fields: [dealId], references: [dealId])
   // dealId                   BigInt?
 
@@ -527,6 +541,24 @@ model Notification {
   receiverId     BigInt?
 
   @@index([notificationId])
+}
+
+model Promotion {
+  id          BigInt          @id @default(autoincrement())
+  title       String
+  description String?
+  imageUrl    String
+  targetType  PromoTargetType // PRODUCT or ROUTE
+  productId   BigInt?
+  priority    Int             @default(1)
+  route       String?
+  placement   PromoPlacement
+  isActive    Boolean         @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product? @relation(fields: [productId], references: [productId])
 }
 
 // model Deal {
