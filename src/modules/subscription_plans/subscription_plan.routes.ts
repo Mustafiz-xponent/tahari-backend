@@ -18,20 +18,10 @@ router.post(
 );
 
 // Route to get all subscription plans
-router.get(
-  "/",
-  authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN", "CUSTOMER", "SUPPORT"),
-  SubscriptionPlanController.getAllSubscriptionPlans
-);
+router.get("/", SubscriptionPlanController.getAllSubscriptionPlans);
 
 // Route to get a subscription plan by ID
-router.get(
-  "/:id",
-  authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN", "CUSTOMER", "SUPPORT"),
-  SubscriptionPlanController.getSubscriptionPlanById
-);
+router.get("/:id", SubscriptionPlanController.getSubscriptionPlanById);
 
 // Route to update a subscription plan's details
 router.put(
