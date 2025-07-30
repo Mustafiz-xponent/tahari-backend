@@ -3,11 +3,11 @@ import prisma from "@/prisma-client/prismaClient";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { CreatePromotionDto } from "@/modules/promotions/promotion.dto";
 import { multerFileToFileObject } from "@/utils/fileUpload/configMulterUpload";
-import { uploadFileToS3 } from "@/utils/fileUpload/s3Aws";
+import {
+  getAccessibleImageUrl,
+  uploadFileToS3,
+} from "@/utils/fileUpload/s3Aws";
 
-/**
- * Create a new promotion
- */
 interface IMulterFile {
   fieldname: string;
   originalname: string;
@@ -16,6 +16,15 @@ interface IMulterFile {
   buffer: Buffer;
   size: number;
 }
+interface IPromotionsResponse {
+  promotions: Promotion[];
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+}
+/**
+ * Create a new promotion
+ */
 export async function createPromotion(
   data: CreatePromotionDto,
   file?: IMulterFile
@@ -55,11 +64,50 @@ export async function createPromotion(
 /**
  * Get all promotions
  */
-export async function getAllPromotions(promotionId: bigint): Promise<void> {
+export async function getAllPromotions(
+  paginationParams: { page: number; limit: number; skip: number; sort: string },
+  filterParams: { placement: string; targetType: string }
+): Promise<IPromotionsResponse> {
   try {
-    await prisma.promotion.delete({
-      where: { promotionId: Number(promotionId) },
+    const { page, limit, skip, sort } = paginationParams;
+    const { placement, targetType } = filterParams;
+    const whereConditions: any = {
+      ...(placement ? { placement } : {}),
+      ...(targetType ? { targetType } : {}),
+    };
+
+    const promotions = await prisma.promotion.findMany({
+      where: whereConditions,
+      take: limit,
+      skip: skip,
+      orderBy: {
+        createdAt: sort === "asc" ? "asc" : "desc",
+      },
     });
+    const promotionWithUrls = await Promise.all(
+      promotions.map(async (promotion) => {
+        let accessibleUrl: string | undefined;
+        if (promotion.imageUrl) {
+          accessibleUrl = await getAccessibleImageUrl(
+            promotion.imageUrl as string,
+            true
+          );
+        }
+        return {
+          ...promotion,
+          accessibleImageUrl: accessibleUrl,
+        };
+      })
+    );
+    const totalPromotions = await prisma.promotion.count({
+      where: whereConditions,
+    });
+    return {
+      promotions: promotionWithUrls,
+      currentPage: page,
+      totalPages: Math.ceil(totalPromotions / limit),
+      totalCount: totalPromotions,
+    };
   } catch (error) {
     throw new Error(`Failed to retrive promotion: ${getErrorMessage(error)}`);
   }
