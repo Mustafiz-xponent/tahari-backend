@@ -66,7 +66,7 @@ export async function createPromotion(
  */
 export async function getAllPromotions(
   paginationParams: { page: number; limit: number; skip: number; sort: string },
-  filterParams: { placement: string; targetType: string }
+  filterParams: { placement?: string; targetType?: string }
 ): Promise<IPromotionsResponse> {
   try {
     const { page, limit, skip, sort } = paginationParams;

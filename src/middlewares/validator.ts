@@ -30,7 +30,6 @@ const validator = (schemas: Schemas): RequestHandler => {
       );
       const bodyData = isMultipart ? coerceFormValues(req.body) : req.body;
       const bodyResult = await schemas.body.safeParseAsync(bodyData);
-      console.log(req.body, isMultipart);
       if (!bodyResult.success) {
         bodyResult.error.errors.forEach((err) => {
           errors.push({

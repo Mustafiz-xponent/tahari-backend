@@ -29,9 +29,19 @@ router.get("/", promotionController.getAllPromotions);
 router.get("/:id", promotionController.getPromotionById);
 
 // Route to update a promotion's details
-router.put("/:id", promotionController.updatePromotion);
+router.put(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  promotionController.updatePromotion
+);
 
 // Route to delete a promotion
-router.delete("/:id", promotionController.deletePromotion);
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  promotionController.deletePromotion
+);
 
 export default router;

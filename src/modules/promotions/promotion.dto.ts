@@ -1,6 +1,15 @@
 import { PromoPlacement, PromoTargetType } from "@/generated/prisma/client";
 import { z } from "zod";
 
+const zBigIntId = (fieldName: string) =>
+  z
+    .union([z.string(), z.number()])
+    .refine((val) => val !== "", { message: `${fieldName} is required` })
+    .transform((val) => BigInt(val))
+    .refine((val) => val > 0n, {
+      message: `${fieldName} must be a positive integer`,
+    });
+
 export const zCreatePromotionDto = {
   body: z
     .object({
@@ -14,14 +23,7 @@ export const zCreatePromotionDto = {
           message: "Invalid target type",
         }),
       }),
-      productId: z
-        .union([z.string(), z.number()])
-        .refine((val) => val !== "", { message: "Product ID is required" })
-        .transform((val) => BigInt(val))
-        .refine((val) => val > 0n, {
-          message: "Product ID must be a positive integer",
-        })
-        .optional(),
+      productId: zBigIntId("Product ID").optional(),
       placement: z.nativeEnum(PromoPlacement, {
         errorMap: () => ({
           message: "Invalid placement",
