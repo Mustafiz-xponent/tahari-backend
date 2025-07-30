@@ -25,7 +25,12 @@ const validator = (schemas: Schemas): RequestHandler => {
       [];
 
     if (schemas.body) {
-      const bodyResult = await schemas.body.safeParseAsync(req.body);
+      const isMultipart = req.headers["content-type"]?.includes(
+        "multipart/form-data"
+      );
+      const bodyData = isMultipart ? coerceFormValues(req.body) : req.body;
+      const bodyResult = await schemas.body.safeParseAsync(bodyData);
+      console.log(req.body, isMultipart);
       if (!bodyResult.success) {
         bodyResult.error.errors.forEach((err) => {
           errors.push({
@@ -82,9 +87,30 @@ const validator = (schemas: Schemas): RequestHandler => {
       });
       return;
     }
-
     next();
   };
 };
 
 export default validator;
+
+/**
+ * Coerces form data values to their proper types.
+ * @param obj an object with string values
+ * @returns an object with the same keys as `obj` but with the values coerced to their proper types
+ * @description converts "true" to true, "false" to false, and "123" to 123
+ **/
+function coerceFormValues(obj: Record<string, any>) {
+  const result: Record<string, any> = {};
+
+  for (const key in obj) {
+    const val = obj[key];
+
+    if (val === "true") result[key] = true;
+    else if (val === "false") result[key] = false;
+    else if (!isNaN(Number(val)) && val.trim() !== "")
+      result[key] = Number(val);
+    else result[key] = val;
+  }
+
+  return result;
+}

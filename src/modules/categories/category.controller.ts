@@ -42,25 +42,6 @@ export const createCategory = [
   },
 ];
 
-// /**
-//  * Get all categories
-//  */
-// export const getAllCategories = async (
-//   _req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const categories = await categoryService.getAllCategories();
-//     res.json({
-//       success: true,
-//       message: "Categories retrieved successfully",
-//       data: categories,
-//     });
-//   } catch (error) {
-//     handleErrorResponse(error, res, "fetch categories");
-//   }
-// };
-
 /**
  * Get all categories with accessible image URLs for products
  */

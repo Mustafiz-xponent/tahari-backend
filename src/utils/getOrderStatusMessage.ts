@@ -2,7 +2,7 @@ import { OrderStatus } from "@/generated/prisma/client";
 
 export function getOrderStatusMessage(
   status: OrderStatus,
-  orderId: BigInt
+  orderId: bigint
 ): string {
   switch (status) {
     case "CONFIRMED":

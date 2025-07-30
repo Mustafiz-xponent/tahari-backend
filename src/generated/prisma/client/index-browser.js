@@ -365,14 +365,13 @@ exports.Prisma.NotificationScalarFieldEnum = {
 };
 
 exports.Prisma.PromotionScalarFieldEnum = {
-  id: 'id',
+  promotionId: 'promotionId',
   title: 'title',
   description: 'description',
   imageUrl: 'imageUrl',
   targetType: 'targetType',
   productId: 'productId',
   priority: 'priority',
-  route: 'route',
   placement: 'placement',
   isActive: 'isActive',
   createdAt: 'createdAt',

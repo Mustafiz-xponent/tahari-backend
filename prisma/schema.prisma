@@ -4,9 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 // Enum for  User Role 
@@ -544,14 +544,13 @@ model Notification {
 }
 
 model Promotion {
-  id          BigInt          @id @default(autoincrement())
-  title       String
+  promotionId BigInt          @id @default(autoincrement())
+  title       String?
   description String?
   imageUrl    String
   targetType  PromoTargetType // PRODUCT or ROUTE
   productId   BigInt?
   priority    Int             @default(1)
-  route       String?
   placement   PromoPlacement
   isActive    Boolean         @default(true)
 

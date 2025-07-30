@@ -29863,26 +29863,25 @@ export namespace Prisma {
   }
 
   export type PromotionAvgAggregateOutputType = {
-    id: number | null
+    promotionId: number | null
     productId: number | null
     priority: number | null
   }
 
   export type PromotionSumAggregateOutputType = {
-    id: bigint | null
+    promotionId: bigint | null
     productId: bigint | null
     priority: number | null
   }
 
   export type PromotionMinAggregateOutputType = {
-    id: bigint | null
+    promotionId: bigint | null
     title: string | null
     description: string | null
     imageUrl: string | null
     targetType: $Enums.PromoTargetType | null
     productId: bigint | null
     priority: number | null
-    route: string | null
     placement: $Enums.PromoPlacement | null
     isActive: boolean | null
     createdAt: Date | null
@@ -29890,14 +29889,13 @@ export namespace Prisma {
   }
 
   export type PromotionMaxAggregateOutputType = {
-    id: bigint | null
+    promotionId: bigint | null
     title: string | null
     description: string | null
     imageUrl: string | null
     targetType: $Enums.PromoTargetType | null
     productId: bigint | null
     priority: number | null
-    route: string | null
     placement: $Enums.PromoPlacement | null
     isActive: boolean | null
     createdAt: Date | null
@@ -29905,14 +29903,13 @@ export namespace Prisma {
   }
 
   export type PromotionCountAggregateOutputType = {
-    id: number
+    promotionId: number
     title: number
     description: number
     imageUrl: number
     targetType: number
     productId: number
     priority: number
-    route: number
     placement: number
     isActive: number
     createdAt: number
@@ -29922,26 +29919,25 @@ export namespace Prisma {
 
 
   export type PromotionAvgAggregateInputType = {
-    id?: true
+    promotionId?: true
     productId?: true
     priority?: true
   }
 
   export type PromotionSumAggregateInputType = {
-    id?: true
+    promotionId?: true
     productId?: true
     priority?: true
   }
 
   export type PromotionMinAggregateInputType = {
-    id?: true
+    promotionId?: true
     title?: true
     description?: true
     imageUrl?: true
     targetType?: true
     productId?: true
     priority?: true
-    route?: true
     placement?: true
     isActive?: true
     createdAt?: true
@@ -29949,14 +29945,13 @@ export namespace Prisma {
   }
 
   export type PromotionMaxAggregateInputType = {
-    id?: true
+    promotionId?: true
     title?: true
     description?: true
     imageUrl?: true
     targetType?: true
     productId?: true
     priority?: true
-    route?: true
     placement?: true
     isActive?: true
     createdAt?: true
@@ -29964,14 +29959,13 @@ export namespace Prisma {
   }
 
   export type PromotionCountAggregateInputType = {
-    id?: true
+    promotionId?: true
     title?: true
     description?: true
     imageUrl?: true
     targetType?: true
     productId?: true
     priority?: true
-    route?: true
     placement?: true
     isActive?: true
     createdAt?: true
@@ -30066,14 +30060,13 @@ export namespace Prisma {
   }
 
   export type PromotionGroupByOutputType = {
-    id: bigint
-    title: string
+    promotionId: bigint
+    title: string | null
     description: string | null
     imageUrl: string
     targetType: $Enums.PromoTargetType
     productId: bigint | null
     priority: number
-    route: string | null
     placement: $Enums.PromoPlacement
     isActive: boolean
     createdAt: Date
@@ -30100,14 +30093,13 @@ export namespace Prisma {
 
 
   export type PromotionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
+    promotionId?: boolean
     title?: boolean
     description?: boolean
     imageUrl?: boolean
     targetType?: boolean
     productId?: boolean
     priority?: boolean
-    route?: boolean
     placement?: boolean
     isActive?: boolean
     createdAt?: boolean
@@ -30116,14 +30108,13 @@ export namespace Prisma {
   }, ExtArgs["result"]["promotion"]>
 
   export type PromotionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
+    promotionId?: boolean
     title?: boolean
     description?: boolean
     imageUrl?: boolean
     targetType?: boolean
     productId?: boolean
     priority?: boolean
-    route?: boolean
     placement?: boolean
     isActive?: boolean
     createdAt?: boolean
@@ -30132,14 +30123,13 @@ export namespace Prisma {
   }, ExtArgs["result"]["promotion"]>
 
   export type PromotionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
+    promotionId?: boolean
     title?: boolean
     description?: boolean
     imageUrl?: boolean
     targetType?: boolean
     productId?: boolean
     priority?: boolean
-    route?: boolean
     placement?: boolean
     isActive?: boolean
     createdAt?: boolean
@@ -30148,21 +30138,20 @@ export namespace Prisma {
   }, ExtArgs["result"]["promotion"]>
 
   export type PromotionSelectScalar = {
-    id?: boolean
+    promotionId?: boolean
     title?: boolean
     description?: boolean
     imageUrl?: boolean
     targetType?: boolean
     productId?: boolean
     priority?: boolean
-    route?: boolean
     placement?: boolean
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PromotionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "imageUrl" | "targetType" | "productId" | "priority" | "route" | "placement" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["promotion"]>
+  export type PromotionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"promotionId" | "title" | "description" | "imageUrl" | "targetType" | "productId" | "priority" | "placement" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["promotion"]>
   export type PromotionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     product?: boolean | Promotion$productArgs<ExtArgs>
   }
@@ -30179,14 +30168,13 @@ export namespace Prisma {
       product: Prisma.$ProductPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: bigint
-      title: string
+      promotionId: bigint
+      title: string | null
       description: string | null
       imageUrl: string
       targetType: $Enums.PromoTargetType
       productId: bigint | null
       priority: number
-      route: string | null
       placement: $Enums.PromoPlacement
       isActive: boolean
       createdAt: Date
@@ -30274,8 +30262,8 @@ export namespace Prisma {
      * // Get first 10 Promotions
      * const promotions = await prisma.promotion.findMany({ take: 10 })
      * 
-     * // Only select the `id`
-     * const promotionWithIdOnly = await prisma.promotion.findMany({ select: { id: true } })
+     * // Only select the `promotionId`
+     * const promotionWithPromotionIdOnly = await prisma.promotion.findMany({ select: { promotionId: true } })
      * 
      */
     findMany<T extends PromotionFindManyArgs>(args?: SelectSubset<T, PromotionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -30319,9 +30307,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Create many Promotions and only return the `id`
-     * const promotionWithIdOnly = await prisma.promotion.createManyAndReturn({
-     *   select: { id: true },
+     * // Create many Promotions and only return the `promotionId`
+     * const promotionWithPromotionIdOnly = await prisma.promotion.createManyAndReturn({
+     *   select: { promotionId: true },
      *   data: [
      *     // ... provide data here
      *   ]
@@ -30410,9 +30398,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more Promotions and only return the `id`
-     * const promotionWithIdOnly = await prisma.promotion.updateManyAndReturn({
-     *   select: { id: true },
+     * // Update zero or more Promotions and only return the `promotionId`
+     * const promotionWithPromotionIdOnly = await prisma.promotion.updateManyAndReturn({
+     *   select: { promotionId: true },
      *   where: {
      *     // ... provide filter here
      *   },
@@ -30615,14 +30603,13 @@ export namespace Prisma {
    * Fields of the Promotion model
    */
   interface PromotionFieldRefs {
-    readonly id: FieldRef<"Promotion", 'BigInt'>
+    readonly promotionId: FieldRef<"Promotion", 'BigInt'>
     readonly title: FieldRef<"Promotion", 'String'>
     readonly description: FieldRef<"Promotion", 'String'>
     readonly imageUrl: FieldRef<"Promotion", 'String'>
     readonly targetType: FieldRef<"Promotion", 'PromoTargetType'>
     readonly productId: FieldRef<"Promotion", 'BigInt'>
     readonly priority: FieldRef<"Promotion", 'Int'>
-    readonly route: FieldRef<"Promotion", 'String'>
     readonly placement: FieldRef<"Promotion", 'PromoPlacement'>
     readonly isActive: FieldRef<"Promotion", 'Boolean'>
     readonly createdAt: FieldRef<"Promotion", 'DateTime'>
@@ -31385,14 +31372,13 @@ export namespace Prisma {
 
 
   export const PromotionScalarFieldEnum: {
-    id: 'id',
+    promotionId: 'promotionId',
     title: 'title',
     description: 'description',
     imageUrl: 'imageUrl',
     targetType: 'targetType',
     productId: 'productId',
     priority: 'priority',
-    route: 'route',
     placement: 'placement',
     isActive: 'isActive',
     createdAt: 'createdAt',
@@ -33456,14 +33442,13 @@ export namespace Prisma {
     AND?: PromotionWhereInput | PromotionWhereInput[]
     OR?: PromotionWhereInput[]
     NOT?: PromotionWhereInput | PromotionWhereInput[]
-    id?: BigIntFilter<"Promotion"> | bigint | number
-    title?: StringFilter<"Promotion"> | string
+    promotionId?: BigIntFilter<"Promotion"> | bigint | number
+    title?: StringNullableFilter<"Promotion"> | string | null
     description?: StringNullableFilter<"Promotion"> | string | null
     imageUrl?: StringFilter<"Promotion"> | string
     targetType?: EnumPromoTargetTypeFilter<"Promotion"> | $Enums.PromoTargetType
     productId?: BigIntNullableFilter<"Promotion"> | bigint | number | null
     priority?: IntFilter<"Promotion"> | number
-    route?: StringNullableFilter<"Promotion"> | string | null
     placement?: EnumPromoPlacementFilter<"Promotion"> | $Enums.PromoPlacement
     isActive?: BoolFilter<"Promotion"> | boolean
     createdAt?: DateTimeFilter<"Promotion"> | Date | string
@@ -33472,14 +33457,13 @@ export namespace Prisma {
   }
 
   export type PromotionOrderByWithRelationInput = {
-    id?: SortOrder
-    title?: SortOrder
+    promotionId?: SortOrder
+    title?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     imageUrl?: SortOrder
     targetType?: SortOrder
     productId?: SortOrderInput | SortOrder
     priority?: SortOrder
-    route?: SortOrderInput | SortOrder
     placement?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -33488,33 +33472,31 @@ export namespace Prisma {
   }
 
   export type PromotionWhereUniqueInput = Prisma.AtLeast<{
-    id?: bigint | number
+    promotionId?: bigint | number
     AND?: PromotionWhereInput | PromotionWhereInput[]
     OR?: PromotionWhereInput[]
     NOT?: PromotionWhereInput | PromotionWhereInput[]
-    title?: StringFilter<"Promotion"> | string
+    title?: StringNullableFilter<"Promotion"> | string | null
     description?: StringNullableFilter<"Promotion"> | string | null
     imageUrl?: StringFilter<"Promotion"> | string
     targetType?: EnumPromoTargetTypeFilter<"Promotion"> | $Enums.PromoTargetType
     productId?: BigIntNullableFilter<"Promotion"> | bigint | number | null
     priority?: IntFilter<"Promotion"> | number
-    route?: StringNullableFilter<"Promotion"> | string | null
     placement?: EnumPromoPlacementFilter<"Promotion"> | $Enums.PromoPlacement
     isActive?: BoolFilter<"Promotion"> | boolean
     createdAt?: DateTimeFilter<"Promotion"> | Date | string
     updatedAt?: DateTimeFilter<"Promotion"> | Date | string
     product?: XOR<ProductNullableScalarRelationFilter, ProductWhereInput> | null
-  }, "id">
+  }, "promotionId">
 
   export type PromotionOrderByWithAggregationInput = {
-    id?: SortOrder
-    title?: SortOrder
+    promotionId?: SortOrder
+    title?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     imageUrl?: SortOrder
     targetType?: SortOrder
     productId?: SortOrderInput | SortOrder
     priority?: SortOrder
-    route?: SortOrderInput | SortOrder
     placement?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -33530,14 +33512,13 @@ export namespace Prisma {
     AND?: PromotionScalarWhereWithAggregatesInput | PromotionScalarWhereWithAggregatesInput[]
     OR?: PromotionScalarWhereWithAggregatesInput[]
     NOT?: PromotionScalarWhereWithAggregatesInput | PromotionScalarWhereWithAggregatesInput[]
-    id?: BigIntWithAggregatesFilter<"Promotion"> | bigint | number
-    title?: StringWithAggregatesFilter<"Promotion"> | string
+    promotionId?: BigIntWithAggregatesFilter<"Promotion"> | bigint | number
+    title?: StringNullableWithAggregatesFilter<"Promotion"> | string | null
     description?: StringNullableWithAggregatesFilter<"Promotion"> | string | null
     imageUrl?: StringWithAggregatesFilter<"Promotion"> | string
     targetType?: EnumPromoTargetTypeWithAggregatesFilter<"Promotion"> | $Enums.PromoTargetType
     productId?: BigIntNullableWithAggregatesFilter<"Promotion"> | bigint | number | null
     priority?: IntWithAggregatesFilter<"Promotion"> | number
-    route?: StringNullableWithAggregatesFilter<"Promotion"> | string | null
     placement?: EnumPromoPlacementWithAggregatesFilter<"Promotion"> | $Enums.PromoPlacement
     isActive?: BoolWithAggregatesFilter<"Promotion"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Promotion"> | Date | string
@@ -35350,13 +35331,12 @@ export namespace Prisma {
   }
 
   export type PromotionCreateInput = {
-    id?: bigint | number
-    title: string
+    promotionId?: bigint | number
+    title?: string | null
     description?: string | null
     imageUrl: string
     targetType: $Enums.PromoTargetType
     priority?: number
-    route?: string | null
     placement: $Enums.PromoPlacement
     isActive?: boolean
     createdAt?: Date | string
@@ -35365,14 +35345,13 @@ export namespace Prisma {
   }
 
   export type PromotionUncheckedCreateInput = {
-    id?: bigint | number
-    title: string
+    promotionId?: bigint | number
+    title?: string | null
     description?: string | null
     imageUrl: string
     targetType: $Enums.PromoTargetType
     productId?: bigint | number | null
     priority?: number
-    route?: string | null
     placement: $Enums.PromoPlacement
     isActive?: boolean
     createdAt?: Date | string
@@ -35380,13 +35359,12 @@ export namespace Prisma {
   }
 
   export type PromotionUpdateInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    title?: StringFieldUpdateOperationsInput | string
+    promotionId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     targetType?: EnumPromoTargetTypeFieldUpdateOperationsInput | $Enums.PromoTargetType
     priority?: IntFieldUpdateOperationsInput | number
-    route?: NullableStringFieldUpdateOperationsInput | string | null
     placement?: EnumPromoPlacementFieldUpdateOperationsInput | $Enums.PromoPlacement
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35395,14 +35373,13 @@ export namespace Prisma {
   }
 
   export type PromotionUncheckedUpdateInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    title?: StringFieldUpdateOperationsInput | string
+    promotionId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     targetType?: EnumPromoTargetTypeFieldUpdateOperationsInput | $Enums.PromoTargetType
     productId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     priority?: IntFieldUpdateOperationsInput | number
-    route?: NullableStringFieldUpdateOperationsInput | string | null
     placement?: EnumPromoPlacementFieldUpdateOperationsInput | $Enums.PromoPlacement
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35410,14 +35387,13 @@ export namespace Prisma {
   }
 
   export type PromotionCreateManyInput = {
-    id?: bigint | number
-    title: string
+    promotionId?: bigint | number
+    title?: string | null
     description?: string | null
     imageUrl: string
     targetType: $Enums.PromoTargetType
     productId?: bigint | number | null
     priority?: number
-    route?: string | null
     placement: $Enums.PromoPlacement
     isActive?: boolean
     createdAt?: Date | string
@@ -35425,13 +35401,12 @@ export namespace Prisma {
   }
 
   export type PromotionUpdateManyMutationInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    title?: StringFieldUpdateOperationsInput | string
+    promotionId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     targetType?: EnumPromoTargetTypeFieldUpdateOperationsInput | $Enums.PromoTargetType
     priority?: IntFieldUpdateOperationsInput | number
-    route?: NullableStringFieldUpdateOperationsInput | string | null
     placement?: EnumPromoPlacementFieldUpdateOperationsInput | $Enums.PromoPlacement
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35439,14 +35414,13 @@ export namespace Prisma {
   }
 
   export type PromotionUncheckedUpdateManyInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    title?: StringFieldUpdateOperationsInput | string
+    promotionId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     targetType?: EnumPromoTargetTypeFieldUpdateOperationsInput | $Enums.PromoTargetType
     productId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     priority?: IntFieldUpdateOperationsInput | number
-    route?: NullableStringFieldUpdateOperationsInput | string | null
     placement?: EnumPromoPlacementFieldUpdateOperationsInput | $Enums.PromoPlacement
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -37250,14 +37224,13 @@ export namespace Prisma {
   }
 
   export type PromotionCountOrderByAggregateInput = {
-    id?: SortOrder
+    promotionId?: SortOrder
     title?: SortOrder
     description?: SortOrder
     imageUrl?: SortOrder
     targetType?: SortOrder
     productId?: SortOrder
     priority?: SortOrder
-    route?: SortOrder
     placement?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -37265,20 +37238,19 @@ export namespace Prisma {
   }
 
   export type PromotionAvgOrderByAggregateInput = {
-    id?: SortOrder
+    promotionId?: SortOrder
     productId?: SortOrder
     priority?: SortOrder
   }
 
   export type PromotionMaxOrderByAggregateInput = {
-    id?: SortOrder
+    promotionId?: SortOrder
     title?: SortOrder
     description?: SortOrder
     imageUrl?: SortOrder
     targetType?: SortOrder
     productId?: SortOrder
     priority?: SortOrder
-    route?: SortOrder
     placement?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -37286,14 +37258,13 @@ export namespace Prisma {
   }
 
   export type PromotionMinOrderByAggregateInput = {
-    id?: SortOrder
+    promotionId?: SortOrder
     title?: SortOrder
     description?: SortOrder
     imageUrl?: SortOrder
     targetType?: SortOrder
     productId?: SortOrder
     priority?: SortOrder
-    route?: SortOrder
     placement?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -37301,7 +37272,7 @@ export namespace Prisma {
   }
 
   export type PromotionSumOrderByAggregateInput = {
-    id?: SortOrder
+    promotionId?: SortOrder
     productId?: SortOrder
     priority?: SortOrder
   }
@@ -41110,13 +41081,12 @@ export namespace Prisma {
   }
 
   export type PromotionCreateWithoutProductInput = {
-    id?: bigint | number
-    title: string
+    promotionId?: bigint | number
+    title?: string | null
     description?: string | null
     imageUrl: string
     targetType: $Enums.PromoTargetType
     priority?: number
-    route?: string | null
     placement: $Enums.PromoPlacement
     isActive?: boolean
     createdAt?: Date | string
@@ -41124,13 +41094,12 @@ export namespace Prisma {
   }
 
   export type PromotionUncheckedCreateWithoutProductInput = {
-    id?: bigint | number
-    title: string
+    promotionId?: bigint | number
+    title?: string | null
     description?: string | null
     imageUrl: string
     targetType: $Enums.PromoTargetType
     priority?: number
-    route?: string | null
     placement: $Enums.PromoPlacement
     isActive?: boolean
     createdAt?: Date | string
@@ -41337,14 +41306,13 @@ export namespace Prisma {
     AND?: PromotionScalarWhereInput | PromotionScalarWhereInput[]
     OR?: PromotionScalarWhereInput[]
     NOT?: PromotionScalarWhereInput | PromotionScalarWhereInput[]
-    id?: BigIntFilter<"Promotion"> | bigint | number
-    title?: StringFilter<"Promotion"> | string
+    promotionId?: BigIntFilter<"Promotion"> | bigint | number
+    title?: StringNullableFilter<"Promotion"> | string | null
     description?: StringNullableFilter<"Promotion"> | string | null
     imageUrl?: StringFilter<"Promotion"> | string
     targetType?: EnumPromoTargetTypeFilter<"Promotion"> | $Enums.PromoTargetType
     productId?: BigIntNullableFilter<"Promotion"> | bigint | number | null
     priority?: IntFilter<"Promotion"> | number
-    route?: StringNullableFilter<"Promotion"> | string | null
     placement?: EnumPromoPlacementFilter<"Promotion"> | $Enums.PromoPlacement
     isActive?: BoolFilter<"Promotion"> | boolean
     createdAt?: DateTimeFilter<"Promotion"> | Date | string
@@ -44921,13 +44889,12 @@ export namespace Prisma {
   }
 
   export type PromotionCreateManyProductInput = {
-    id?: bigint | number
-    title: string
+    promotionId?: bigint | number
+    title?: string | null
     description?: string | null
     imageUrl: string
     targetType: $Enums.PromoTargetType
     priority?: number
-    route?: string | null
     placement: $Enums.PromoPlacement
     isActive?: boolean
     createdAt?: Date | string
@@ -45073,13 +45040,12 @@ export namespace Prisma {
   }
 
   export type PromotionUpdateWithoutProductInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    title?: StringFieldUpdateOperationsInput | string
+    promotionId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     targetType?: EnumPromoTargetTypeFieldUpdateOperationsInput | $Enums.PromoTargetType
     priority?: IntFieldUpdateOperationsInput | number
-    route?: NullableStringFieldUpdateOperationsInput | string | null
     placement?: EnumPromoPlacementFieldUpdateOperationsInput | $Enums.PromoPlacement
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45087,13 +45053,12 @@ export namespace Prisma {
   }
 
   export type PromotionUncheckedUpdateWithoutProductInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    title?: StringFieldUpdateOperationsInput | string
+    promotionId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     targetType?: EnumPromoTargetTypeFieldUpdateOperationsInput | $Enums.PromoTargetType
     priority?: IntFieldUpdateOperationsInput | number
-    route?: NullableStringFieldUpdateOperationsInput | string | null
     placement?: EnumPromoPlacementFieldUpdateOperationsInput | $Enums.PromoPlacement
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45101,13 +45066,12 @@ export namespace Prisma {
   }
 
   export type PromotionUncheckedUpdateManyWithoutProductInput = {
-    id?: BigIntFieldUpdateOperationsInput | bigint | number
-    title?: StringFieldUpdateOperationsInput | string
+    promotionId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     targetType?: EnumPromoTargetTypeFieldUpdateOperationsInput | $Enums.PromoTargetType
     priority?: IntFieldUpdateOperationsInput | number
-    route?: NullableStringFieldUpdateOperationsInput | string | null
     placement?: EnumPromoPlacementFieldUpdateOperationsInput | $Enums.PromoPlacement
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
