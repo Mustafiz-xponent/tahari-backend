@@ -10,7 +10,10 @@ import { getErrorMessage } from "@/utils/errorHandler";
 import { getBatchAccessibleImageUrls } from "@/utils/fileUpload/s3Aws";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
 import { createNotification } from "@/utils/processPayment";
-import { hasInsufficientWalletBalance } from "@/utils/processSubscription";
+import {
+  hasInsufficientWalletBalance,
+  upcomingDelivery,
+} from "@/utils/processSubscription";
 
 interface CustomerOrdersResult {
   orders: Order[];
@@ -273,12 +276,26 @@ export async function updateOrder(
       }
       if (currentOrder.isSubscription) {
         // Update subscription delivery
-        await tx.subscriptionDelivery.update({
-          where: { orderId },
-          data: {
-            status: data.status,
-          },
-        });
+        const updatedSubscriptionDelivery =
+          await tx.subscriptionDelivery.update({
+            where: { orderId },
+            data: { status: data.status },
+          });
+        if (data.status === "DELIVERED") {
+          const subscriptionId = updatedSubscriptionDelivery.subscriptionId;
+          const delivery = await upcomingDelivery(tx, subscriptionId);
+          let nextDeliveryDate: Date | null;
+          if (delivery) {
+            nextDeliveryDate = delivery.deliveryDate;
+          } else {
+            nextDeliveryDate = null;
+          }
+          // update subscription delivery date
+          await tx.subscription.update({
+            where: { subscriptionId },
+            data: { nextDeliveryDate },
+          });
+        }
         if (
           currentOrder.paymentMethod === "WALLET" &&
           data.status === "DELIVERED"
@@ -301,9 +318,7 @@ export async function updateOrder(
           });
           // update wallet transaction record
           await tx.walletTransaction.update({
-            where: {
-              orderId: currentOrder.orderId,
-            },
+            where: { orderId },
             data: {
               transactionStatus: "COMPLETED",
               description: `Payment completed for order #${currentOrder.orderId}`,

@@ -103,7 +103,17 @@ export const getNextDeliveryDate = (
 
   return deliveryDate;
 };
-
+export const upcomingDelivery = async (
+  tx: Prisma.TransactionClient,
+  subscriptionId: bigint
+) => {
+  const today = new Date();
+  const upcomingDelivery = await tx.subscriptionDelivery.findFirst({
+    where: { subscriptionId, deliveryDate: { gte: today } },
+    orderBy: { deliveryDate: "asc" },
+  });
+  return upcomingDelivery;
+};
 export const hasInsufficientStock = (
   product: Product,
   quantity: number = 1
@@ -294,7 +304,13 @@ const handleRenewalWalletPayment = async (
   const wallet = customer.wallet!;
   const frequency = subscription.subscriptionPlan.frequency;
   const nextRenewal = getNextRenewalDate(today, frequency);
-  const nextDeliveryDate = getNextDeliveryDate(today, frequency);
+  const delivery = await upcomingDelivery(tx, subscription.subscriptionId);
+  let nextDeliveryDate: Date;
+  if (delivery) {
+    nextDeliveryDate = delivery.deliveryDate;
+  } else {
+    nextDeliveryDate = getNextDeliveryDate(today, frequency);
+  }
 
   const product = await getProduct(subscription, tx);
 
@@ -453,7 +469,13 @@ export const handleCODPayment = async (
     // Update subscription for next delivery
     const frequency = subscription.subscriptionPlan.frequency;
     const nextRenewal = getNextRenewalDate(today, frequency);
-    const nextDeliveryDate = getNextDeliveryDate(today, frequency);
+    const delivery = await upcomingDelivery(tx, subscription.subscriptionId);
+    let nextDeliveryDate: Date;
+    if (delivery) {
+      nextDeliveryDate = delivery.deliveryDate;
+    } else {
+      nextDeliveryDate = getNextDeliveryDate(today, frequency);
+    }
 
     await tx.subscription.update({
       where: { subscriptionId: subscription.subscriptionId },

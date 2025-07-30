@@ -20,7 +20,7 @@ export const canPauseOrCancelSubscription = async (
   const nextDelivery = await prisma.subscriptionDelivery.findFirst({
     where: { subscriptionId, deliveryDate: { gte: today } },
     orderBy: { deliveryDate: "asc" },
-  });
+  }); 
   if (!nextDelivery) return { canProceed: true, nextDelivery: null };
   const daysLeft = differenceInCalendarDays(nextDelivery.deliveryDate, today);
   return { canProceed: daysLeft > bufferDays, nextDelivery };
