@@ -489,6 +489,7 @@ exports.NotificationType = exports.$Enums.NotificationType = {
 exports.PromoTargetType = exports.$Enums.PromoTargetType = {
   PRODUCT: 'PRODUCT',
   SUBSCRIPTION_PLAN: 'SUBSCRIPTION_PLAN',
+  PREORDER: 'PREORDER',
   DEAL: 'DEAL',
   OFFER: 'OFFER'
 };

@@ -72,6 +72,7 @@ export async function getAllPromotions(
     const { page, limit, skip, sort } = paginationParams;
     const { placement, targetType } = filterParams;
     const whereConditions: any = {
+      isActive: true,
       ...(placement ? { placement } : {}),
       ...(targetType ? { targetType } : {}),
     };
@@ -80,9 +81,10 @@ export async function getAllPromotions(
       where: whereConditions,
       take: limit,
       skip: skip,
-      orderBy: {
-        createdAt: sort === "asc" ? "asc" : "desc",
-      },
+      orderBy: [
+        { priority: sort === "asc" ? "asc" : "desc" },
+        { createdAt: sort === "asc" ? "asc" : "desc" },
+      ],
     });
     const promotionWithUrls = await Promise.all(
       promotions.map(async (promotion) => {

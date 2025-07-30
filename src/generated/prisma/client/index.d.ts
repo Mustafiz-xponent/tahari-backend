@@ -295,6 +295,7 @@ export type NotificationType = (typeof NotificationType)[keyof typeof Notificati
 export const PromoTargetType: {
   PRODUCT: 'PRODUCT',
   SUBSCRIPTION_PLAN: 'SUBSCRIPTION_PLAN',
+  PREORDER: 'PREORDER',
   DEAL: 'DEAL',
   OFFER: 'OFFER'
 };
