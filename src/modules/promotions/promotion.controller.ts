@@ -87,9 +87,10 @@ export const getAllPromotions = async (
 export const getPromotionById = async (
   req: Request,
   res: Response
-): Promise<void> => {
+): Promise<any> => {
   try {
-    const promotion = await promotionService.getPromotionById(req.body);
+    const promotionId = BigInt(req.params.id);
+    const promotion = await promotionService.getPromotionById(promotionId);
     res.status(httpStatus.CREATED).json({
       success: true,
       message: "Promotion retrieved successfully",

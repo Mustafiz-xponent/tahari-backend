@@ -47,3 +47,9 @@ export const zCreatePromotionDto = {
     ),
 };
 export type CreatePromotionDto = z.infer<typeof zCreatePromotionDto.body>;
+
+export const zGetPromotionDto = {
+  params: z.object({
+    id: zBigIntId("Promotion ID"),
+  }),
+};

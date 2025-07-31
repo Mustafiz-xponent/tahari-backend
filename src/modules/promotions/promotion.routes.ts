@@ -7,7 +7,10 @@ import { Router } from "express";
 import * as promotionController from "@/modules/promotions/promotion.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 import validator from "@/middlewares/validator";
-import { zCreatePromotionDto } from "@/modules/promotions/promotion.dto";
+import {
+  zCreatePromotionDto,
+  zGetPromotionDto,
+} from "@/modules/promotions/promotion.dto";
 import { upload } from "@/utils/fileUpload/configMulterUpload";
 
 const router = Router();
@@ -26,7 +29,11 @@ router.post(
 router.get("/", promotionController.getAllPromotions);
 
 // Route to get a promotion by ID
-router.get("/:id", promotionController.getPromotionById);
+router.get(
+  "/:id",
+  validator(zGetPromotionDto),
+  promotionController.getPromotionById
+);
 
 // Route to update a promotion's details
 router.put(

@@ -22,6 +22,9 @@ interface IPromotionsResponse {
   totalPages: number;
   totalCount: number;
 }
+type PromotionWithUrl = Promotion & {
+  accessibleImageUrl?: string;
+};
 /**
  * Create a new promotion
  */
@@ -118,11 +121,28 @@ export async function getAllPromotions(
 /**
  * Get promotion by it's ID
  */
-export async function getPromotionById(promotionId: bigint): Promise<void> {
+export async function getPromotionById(
+  promotionId: bigint
+): Promise<PromotionWithUrl> {
   try {
-    await prisma.promotion.delete({
+    const promotion = await prisma.promotion.findUnique({
       where: { promotionId: Number(promotionId) },
     });
+    if (!promotion) throw new Error("Promotion not found");
+
+    let accessibleImageUrl: string | undefined;
+
+    if (promotion.imageUrl) {
+      accessibleImageUrl = await getAccessibleImageUrl(
+        promotion.imageUrl,
+        true
+      );
+    }
+
+    return {
+      ...promotion,
+      accessibleImageUrl,
+    };
   } catch (error) {
     throw new Error(`Failed to retrive promotion: ${getErrorMessage(error)}`);
   }
