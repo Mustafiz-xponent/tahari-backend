@@ -16,18 +16,19 @@ export const zCreatePromotionDto = {
       title: z
         .string()
         .min(3, { message: "Title must be at least 3 characters long" })
+        .max(30, { message: "Title must be at most 30 characters long" })
         .optional(),
-      description: z.string().optional(),
+      description: z
+        .string()
+        .min(3, { message: "Description must be at least 3 characters long" })
+        .max(48, { message: "Description must be at most 48 characters long" })
+        .optional(),
       targetType: z.nativeEnum(PromoTargetType, {
-        errorMap: () => ({
-          message: "Invalid target type",
-        }),
+        errorMap: () => ({ message: "Invalid target type" }),
       }),
       productId: zBigIntId("Product ID").optional(),
       placement: z.nativeEnum(PromoPlacement, {
-        errorMap: () => ({
-          message: "Invalid placement",
-        }),
+        errorMap: () => ({ message: "Invalid placement" }),
       }),
       priority: z
         .number()
