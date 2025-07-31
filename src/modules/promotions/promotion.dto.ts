@@ -53,3 +53,58 @@ export const zGetPromotionDto = {
     id: zBigIntId("Promotion ID"),
   }),
 };
+export const zUpdatePromotionDto = {
+  params: z.object({
+    id: zBigIntId("Promotion ID"),
+  }),
+  body: z
+    .object({
+      title: z
+        .string()
+        .min(3, { message: "Title must be at least 3 characters long" })
+        .max(30, { message: "Title must be at most 30 characters long" })
+        .optional(),
+
+      description: z
+        .string()
+        .min(3, { message: "Description must be at least 3 characters long" })
+        .max(48, { message: "Description must be at most 48 characters long" })
+        .optional(),
+
+      targetType: z
+        .nativeEnum(PromoTargetType, {
+          errorMap: () => ({ message: "Invalid target type" }),
+        })
+        .optional(),
+
+      productId: zBigIntId("Product ID").optional(),
+
+      placement: z
+        .nativeEnum(PromoPlacement, {
+          errorMap: () => ({ message: "Invalid placement" }),
+        })
+        .optional(),
+
+      priority: z
+        .number()
+        .min(1, { message: "Priority must be at least 1" })
+        .optional(),
+
+      isActive: z.boolean().optional(),
+    })
+    .refine(
+      (data) =>
+        (data.productId === undefined || data.targetType === "PRODUCT") &&
+        (data.targetType !== "PRODUCT" || data.productId !== undefined),
+      {
+        message: "productId requires targetType 'PRODUCT', and vice versa.",
+        path: ["productId"],
+      }
+    ),
+};
+export type UpdatePromotionDto = z.infer<typeof zUpdatePromotionDto.body>;
+export const zDeletePromotionDto = {
+  params: z.object({
+    id: zBigIntId("Promotion ID"),
+  }),
+};

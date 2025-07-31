@@ -10,6 +10,7 @@ import validator from "@/middlewares/validator";
 import {
   zCreatePromotionDto,
   zGetPromotionDto,
+  zUpdatePromotionDto,
 } from "@/modules/promotions/promotion.dto";
 import { upload } from "@/utils/fileUpload/configMulterUpload";
 
@@ -40,6 +41,8 @@ router.put(
   "/:id",
   authMiddleware,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  upload.single("image"),
+  validator(zUpdatePromotionDto),
   promotionController.updatePromotion
 );
 

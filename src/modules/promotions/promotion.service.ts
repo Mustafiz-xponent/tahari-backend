@@ -1,9 +1,13 @@
 import { Promotion } from "@/generated/prisma/client";
 import prisma from "@/prisma-client/prismaClient";
 import { getErrorMessage } from "@/utils/errorHandler";
-import { CreatePromotionDto } from "@/modules/promotions/promotion.dto";
+import {
+  CreatePromotionDto,
+  UpdatePromotionDto,
+} from "@/modules/promotions/promotion.dto";
 import { multerFileToFileObject } from "@/utils/fileUpload/configMulterUpload";
 import {
+  deleteFileFromS3,
   getAccessibleImageUrl,
   uploadFileToS3,
 } from "@/utils/fileUpload/s3Aws";
@@ -35,15 +39,10 @@ export async function createPromotion(
   try {
     if (!file) throw new Error("Image is required");
     // Upload image to S3
-    let imageRes;
+    let s3Res;
     if (file) {
       const fileObject = multerFileToFileObject(file);
-      imageRes = await uploadFileToS3(
-        fileObject,
-        "categories",
-        undefined,
-        true
-      );
+      s3Res = await uploadFileToS3(fileObject, "promotions", undefined, true);
     }
 
     const promotion = await prisma.promotion.create({
@@ -51,7 +50,7 @@ export async function createPromotion(
         title: data.title ?? null,
         description: data.description ?? null,
         targetType: data.targetType,
-        imageUrl: imageRes?.url!,
+        imageUrl: s3Res?.url!,
         productId: data.productId ?? null,
         placement: data.placement,
         priority: data.priority,
@@ -151,11 +150,38 @@ export async function getPromotionById(
 /**
  * Update a promotion by its ID
  */
-export async function updatePromotion(promotionId: bigint): Promise<void> {
+export async function updatePromotion(
+  promotionId: bigint,
+  data: UpdatePromotionDto,
+  file?: IMulterFile
+): Promise<Promotion> {
   try {
-    await prisma.promotion.delete({
-      where: { promotionId: Number(promotionId) },
+    const promotion = await prisma.promotion.findUnique({
+      where: { promotionId },
     });
+    if (!promotion) throw new Error("Promotion not found");
+    // Upload image to S3
+    let s3Res;
+    if (file) {
+      await deleteFileFromS3(promotion.imageUrl!, true);
+      const fileObject = multerFileToFileObject(file);
+      s3Res = await uploadFileToS3(fileObject, "promotions", undefined, true);
+    }
+
+    const updatedPromotion = await prisma.promotion.update({
+      where: { promotionId },
+      data: {
+        title: data.title,
+        description: data.description,
+        targetType: data.targetType,
+        productId: data.productId,
+        imageUrl: s3Res?.url ? s3Res.url : promotion.imageUrl,
+        placement: data.placement,
+        priority: data.priority,
+        isActive: data.isActive,
+      },
+    });
+    return updatedPromotion;
   } catch (error) {
     throw new Error(`Failed to update promotion: ${getErrorMessage(error)}`);
   }

@@ -91,7 +91,7 @@ export const getPromotionById = async (
   try {
     const promotionId = BigInt(req.params.id);
     const promotion = await promotionService.getPromotionById(promotionId);
-    res.status(httpStatus.CREATED).json({
+    res.status(httpStatus.OK).json({
       success: true,
       message: "Promotion retrieved successfully",
       data: promotion,
@@ -109,8 +109,15 @@ export const updatePromotion = async (
   res: Response
 ): Promise<void> => {
   try {
-    const promotion = await promotionService.updatePromotion(req.body);
-    res.status(httpStatus.CREATED).json({
+    const promotionId = BigInt(req.params.id);
+    const data = req.body;
+    const file = req.file;
+    const promotion = await promotionService.updatePromotion(
+      promotionId,
+      data,
+      file
+    );
+    res.status(httpStatus.OK).json({
       success: true,
       message: "Promotion updated successfully",
       data: promotion,
@@ -129,7 +136,7 @@ export const deletePromotion = async (
 ): Promise<void> => {
   try {
     const promotion = await promotionService.deletePromotion(req.body);
-    res.status(httpStatus.CREATED).json({
+    res.status(httpStatus.OK).json({
       success: true,
       message: "Promotion deleted successfully",
       data: promotion,
