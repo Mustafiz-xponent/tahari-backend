@@ -68,29 +68,6 @@ export const getAllCategories = async (
   }
 };
 
-// /**
-//  * Get a single category by ID
-//  */
-// export const getCategoryById = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const categoryId = BigInt(req.params.id);
-//     const category = await categoryService.getCategoryById(categoryId);
-//     if (!category) {
-//       throw new Error("Category not found.");
-//     }
-//     res.json({
-//       success: true,
-//       message: "Category retrieved successfully",
-//       data: category,
-//     });
-//   } catch (error) {
-//     handleErrorResponse(error, res, "fetch category");
-//   }
-// };
-
 /**
  * Get a single category by ID with accessible image URLs for products
  */
