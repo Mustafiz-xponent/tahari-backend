@@ -9,6 +9,7 @@ import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 import validator from "@/middlewares/validator";
 import {
   zCreatePromotionDto,
+  zDeletePromotionDto,
   zGetPromotionDto,
   zUpdatePromotionDto,
 } from "@/modules/promotions/promotion.dto";
@@ -51,6 +52,7 @@ router.delete(
   "/:id",
   authMiddleware,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  validator(zDeletePromotionDto),
   promotionController.deletePromotion
 );
 

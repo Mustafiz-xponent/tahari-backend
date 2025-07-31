@@ -133,13 +133,14 @@ export const updatePromotion = async (
 export const deletePromotion = async (
   req: Request,
   res: Response
-): Promise<void> => {
+): Promise<any> => {
   try {
-    const promotion = await promotionService.deletePromotion(req.body);
+    const promotionId = BigInt(req.params.id);
+    await promotionService.deletePromotion(promotionId);
     res.status(httpStatus.OK).json({
       success: true,
       message: "Promotion deleted successfully",
-      data: promotion,
+      data: null,
     });
   } catch (error) {
     handleErrorResponse(error, res, "delete promotion");

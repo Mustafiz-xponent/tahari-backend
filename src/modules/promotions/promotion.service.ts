@@ -192,9 +192,14 @@ export async function updatePromotion(
  */
 export async function deletePromotion(promotionId: bigint): Promise<void> {
   try {
-    await prisma.promotion.delete({
-      where: { promotionId: Number(promotionId) },
+    const promotion = await prisma.promotion.findUnique({
+      where: { promotionId },
     });
+    if (!promotion) throw new Error("Promotion not found");
+    // Delete image from S3
+    await deleteFileFromS3(promotion.imageUrl!, true);
+    // Delete promotion
+    await prisma.promotion.delete({ where: { promotionId } });
   } catch (error) {
     throw new Error(`Failed to delete promotion: ${getErrorMessage(error)}`);
   }
