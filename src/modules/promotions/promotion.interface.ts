@@ -1,15 +1,22 @@
-export interface IPagination {
+import {
+  PromoPlacement,
+  PromoTargetType,
+  Promotion,
+} from "@/generated/prisma/client";
+export interface IGetPromotionsQuery {
+  page?: string;
+  limit?: string;
+  sort?: string;
+  placement?: PromoPlacement;
+  targetType?: PromoTargetType;
+}
+export type PromotionWithUrl = Promotion & {
+  accessibleImageUrl?: string;
+};
+
+export interface IGetPromotionsResult {
+  data: PromotionWithUrl[];
   currentPage: number;
   totalPages: number;
-  totalItems: number;
-  itemsPerPage: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-export interface IApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
-  pagination?: IPagination;
-  meta?: Record<string, unknown>;
+  totalCount: number;
 }

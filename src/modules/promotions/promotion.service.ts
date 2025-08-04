@@ -12,24 +12,11 @@ import {
 } from "@/utils/fileUpload/s3Aws";
 import { AppError } from "@/utils/appError";
 import httpStatus from "http-status";
-
-interface IMulterFile {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  buffer: Buffer;
-  size: number;
-}
-interface IPromotionsResponse {
-  promotions: Promotion[];
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-}
-type PromotionWithUrl = Promotion & {
-  accessibleImageUrl?: string;
-};
+import { IMulterFile } from "@/utils/fileUpload/configMulterUpload";
+import {
+  IGetPromotionsResult,
+  PromotionWithUrl,
+} from "@/modules/promotions/promotion.interface";
 
 export async function createPromotion(
   data: CreatePromotionDto,
@@ -61,7 +48,7 @@ export async function createPromotion(
 export async function getAllPromotions(
   paginationParams: { page: number; limit: number; skip: number; sort: string },
   filterParams: { placement?: string; targetType?: string }
-): Promise<IPromotionsResponse> {
+): Promise<IGetPromotionsResult> {
   const { page, limit, skip, sort } = paginationParams;
   const { placement, targetType } = filterParams;
   const whereConditions: any = {
@@ -98,7 +85,7 @@ export async function getAllPromotions(
     where: whereConditions,
   });
   return {
-    promotions: promotionWithUrls,
+    data: promotionWithUrls,
     currentPage: page,
     totalPages: Math.ceil(totalPromotions / limit),
     totalCount: totalPromotions,

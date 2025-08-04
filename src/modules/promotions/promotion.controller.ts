@@ -8,14 +8,7 @@ import {
 import asyncHandler from "@/utils/asyncHandler";
 import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
-
-interface IPromotionsQuery {
-  page?: string;
-  limit?: string;
-  sort?: string;
-  placement?: PromoPlacement;
-  targetType?: PromoTargetType;
-}
+import { IGetPromotionsQuery } from "@/modules/promotions/promotion.interface";
 
 export const createPromotion = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
@@ -34,7 +27,7 @@ export const createPromotion = asyncHandler(
 
 export const getAllPromotions = asyncHandler(
   async (
-    req: Request<{}, {}, {}, IPromotionsQuery>,
+    req: Request<{}, {}, {}, IGetPromotionsQuery>,
     res: Response
   ): Promise<void> => {
     const page = Math.max(parseInt(req.query.page as string) || 1, 1);
@@ -54,11 +47,12 @@ export const getAllPromotions = asyncHandler(
       paginationParams,
       filterParams
     );
+
     sendResponse<Promotion[]>(res, {
       success: true,
       statusCode: httpStatus.OK,
       message: "Promotions retrieved successfully",
-      data: result.promotions,
+      data: result.data,
       pagination: {
         currentPage: result.currentPage,
         totalPages: result.totalPages,
@@ -94,6 +88,7 @@ export const updatePromotion = asyncHandler(
       data,
       file
     );
+
     sendResponse<Promotion>(res, {
       success: true,
       statusCode: httpStatus.OK,

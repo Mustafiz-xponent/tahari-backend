@@ -17,7 +17,7 @@ export const upload = multer({
   },
 });
 
-interface IMulterFile {
+export interface IMulterFile {
   fieldname: string;
   originalname: string;
   encoding: string;
