@@ -22,8 +22,18 @@ server.listen(PORT, () => {
 // unhandled promise rejection--
 process.on("unhandledRejection", (err) => {
   logger.error(`Unhandled Rejection: ${err} | ${err}`);
-
   server.close(() => {
     process.exit(1);
   });
 });
+// Handle graceful shutdown
+const shutdown = () => {
+  console.log("Gracefully shutting down...");
+  server.close(() => {
+    process.exit(0);
+  });
+};
+// Handle manual termination
+process.on("SIGINT", shutdown);
+// Handle system termination
+process.on("SIGTERM", shutdown);

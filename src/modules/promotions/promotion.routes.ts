@@ -1,8 +1,3 @@
-/**
- * Routes for promotion entity operations.
- * Defines API endpoints for promotion related CRUD operations.
- */
-
 import { Router } from "express";
 import * as promotionController from "@/modules/promotions/promotion.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
