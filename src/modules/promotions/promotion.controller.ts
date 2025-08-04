@@ -1,13 +1,13 @@
-/**
- * Controller layer for Promotions entity operations.
- * Handles HTTP requests and responses for promotion-related endpoints.
- */
-
 import { Request, Response } from "express";
 import * as promotionService from "@/modules/promotions/promotion.service";
-import { handleErrorResponse } from "@/utils/errorResponseHandler";
+import {
+  PromoPlacement,
+  PromoTargetType,
+  Promotion,
+} from "@/generated/prisma/client";
+import asyncHandler from "@/utils/asyncHandler";
 import httpStatus from "http-status";
-import { PromoPlacement, PromoTargetType } from "@/generated/prisma/client";
+import sendResponse from "@/utils/sendResponse";
 
 interface IPromotionsQuery {
   page?: string;
@@ -17,35 +17,26 @@ interface IPromotionsQuery {
   targetType?: PromoTargetType;
 }
 
-/**
- * Create a new promotion
- */
-export const createPromotion = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const createPromotion = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const data = req.body;
     const file = req.file;
     const promotion = await promotionService.createPromotion(data, file);
-    res.status(httpStatus.CREATED).json({
+
+    sendResponse<Promotion>(res, {
       success: true,
       message: "Promotion created successfully",
       data: promotion,
+      statusCode: httpStatus.CREATED,
     });
-  } catch (error) {
-    handleErrorResponse(error, res, "create promotion");
   }
-};
+);
 
-/**
- * Get all promotions
- */
-export const getAllPromotions = async (
-  req: Request<{}, {}, {}, IPromotionsQuery>,
-  res: Response
-): Promise<void> => {
-  try {
+export const getAllPromotions = asyncHandler(
+  async (
+    req: Request<{}, {}, {}, IPromotionsQuery>,
+    res: Response
+  ): Promise<void> => {
     const page = Math.max(parseInt(req.query.page as string) || 1, 1);
     const limit = Math.min(
       Math.max(parseInt(req.query.limit as string) || 10, 1),
@@ -63,8 +54,9 @@ export const getAllPromotions = async (
       paginationParams,
       filterParams
     );
-    res.status(httpStatus.OK).json({
+    sendResponse<Promotion[]>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Promotions retrieved successfully",
       data: result.promotions,
       pagination: {
@@ -76,39 +68,24 @@ export const getAllPromotions = async (
         hasPreviousPage: page > 1,
       },
     });
-  } catch (error) {
-    handleErrorResponse(error, res, "retrive promotion");
   }
-};
+);
 
-/**
- * Get promotion by its ID
- */
-export const getPromotionById = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
-  try {
+export const getPromotionById = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const promotionId = BigInt(req.params.id);
     const promotion = await promotionService.getPromotionById(promotionId);
-    res.status(httpStatus.OK).json({
+    sendResponse<Promotion>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Promotion retrieved successfully",
       data: promotion,
     });
-  } catch (error) {
-    handleErrorResponse(error, res, "retrive promotion");
   }
-};
+);
 
-/**
- * Update promotion
- */
-export const updatePromotion = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const updatePromotion = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const promotionId = BigInt(req.params.id);
     const data = req.body;
     const file = req.file;
@@ -117,32 +94,24 @@ export const updatePromotion = async (
       data,
       file
     );
-    res.status(httpStatus.OK).json({
+    sendResponse<Promotion>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Promotion updated successfully",
       data: promotion,
     });
-  } catch (error) {
-    handleErrorResponse(error, res, "update promotion");
   }
-};
+);
 
-/**
- * Delete promotion
- */
-export const deletePromotion = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
-  try {
+export const deletePromotion = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const promotionId = BigInt(req.params.id);
     await promotionService.deletePromotion(promotionId);
-    res.status(httpStatus.OK).json({
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Promotion deleted successfully",
       data: null,
     });
-  } catch (error) {
-    handleErrorResponse(error, res, "delete promotion");
   }
-};
+);

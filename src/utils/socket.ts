@@ -1,8 +1,8 @@
-import { Server as SocketIOServer } from "socket.io";
-import http from "http";
-import { User, UserRole } from "@/generated/prisma/client";
-import logger from "@/utils/logger";
 import app from "@/app";
+import http from "http";
+import logger from "@/utils/logger";
+import { Server as SocketIOServer } from "socket.io";
+import { User, UserRole } from "@/generated/prisma/client";
 import { authenticateSocket } from "@/middlewares/auth";
 
 const server = http.createServer(app);

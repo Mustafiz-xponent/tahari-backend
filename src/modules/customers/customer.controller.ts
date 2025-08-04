@@ -14,29 +14,6 @@ const customerIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
 });
 
 /**
- * Create a new customer
- */
-// export const createCustomer = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const data = zCreateCustomerDto.parse(req.body);
-//     const customer = await customerService.createCustomer(data);
-//     res
-//       .status(201)
-//       .json({ message: "Customer created successfully", customer });
-//   } catch (error) {
-//     if (error instanceof ZodError) {
-//       res.status(400).json({ errors: error.flatten() });
-//       return;
-//     }
-//     console.error("Error creating customer:", error);
-//     res.status(500).json({ message: "Failed to create customer" });
-//   }
-// };
-
-/**
  * Get all customers
  */
 export const getAllCustomers = async (
