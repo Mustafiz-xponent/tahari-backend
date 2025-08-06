@@ -48,11 +48,26 @@ export const zCreatePromotionDto = {
 };
 export type CreatePromotionDto = z.infer<typeof zCreatePromotionDto.body>;
 
+export const zGetAllPromotionsDto = {
+  query: z.object({
+    page: z.coerce.number().int().positive().optional().default(1),
+    limit: z.coerce.number().int().positive().max(100).optional().default(10),
+    sort: z.enum(["asc", "desc"]).optional().default("desc"),
+    placement: z.nativeEnum(PromoPlacement).optional(),
+    targetType: z.nativeEnum(PromoTargetType).optional(),
+  }),
+};
+
+export type GetAllPromotionsQueryDto = z.infer<
+  typeof zGetAllPromotionsDto.query
+>;
+
 export const zGetPromotionDto = {
   params: z.object({
     id: zBigIntId("Promotion ID"),
   }),
 };
+
 export const zUpdatePromotionDto = {
   params: z.object({
     id: zBigIntId("Promotion ID"),
@@ -103,6 +118,7 @@ export const zUpdatePromotionDto = {
     ),
 };
 export type UpdatePromotionDto = z.infer<typeof zUpdatePromotionDto.body>;
+
 export const zDeletePromotionDto = {
   params: z.object({
     id: zBigIntId("Promotion ID"),

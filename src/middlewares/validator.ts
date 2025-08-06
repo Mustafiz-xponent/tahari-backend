@@ -54,7 +54,13 @@ const validator = (schemas: Schemas): RequestHandler => {
           });
         });
       } else {
-        req.query = queryResult.data;
+        // Override req.query property with validated data
+        Object.defineProperty(req, "query", {
+          configurable: true,
+          enumerable: true,
+          writable: true,
+          value: queryResult.data,
+        });
       }
     }
 

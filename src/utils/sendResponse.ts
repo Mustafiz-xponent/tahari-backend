@@ -20,7 +20,7 @@ export interface IApiResponse<T> {
 
 const sendResponse = <T>(
   res: Response,
-  { success, message, data, pagination, meta, statusCode }: IApiResponse<T>
+  { success, statusCode, message, data, pagination, meta }: IApiResponse<T>
 ): Response<IApiResponse<T>> => {
   const responseBody: IApiResponse<T> = {
     success,

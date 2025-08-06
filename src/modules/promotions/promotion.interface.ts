@@ -1,15 +1,5 @@
-import {
-  PromoPlacement,
-  PromoTargetType,
-  Promotion,
-} from "@/generated/prisma/client";
-export interface IGetPromotionsQuery {
-  page?: string;
-  limit?: string;
-  sort?: string;
-  placement?: PromoPlacement;
-  targetType?: PromoTargetType;
-}
+import { Promotion } from "@/generated/prisma/client";
+
 export type PromotionWithUrl = Promotion & {
   accessibleImageUrl?: string;
 };

@@ -1,14 +1,10 @@
 import { Request, Response } from "express";
 import * as promotionService from "@/modules/promotions/promotion.service";
-import {
-  PromoPlacement,
-  PromoTargetType,
-  Promotion,
-} from "@/generated/prisma/client";
+import { Promotion } from "@/generated/prisma/client";
 import asyncHandler from "@/utils/asyncHandler";
 import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
-import { IGetPromotionsQuery } from "@/modules/promotions/promotion.interface";
+import { GetAllPromotionsQueryDto } from "./promotion.dto";
 
 export const createPromotion = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
@@ -26,20 +22,10 @@ export const createPromotion = asyncHandler(
 );
 
 export const getAllPromotions = asyncHandler(
-  async (
-    req: Request<{}, {}, {}, IGetPromotionsQuery>,
-    res: Response
-  ): Promise<void> => {
-    const page = Math.max(parseInt(req.query.page as string) || 1, 1);
-    const limit = Math.min(
-      Math.max(parseInt(req.query.limit as string) || 10, 1),
-      100
-    ); // Max 100 items per page
+  async (req: Request, res: Response): Promise<void> => {
+    const { page, limit, sort, placement, targetType } =
+      req.query as unknown as GetAllPromotionsQueryDto;
     const skip = (page - 1) * limit;
-    const sort = req.query.sort === "asc" ? "asc" : "desc";
-    const placement = req.query.placement as PromoPlacement;
-    const targetType = req.query.targetType as PromoTargetType;
-
     const paginationParams = { page, limit, skip, sort };
     const filterParams = { placement, targetType };
 

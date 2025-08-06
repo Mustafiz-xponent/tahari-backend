@@ -5,6 +5,7 @@ import validator from "@/middlewares/validator";
 import {
   zCreatePromotionDto,
   zDeletePromotionDto,
+  zGetAllPromotionsDto,
   zGetPromotionDto,
   zUpdatePromotionDto,
 } from "@/modules/promotions/promotion.dto";
@@ -23,7 +24,11 @@ router.post(
 );
 
 // Route to get all promotions
-router.get("/", promotionController.getAllPromotions);
+router.get(
+  "/",
+  validator(zGetAllPromotionsDto),
+  promotionController.getAllPromotions
+);
 
 // Route to get a promotion by ID
 router.get(
