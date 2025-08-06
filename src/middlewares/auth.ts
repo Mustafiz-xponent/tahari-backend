@@ -5,6 +5,7 @@ import { UserRole } from "@/generated/prisma/client";
 import { status } from "http-status";
 import { User } from "@/generated/prisma/client";
 import { Socket } from "socket.io";
+import logger from "@/utils/logger";
 
 // Auth middleware check if user is authenticated
 export const authMiddleware: RequestHandler = async (
@@ -78,8 +79,10 @@ export const authenticateSocket = async (
       throw new Error("Please login to access this resource.");
     }
     socket.user = user as User;
+    logger.info(`Socket authenticated: ${user.name} (${user.userId})`);
     next();
   } catch (err: any) {
+    logger.info(`Socket authentication failed: ${err.message}`);
     return next(err as Error);
   }
 };

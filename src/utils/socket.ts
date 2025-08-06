@@ -13,6 +13,8 @@ const io = new SocketIOServer(server, {
     methods: ["GET", "POST"],
   },
   transports: ["websocket"],
+  pingInterval: 25000, // 25 seconds
+  pingTimeout: 60000, // 60 seconds
 });
 
 // Track online users with their roles
@@ -47,7 +49,7 @@ io.use(authenticateSocket);
 
 io.on("connection", async (socket) => {
   const user = socket.user as User;
-  logger.info(`User connected: ${user.phone} (${user.userId}): ${socket.id}`);
+  logger.info(`User connected: ${user.name} (${user.userId}): ${socket.id}`);
 
   // Add user to online list with role
   onlineUsers.set(String(user.userId), {
@@ -58,9 +60,9 @@ io.on("connection", async (socket) => {
   // Notify about online status change
   io.emit("onlineUsers", getAllOnlineUsers());
 
-  socket.on("disconnect", () => {
+  socket.on("disconnect", (reasone) => {
     logger.info(
-      `User disconnected: ${user.phone} (${user.userId}): ${socket.id}`
+      `User disconnected: ${user.name} (${user.userId}): ${socket.id} Reasone: ${reasone}`
     );
     onlineUsers.delete(String(user.userId));
     io.emit("onlineUsers", getAllOnlineUsers());
