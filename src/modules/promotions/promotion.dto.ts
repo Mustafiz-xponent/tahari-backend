@@ -1,6 +1,12 @@
 import { PromoPlacement, PromoTargetType } from "@/generated/prisma/client";
 import { z } from "zod";
 
+/**
+ * Returns a Zod schema for a positive integer ID, with the given field name used
+ * for error messages.
+ * @param fieldName The name of the field, used for error messages.
+ * @returns A Zod schema for a positive integer ID.
+ */
 const zBigIntId = (fieldName: string) =>
   z
     .union([z.string(), z.number()])
@@ -10,6 +16,9 @@ const zBigIntId = (fieldName: string) =>
       message: `${fieldName} must be a positive integer`,
     });
 
+/*
+ **  Schema: Create Promotion
+ */
 export const zCreatePromotionDto = {
   body: z
     .object({
@@ -48,6 +57,10 @@ export const zCreatePromotionDto = {
 };
 export type CreatePromotionDto = z.infer<typeof zCreatePromotionDto.body>;
 
+/*
+ ** Schema: Get All Promotions (Query Parameters)
+ ** Includes pagination, sorting, filtering
+ */
 export const zGetAllPromotionsDto = {
   query: z.object({
     page: z.coerce.number().int().positive().optional().default(1),
@@ -62,12 +75,19 @@ export type GetAllPromotionsQueryDto = z.infer<
   typeof zGetAllPromotionsDto.query
 >;
 
+/*
+ **   Schema: Get Single Promotion by ID (Route Param)
+ */
 export const zGetPromotionDto = {
   params: z.object({
     id: zBigIntId("Promotion ID"),
   }),
 };
 
+/*
+ ** Schema: Update Promotion
+ ** All fields optional, but validated similarly to creation
+ */
 export const zUpdatePromotionDto = {
   params: z.object({
     id: zBigIntId("Promotion ID"),
@@ -119,6 +139,9 @@ export const zUpdatePromotionDto = {
 };
 export type UpdatePromotionDto = z.infer<typeof zUpdatePromotionDto.body>;
 
+/*
+ ** Schema: Delete Promotion by ID (Route Param)
+ */
 export const zDeletePromotionDto = {
   params: z.object({
     id: zBigIntId("Promotion ID"),
