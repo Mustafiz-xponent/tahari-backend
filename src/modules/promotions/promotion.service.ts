@@ -18,6 +18,12 @@ import {
   PromotionWithUrl,
 } from "@/modules/promotions/promotion.interface";
 
+/**
+ * Creates a new promotion entry in the database
+ * - Requires an image file (uploaded to S3)
+ * - Accepts promotion metadata in `CreatePromotionDto`
+ * - Stores S3 URL of the image
+ */
 export async function createPromotion(
   data: CreatePromotionDto,
   file?: IMulterFile
@@ -44,7 +50,11 @@ export async function createPromotion(
   });
   return promotion;
 }
-
+/**
+ * Retrieves all promotions with optional filters and pagination
+ * - Supports filtering by placement and targetType
+ * - Adds a signed, accessible image URL to each promotion
+ */
 export async function getAllPromotions(
   paginationParams: { page: number; limit: number; skip: number; sort: string },
   filterParams: { placement?: string; targetType?: string }
@@ -66,6 +76,7 @@ export async function getAllPromotions(
       { createdAt: sort === "asc" ? "asc" : "desc" },
     ],
   });
+  // Add signed image URLs
   const promotionWithUrls = await Promise.all(
     promotions.map(async (promotion) => {
       let accessibleUrl: string | undefined;
@@ -91,7 +102,11 @@ export async function getAllPromotions(
     totalCount: totalPromotions,
   };
 }
-
+/**
+ * Retrieves a single promotion by its ID
+ * - Returns signed accessible image URL if available
+ * - Throws an error if promotion is not found
+ */
 export async function getPromotionById(
   promotionId: bigint
 ): Promise<PromotionWithUrl> {
@@ -113,7 +128,11 @@ export async function getPromotionById(
     accessibleImageUrl,
   };
 }
-
+/**
+ * Updates an existing promotion by its ID
+ * - Replaces image in S3 if a new file is provided
+ * - Falls back to existing image URL if not
+ */
 export async function updatePromotion(
   promotionId: bigint,
   data: UpdatePromotionDto,
@@ -132,7 +151,7 @@ export async function updatePromotion(
     const fileObject = multerFileToFileObject(file);
     s3Res = await uploadFileToS3(fileObject, "promotions", undefined, true);
   }
-
+  // update promotion
   const updatedPromotion = await prisma.promotion.update({
     where: { promotionId },
     data: {
@@ -149,6 +168,11 @@ export async function updatePromotion(
   return updatedPromotion;
 }
 
+/**
+ * Deletes a promotion by its ID
+ * - Also deletes associated image from S3
+ * - Throws an error if promotion not found
+ */
 export async function deletePromotion(promotionId: bigint): Promise<void> {
   const promotion = await prisma.promotion.findUnique({
     where: { promotionId },

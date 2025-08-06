@@ -6,6 +6,12 @@ import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
 import { GetAllPromotionsQueryDto } from "./promotion.dto";
 
+/**
+ * Create a new promotion
+ * - Expects promotion data in `req.body`
+ * - Expects `req.file` to accepts a file (e.g., image/banner)
+ * - Calls service to create promotion and returns created object
+ */
 export const createPromotion = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const data = req.body;
@@ -20,7 +26,11 @@ export const createPromotion = asyncHandler(
     });
   }
 );
-
+/**
+ * Get all promotions with pagination and filtering
+ * - Accepts query params: page, limit, sort, placement, targetType
+ * - Calls service to fetch paginated + filtered promotions
+ */
 export const getAllPromotions = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const { page, limit, sort, placement, targetType } =
@@ -50,7 +60,11 @@ export const getAllPromotions = asyncHandler(
     });
   }
 );
-
+/**
+ * Get a single promotion by its ID
+ * - Converts the string ID from URL param into BigInt
+ * - Calls service to get promotion by ID
+ */
 export const getPromotionById = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const promotionId = BigInt(req.params.id);
@@ -63,7 +77,12 @@ export const getPromotionById = asyncHandler(
     });
   }
 );
-
+/**
+ * Update a promotion by ID
+ * - Accepts updated data in body and optional file
+ * - Converts the ID to BigInt
+ * - Calls service to update promotion
+ */
 export const updatePromotion = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const promotionId = BigInt(req.params.id);
@@ -83,7 +102,11 @@ export const updatePromotion = asyncHandler(
     });
   }
 );
-
+/**
+ * Delete a promotion by ID
+ * - Converts ID to BigInt
+ * - Calls service to delete promotion
+ */
 export const deletePromotion = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const promotionId = BigInt(req.params.id);
