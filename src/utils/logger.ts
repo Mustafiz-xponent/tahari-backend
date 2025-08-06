@@ -1,6 +1,7 @@
 import pino from "pino";
 
-const isProd = process.env.NODE_ENV === "production";
+// const isProd = process.env.NODE_ENV === "production";
+const isProd = true;
 
 const logger = pino(
   isProd
