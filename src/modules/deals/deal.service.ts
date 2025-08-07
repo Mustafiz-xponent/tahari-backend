@@ -1,7 +1,7 @@
 import prisma from "@/prisma-client/prismaClient";
 import { AppError } from "@/utils/appError";
 import httpStatus from "http-status";
-import { CreateDealDto } from "./deal.dto";
+import { CreateDealDto, UpdateDealDto } from "@/modules/deals/deal.dto";
 import { Deal } from "@/generated/prisma/client";
 import { IGetDealsResult } from "@/modules/deals/deal.interface";
 
@@ -137,6 +137,107 @@ export async function getDealById(dealId: bigint): Promise<Deal> {
     throw new AppError("Deal not found", httpStatus.NOT_FOUND);
   }
   return deal;
+}
+/**
+ * Updates an existing deal by its ID
+ * - Throws an error if deal is not found
+ */
+export async function updateDeal(
+  dealId: bigint,
+  data: UpdateDealDto
+): Promise<Deal> {
+  const existingDeal = await prisma.deal.findUnique({ where: { dealId } });
+
+  if (!existingDeal) {
+    throw new AppError("Deal not found", httpStatus.NOT_FOUND);
+  }
+
+  // If deal is global, ensure there's no other active global deal
+  if (data.isGlobal) {
+    const now = new Date();
+    const otherActiveGlobalDeal = await prisma.deal.findFirst({
+      where: {
+        isGlobal: true,
+        dealId: { not: dealId },
+        startDate: { lte: now },
+        endDate: { gte: now },
+      },
+    });
+
+    if (otherActiveGlobalDeal) {
+      throw new AppError(
+        "Another active global deal already exists.",
+        httpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  // If not global, must have productIds
+  if (
+    data.isGlobal === false &&
+    (!data.productIds || data.productIds.length === 0)
+  ) {
+    throw new AppError(
+      "Please provide productIds for non-global deals.",
+      httpStatus.BAD_REQUEST
+    );
+  }
+
+  // Check for active deals on the products (excluding this deal)
+  if (!data.isGlobal && data.productIds?.length) {
+    const now = new Date();
+    const productsWithDeal = await prisma.product.findMany({
+      where: {
+        productId: { in: data.productIds },
+        deal: {
+          NOT: { dealId },
+          startDate: { lte: now },
+          endDate: { gte: now },
+        },
+      },
+    });
+
+    if (productsWithDeal.length > 0) {
+      const ids = productsWithDeal.map((p) => p.productId);
+      throw new AppError(
+        `These products already have active deals: ${ids.join(", ")}`,
+        httpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    // Update deal
+    const updatedDeal = await tx.deal.update({
+      where: { dealId },
+      data: {
+        title: data.title,
+        description: data.description,
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        isGlobal: data.isGlobal,
+      },
+    });
+
+    // If non-global and productIds are provided, reassign them
+    if (!data.isGlobal && data.productIds) {
+      // Unassign the deal from all previously assigned products
+      await tx.product.updateMany({
+        where: { dealId },
+        data: { dealId: null },
+      });
+
+      // Assign the deal to new products
+      await tx.product.updateMany({
+        where: { productId: { in: data.productIds } },
+        data: { dealId },
+      });
+    }
+
+    return updatedDeal;
+  });
 }
 
 /**

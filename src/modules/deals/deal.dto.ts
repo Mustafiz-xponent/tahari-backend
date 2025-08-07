@@ -102,6 +102,78 @@ export const zGetDealDto = {
   }),
 };
 /*
+ ** Schema: Update Deal
+ ** All fields optional, but validated similarly to creation
+ */
+export const zUpdateDealDto = {
+  params: z.object({
+    id: zBigIntId("Deal ID"),
+  }),
+  body: z
+    .object({
+      title: z.string().min(3).max(100).optional(),
+      description: z.string().max(255).optional(),
+      discountType: z.nativeEnum(DiscountType).optional(),
+      discountValue: z
+        .string()
+        .refine((val) => !isNaN(Number(val)), {
+          message: "Must be a valid number",
+        })
+        .transform((val) => parseFloat(val))
+        .optional(),
+      startDate: z.coerce.date().optional(),
+      endDate: z.coerce.date().optional(),
+      isGlobal: z.boolean().optional(),
+      productIds: z
+        .array(zBigIntId("Product ID"))
+        .optional()
+        .refine((arr) => arr === undefined || arr.length > 0, {
+          message: "At least one product must be selected",
+        }),
+    })
+    .refine(
+      (data) => {
+        if (data.startDate && data.endDate) {
+          return data.endDate > data.startDate;
+        }
+        return true;
+      },
+      {
+        message: "End date must be after start date",
+        path: ["endDate"],
+      }
+    )
+    .refine(
+      (data) => {
+        if (data.isGlobal && data.productIds?.length) {
+          return false;
+        }
+        return true;
+      },
+      {
+        message: "Global deals should not have product IDs",
+        path: ["productIds"],
+      }
+    )
+    .refine(
+      (data) => {
+        if (
+          data.isGlobal === false &&
+          (!data.productIds || data.productIds.length === 0)
+        ) {
+          return false;
+        }
+        return true;
+      },
+      {
+        message: "At least one product must be selected for non-global deals",
+        path: ["productIds"],
+      }
+    ),
+};
+
+export type UpdateDealDto = z.infer<typeof zUpdateDealDto.body>;
+/*
  ** Schema: Delete Deal by ID (Route Param)
  */
 export const zDeleteDealDto = {

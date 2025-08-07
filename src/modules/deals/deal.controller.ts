@@ -77,7 +77,25 @@ export const getDealById = asyncHandler(
     });
   }
 );
+/**
+ * Update a deal by ID
+ * - Converts the ID to BigInt
+ * - Calls service to update deal and returns response
+ */
+export const updateDeal = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const data = req.body;
+    const dealId = BigInt(req.params.id);
+    const promotion = await dealService.updateDeal(dealId, data);
 
+    sendResponse<Deal>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Deal updated successfully",
+      data: promotion,
+    });
+  }
+);
 /**
  * Delete a delete by ID
  * - Converts ID to BigInt

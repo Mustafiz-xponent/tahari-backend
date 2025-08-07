@@ -8,6 +8,7 @@ import {
   zDeleteDealDto,
   zGetAllDealsDto,
   zGetDealDto,
+  zUpdateDealDto,
 } from "@/modules/deals/deal.dto";
 
 const router = Router();
@@ -29,8 +30,18 @@ router.get(
   validator(zGetAllDealsDto),
   dealController.getAllDeals
 );
+
 // Route to get a deal by ID
 router.get("/:id", validator(zGetDealDto), dealController.getDealById);
+
+// Route to update a deal's details
+router.put(
+  "/:id",
+  authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validator(zUpdateDealDto),
+  dealController.updateDeal
+);
 
 // Route to delete a promotion
 router.delete(
