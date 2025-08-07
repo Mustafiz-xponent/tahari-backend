@@ -11013,7 +11013,7 @@ export namespace Prisma {
     dealId?: boolean
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
-    Deal?: boolean | Product$DealArgs<ExtArgs>
+    deal?: boolean | Product$dealArgs<ExtArgs>
     inventoryPurchases?: boolean | Product$inventoryPurchasesArgs<ExtArgs>
     stockTransactions?: boolean | Product$stockTransactionsArgs<ExtArgs>
     subscriptionPlans?: boolean | Product$subscriptionPlansArgs<ExtArgs>
@@ -11044,7 +11044,7 @@ export namespace Prisma {
     dealId?: boolean
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
-    Deal?: boolean | Product$DealArgs<ExtArgs>
+    deal?: boolean | Product$dealArgs<ExtArgs>
   }, ExtArgs["result"]["product"]>
 
   export type ProductSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -11069,7 +11069,7 @@ export namespace Prisma {
     dealId?: boolean
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
-    Deal?: boolean | Product$DealArgs<ExtArgs>
+    deal?: boolean | Product$dealArgs<ExtArgs>
   }, ExtArgs["result"]["product"]>
 
   export type ProductSelectScalar = {
@@ -11098,7 +11098,7 @@ export namespace Prisma {
   export type ProductInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
-    Deal?: boolean | Product$DealArgs<ExtArgs>
+    deal?: boolean | Product$dealArgs<ExtArgs>
     inventoryPurchases?: boolean | Product$inventoryPurchasesArgs<ExtArgs>
     stockTransactions?: boolean | Product$stockTransactionsArgs<ExtArgs>
     subscriptionPlans?: boolean | Product$subscriptionPlansArgs<ExtArgs>
@@ -11109,12 +11109,12 @@ export namespace Prisma {
   export type ProductIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
-    Deal?: boolean | Product$DealArgs<ExtArgs>
+    deal?: boolean | Product$dealArgs<ExtArgs>
   }
   export type ProductIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
-    Deal?: boolean | Product$DealArgs<ExtArgs>
+    deal?: boolean | Product$dealArgs<ExtArgs>
   }
 
   export type $ProductPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -11122,7 +11122,7 @@ export namespace Prisma {
     objects: {
       category: Prisma.$CategoryPayload<ExtArgs>
       farmer: Prisma.$FarmerPayload<ExtArgs>
-      Deal: Prisma.$DealPayload<ExtArgs> | null
+      deal: Prisma.$DealPayload<ExtArgs> | null
       inventoryPurchases: Prisma.$InventoryPurchasePayload<ExtArgs>[]
       stockTransactions: Prisma.$StockTransactionPayload<ExtArgs>[]
       subscriptionPlans: Prisma.$SubscriptionPlanPayload<ExtArgs>[]
@@ -11545,7 +11545,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     category<T extends CategoryDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CategoryDefaultArgs<ExtArgs>>): Prisma__CategoryClient<$Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     farmer<T extends FarmerDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FarmerDefaultArgs<ExtArgs>>): Prisma__FarmerClient<$Result.GetResult<Prisma.$FarmerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    Deal<T extends Product$DealArgs<ExtArgs> = {}>(args?: Subset<T, Product$DealArgs<ExtArgs>>): Prisma__DealClient<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    deal<T extends Product$dealArgs<ExtArgs> = {}>(args?: Subset<T, Product$dealArgs<ExtArgs>>): Prisma__DealClient<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     inventoryPurchases<T extends Product$inventoryPurchasesArgs<ExtArgs> = {}>(args?: Subset<T, Product$inventoryPurchasesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryPurchasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     stockTransactions<T extends Product$stockTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Product$stockTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     subscriptionPlans<T extends Product$subscriptionPlansArgs<ExtArgs> = {}>(args?: Subset<T, Product$subscriptionPlansArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPlanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -11995,9 +11995,9 @@ export namespace Prisma {
   }
 
   /**
-   * Product.Deal
+   * Product.deal
    */
-  export type Product$DealArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Product$dealArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Deal
      */
@@ -31228,12 +31228,12 @@ export namespace Prisma {
 
   export type DealAvgAggregateOutputType = {
     dealId: number | null
-    discountValue: Decimal | null
+    discountValue: number | null
   }
 
   export type DealSumAggregateOutputType = {
     dealId: bigint | null
-    discountValue: Decimal | null
+    discountValue: number | null
   }
 
   export type DealMinAggregateOutputType = {
@@ -31241,10 +31241,9 @@ export namespace Prisma {
     title: string | null
     description: string | null
     discountType: $Enums.DiscountType | null
-    discountValue: Decimal | null
+    discountValue: number | null
     startDate: Date | null
     endDate: Date | null
-    isActive: boolean | null
     isGlobal: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -31255,10 +31254,9 @@ export namespace Prisma {
     title: string | null
     description: string | null
     discountType: $Enums.DiscountType | null
-    discountValue: Decimal | null
+    discountValue: number | null
     startDate: Date | null
     endDate: Date | null
-    isActive: boolean | null
     isGlobal: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -31272,7 +31270,6 @@ export namespace Prisma {
     discountValue: number
     startDate: number
     endDate: number
-    isActive: number
     isGlobal: number
     createdAt: number
     updatedAt: number
@@ -31298,7 +31295,6 @@ export namespace Prisma {
     discountValue?: true
     startDate?: true
     endDate?: true
-    isActive?: true
     isGlobal?: true
     createdAt?: true
     updatedAt?: true
@@ -31312,7 +31308,6 @@ export namespace Prisma {
     discountValue?: true
     startDate?: true
     endDate?: true
-    isActive?: true
     isGlobal?: true
     createdAt?: true
     updatedAt?: true
@@ -31326,7 +31321,6 @@ export namespace Prisma {
     discountValue?: true
     startDate?: true
     endDate?: true
-    isActive?: true
     isGlobal?: true
     createdAt?: true
     updatedAt?: true
@@ -31424,10 +31418,9 @@ export namespace Prisma {
     title: string
     description: string | null
     discountType: $Enums.DiscountType
-    discountValue: Decimal
+    discountValue: number
     startDate: Date
     endDate: Date
-    isActive: boolean
     isGlobal: boolean
     createdAt: Date
     updatedAt: Date
@@ -31460,7 +31453,6 @@ export namespace Prisma {
     discountValue?: boolean
     startDate?: boolean
     endDate?: boolean
-    isActive?: boolean
     isGlobal?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -31476,7 +31468,6 @@ export namespace Prisma {
     discountValue?: boolean
     startDate?: boolean
     endDate?: boolean
-    isActive?: boolean
     isGlobal?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -31490,7 +31481,6 @@ export namespace Prisma {
     discountValue?: boolean
     startDate?: boolean
     endDate?: boolean
-    isActive?: boolean
     isGlobal?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -31504,13 +31494,12 @@ export namespace Prisma {
     discountValue?: boolean
     startDate?: boolean
     endDate?: boolean
-    isActive?: boolean
     isGlobal?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DealOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"dealId" | "title" | "description" | "discountType" | "discountValue" | "startDate" | "endDate" | "isActive" | "isGlobal" | "createdAt" | "updatedAt", ExtArgs["result"]["deal"]>
+  export type DealOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"dealId" | "title" | "description" | "discountType" | "discountValue" | "startDate" | "endDate" | "isGlobal" | "createdAt" | "updatedAt", ExtArgs["result"]["deal"]>
   export type DealInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     Product?: boolean | Deal$ProductArgs<ExtArgs>
     _count?: boolean | DealCountOutputTypeDefaultArgs<ExtArgs>
@@ -31528,10 +31517,9 @@ export namespace Prisma {
       title: string
       description: string | null
       discountType: $Enums.DiscountType
-      discountValue: Prisma.Decimal
+      discountValue: number
       startDate: Date
       endDate: Date
-      isActive: boolean
       isGlobal: boolean
       createdAt: Date
       updatedAt: Date
@@ -31963,10 +31951,9 @@ export namespace Prisma {
     readonly title: FieldRef<"Deal", 'String'>
     readonly description: FieldRef<"Deal", 'String'>
     readonly discountType: FieldRef<"Deal", 'DiscountType'>
-    readonly discountValue: FieldRef<"Deal", 'Decimal'>
+    readonly discountValue: FieldRef<"Deal", 'Float'>
     readonly startDate: FieldRef<"Deal", 'DateTime'>
     readonly endDate: FieldRef<"Deal", 'DateTime'>
-    readonly isActive: FieldRef<"Deal", 'Boolean'>
     readonly isGlobal: FieldRef<"Deal", 'Boolean'>
     readonly createdAt: FieldRef<"Deal", 'DateTime'>
     readonly updatedAt: FieldRef<"Deal", 'DateTime'>
@@ -32750,7 +32737,6 @@ export namespace Prisma {
     discountValue: 'discountValue',
     startDate: 'startDate',
     endDate: 'endDate',
-    isActive: 'isActive',
     isGlobal: 'isGlobal',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -33511,7 +33497,7 @@ export namespace Prisma {
     dealId?: BigIntNullableFilter<"Product"> | bigint | number | null
     category?: XOR<CategoryScalarRelationFilter, CategoryWhereInput>
     farmer?: XOR<FarmerScalarRelationFilter, FarmerWhereInput>
-    Deal?: XOR<DealNullableScalarRelationFilter, DealWhereInput> | null
+    deal?: XOR<DealNullableScalarRelationFilter, DealWhereInput> | null
     inventoryPurchases?: InventoryPurchaseListRelationFilter
     stockTransactions?: StockTransactionListRelationFilter
     subscriptionPlans?: SubscriptionPlanListRelationFilter
@@ -33541,7 +33527,7 @@ export namespace Prisma {
     dealId?: SortOrderInput | SortOrder
     category?: CategoryOrderByWithRelationInput
     farmer?: FarmerOrderByWithRelationInput
-    Deal?: DealOrderByWithRelationInput
+    deal?: DealOrderByWithRelationInput
     inventoryPurchases?: InventoryPurchaseOrderByRelationAggregateInput
     stockTransactions?: StockTransactionOrderByRelationAggregateInput
     subscriptionPlans?: SubscriptionPlanOrderByRelationAggregateInput
@@ -33574,7 +33560,7 @@ export namespace Prisma {
     dealId?: BigIntNullableFilter<"Product"> | bigint | number | null
     category?: XOR<CategoryScalarRelationFilter, CategoryWhereInput>
     farmer?: XOR<FarmerScalarRelationFilter, FarmerWhereInput>
-    Deal?: XOR<DealNullableScalarRelationFilter, DealWhereInput> | null
+    deal?: XOR<DealNullableScalarRelationFilter, DealWhereInput> | null
     inventoryPurchases?: InventoryPurchaseListRelationFilter
     stockTransactions?: StockTransactionListRelationFilter
     subscriptionPlans?: SubscriptionPlanListRelationFilter
@@ -34926,10 +34912,9 @@ export namespace Prisma {
     title?: StringFilter<"Deal"> | string
     description?: StringNullableFilter<"Deal"> | string | null
     discountType?: EnumDiscountTypeFilter<"Deal"> | $Enums.DiscountType
-    discountValue?: DecimalFilter<"Deal"> | Decimal | DecimalJsLike | number | string
+    discountValue?: FloatFilter<"Deal"> | number
     startDate?: DateTimeFilter<"Deal"> | Date | string
     endDate?: DateTimeFilter<"Deal"> | Date | string
-    isActive?: BoolFilter<"Deal"> | boolean
     isGlobal?: BoolFilter<"Deal"> | boolean
     createdAt?: DateTimeFilter<"Deal"> | Date | string
     updatedAt?: DateTimeFilter<"Deal"> | Date | string
@@ -34944,7 +34929,6 @@ export namespace Prisma {
     discountValue?: SortOrder
     startDate?: SortOrder
     endDate?: SortOrder
-    isActive?: SortOrder
     isGlobal?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -34959,10 +34943,9 @@ export namespace Prisma {
     title?: StringFilter<"Deal"> | string
     description?: StringNullableFilter<"Deal"> | string | null
     discountType?: EnumDiscountTypeFilter<"Deal"> | $Enums.DiscountType
-    discountValue?: DecimalFilter<"Deal"> | Decimal | DecimalJsLike | number | string
+    discountValue?: FloatFilter<"Deal"> | number
     startDate?: DateTimeFilter<"Deal"> | Date | string
     endDate?: DateTimeFilter<"Deal"> | Date | string
-    isActive?: BoolFilter<"Deal"> | boolean
     isGlobal?: BoolFilter<"Deal"> | boolean
     createdAt?: DateTimeFilter<"Deal"> | Date | string
     updatedAt?: DateTimeFilter<"Deal"> | Date | string
@@ -34977,7 +34960,6 @@ export namespace Prisma {
     discountValue?: SortOrder
     startDate?: SortOrder
     endDate?: SortOrder
-    isActive?: SortOrder
     isGlobal?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -34996,10 +34978,9 @@ export namespace Prisma {
     title?: StringWithAggregatesFilter<"Deal"> | string
     description?: StringNullableWithAggregatesFilter<"Deal"> | string | null
     discountType?: EnumDiscountTypeWithAggregatesFilter<"Deal"> | $Enums.DiscountType
-    discountValue?: DecimalWithAggregatesFilter<"Deal"> | Decimal | DecimalJsLike | number | string
+    discountValue?: FloatWithAggregatesFilter<"Deal"> | number
     startDate?: DateTimeWithAggregatesFilter<"Deal"> | Date | string
     endDate?: DateTimeWithAggregatesFilter<"Deal"> | Date | string
-    isActive?: BoolWithAggregatesFilter<"Deal"> | boolean
     isGlobal?: BoolWithAggregatesFilter<"Deal"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Deal"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Deal"> | Date | string
@@ -35420,7 +35401,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     farmer: FarmerCreateNestedOneWithoutProductsInput
-    Deal?: DealCreateNestedOneWithoutProductInput
+    deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
@@ -35474,7 +35455,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
-    Deal?: DealUpdateOneWithoutProductNestedInput
+    deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
@@ -36918,10 +36899,9 @@ export namespace Prisma {
     title: string
     description?: string | null
     discountType: $Enums.DiscountType
-    discountValue: Decimal | DecimalJsLike | number | string
+    discountValue: number
     startDate: Date | string
     endDate: Date | string
-    isActive?: boolean
     isGlobal?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -36933,10 +36913,9 @@ export namespace Prisma {
     title: string
     description?: string | null
     discountType: $Enums.DiscountType
-    discountValue: Decimal | DecimalJsLike | number | string
+    discountValue: number
     startDate: Date | string
     endDate: Date | string
-    isActive?: boolean
     isGlobal?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -36948,10 +36927,9 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     discountType?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
-    discountValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    discountValue?: FloatFieldUpdateOperationsInput | number
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     endDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
     isGlobal?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36963,10 +36941,9 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     discountType?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
-    discountValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    discountValue?: FloatFieldUpdateOperationsInput | number
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     endDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
     isGlobal?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36978,10 +36955,9 @@ export namespace Prisma {
     title: string
     description?: string | null
     discountType: $Enums.DiscountType
-    discountValue: Decimal | DecimalJsLike | number | string
+    discountValue: number
     startDate: Date | string
     endDate: Date | string
-    isActive?: boolean
     isGlobal?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -36992,10 +36968,9 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     discountType?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
-    discountValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    discountValue?: FloatFieldUpdateOperationsInput | number
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     endDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
     isGlobal?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -37006,10 +36981,9 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     discountType?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
-    discountValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    discountValue?: FloatFieldUpdateOperationsInput | number
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     endDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
     isGlobal?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38910,7 +38884,6 @@ export namespace Prisma {
     discountValue?: SortOrder
     startDate?: SortOrder
     endDate?: SortOrder
-    isActive?: SortOrder
     isGlobal?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -38929,7 +38902,6 @@ export namespace Prisma {
     discountValue?: SortOrder
     startDate?: SortOrder
     endDate?: SortOrder
-    isActive?: SortOrder
     isGlobal?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -38943,7 +38915,6 @@ export namespace Prisma {
     discountValue?: SortOrder
     startDate?: SortOrder
     endDate?: SortOrder
-    isActive?: SortOrder
     isGlobal?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -42281,7 +42252,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
-    Deal?: DealCreateNestedOneWithoutProductInput
+    deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
@@ -42585,7 +42556,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     farmer: FarmerCreateNestedOneWithoutProductsInput
-    Deal?: DealCreateNestedOneWithoutProductInput
+    deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
@@ -42702,10 +42673,9 @@ export namespace Prisma {
     title: string
     description?: string | null
     discountType: $Enums.DiscountType
-    discountValue: Decimal | DecimalJsLike | number | string
+    discountValue: number
     startDate: Date | string
     endDate: Date | string
-    isActive?: boolean
     isGlobal?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -42716,10 +42686,9 @@ export namespace Prisma {
     title: string
     description?: string | null
     discountType: $Enums.DiscountType
-    discountValue: Decimal | DecimalJsLike | number | string
+    discountValue: number
     startDate: Date | string
     endDate: Date | string
-    isActive?: boolean
     isGlobal?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -42980,10 +42949,9 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     discountType?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
-    discountValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    discountValue?: FloatFieldUpdateOperationsInput | number
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     endDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
     isGlobal?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -42994,10 +42962,9 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     discountType?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
-    discountValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    discountValue?: FloatFieldUpdateOperationsInput | number
     startDate?: DateTimeFieldUpdateOperationsInput | Date | string
     endDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
     isGlobal?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43192,7 +43159,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     farmer: FarmerCreateNestedOneWithoutProductsInput
-    Deal?: DealCreateNestedOneWithoutProductInput
+    deal?: DealCreateNestedOneWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
     orderItems?: OrderItemCreateNestedManyWithoutProductInput
@@ -43361,7 +43328,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
-    Deal?: DealUpdateOneWithoutProductNestedInput
+    deal?: DealUpdateOneWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUpdateManyWithoutProductNestedInput
@@ -43771,7 +43738,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     farmer: FarmerCreateNestedOneWithoutProductsInput
-    Deal?: DealCreateNestedOneWithoutProductInput
+    deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
     orderItems?: OrderItemCreateNestedManyWithoutProductInput
@@ -43923,7 +43890,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
-    Deal?: DealUpdateOneWithoutProductNestedInput
+    deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUpdateManyWithoutProductNestedInput
@@ -44773,7 +44740,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     farmer: FarmerCreateNestedOneWithoutProductsInput
-    Deal?: DealCreateNestedOneWithoutProductInput
+    deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
@@ -44894,7 +44861,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
-    Deal?: DealUpdateOneWithoutProductNestedInput
+    deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
@@ -45194,7 +45161,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     farmer: FarmerCreateNestedOneWithoutProductsInput
-    Deal?: DealCreateNestedOneWithoutProductInput
+    deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     orderItems?: OrderItemCreateNestedManyWithoutProductInput
@@ -45306,7 +45273,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
-    Deal?: DealUpdateOneWithoutProductNestedInput
+    deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUpdateManyWithoutProductNestedInput
@@ -45982,7 +45949,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     farmer: FarmerCreateNestedOneWithoutProductsInput
-    Deal?: DealCreateNestedOneWithoutProductInput
+    deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
@@ -46050,7 +46017,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
-    Deal?: DealUpdateOneWithoutProductNestedInput
+    deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
@@ -46513,7 +46480,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
-    Deal?: DealUpdateOneWithoutProductNestedInput
+    deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
@@ -46718,7 +46685,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
-    Deal?: DealUpdateOneWithoutProductNestedInput
+    deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput

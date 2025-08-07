@@ -4,13 +4,13 @@ import { Promotion } from "@/generated/prisma/client";
 import asyncHandler from "@/utils/asyncHandler";
 import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
-import { GetAllPromotionsQueryDto } from "./promotion.dto";
+import { GetAllPromotionsQueryDto } from "@/modules/promotions/promotion.dto";
 
 /**
  * Create a new promotion
  * - Expects promotion data in `req.body`
  * - Expects `req.file` to accepts a file (e.g., image/banner)
- * - Calls service to create promotion and returns created object
+ * - Calls service to create promotion and returns response
  */
 export const createPromotion = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {

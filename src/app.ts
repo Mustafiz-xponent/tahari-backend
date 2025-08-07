@@ -30,7 +30,7 @@ import notificationsRoutes from "@/modules/notifications/notification.routes";
 import messageRoutes from "@/modules/messages/message.routes";
 import customerRoutes from "@/modules/customers/customer.routes";
 import promotionRoutes from "@/modules/promotions/promotion.routes";
-import dealRoutes from "@/modules/deal/deal.routes";
+import dealRoutes from "@/modules/deals/deal.routes";
 import { rateLimiter } from "@/middlewares/rateLimiter";
 import { globalErrorHandler } from "@/middlewares/errorHandler";
 import cors from "cors";

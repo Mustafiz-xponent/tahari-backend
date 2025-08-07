@@ -387,7 +387,6 @@ exports.Prisma.DealScalarFieldEnum = {
   discountValue: 'discountValue',
   startDate: 'startDate',
   endDate: 'endDate',
-  isActive: 'isActive',
   isGlobal: 'isGlobal',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
