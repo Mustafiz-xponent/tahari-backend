@@ -3,6 +3,7 @@ import { AppError } from "@/utils/appError";
 import httpStatus from "http-status";
 import { CreateDealDto } from "./deal.dto";
 import { Deal } from "@/generated/prisma/client";
+import { IGetDealsResult } from "@/modules/deals/deal.interface";
 
 /**
  * Creates a new deal entry in the database
@@ -86,4 +87,41 @@ export async function createDeal(data: CreateDealDto): Promise<Deal> {
 
     return deal;
   });
+}
+
+/**
+ * - Retrieves all deals with optional pagination
+ */
+export async function getAllDeals(
+  paginationParams: { page: number; limit: number; skip: number; sort: string },
+  filterParams: { isActive?: boolean }
+): Promise<IGetDealsResult> {
+  const { page, limit, skip, sort } = paginationParams;
+  const isActive = filterParams.isActive;
+  const now = new Date();
+  const whereClause: any = {};
+
+  if (typeof isActive === "boolean") {
+    if (isActive) {
+      whereClause.startDate = { lte: now };
+      whereClause.endDate = { gt: now };
+    } else {
+      whereClause.OR = [{ startDate: { gt: now } }, { endDate: { lte: now } }];
+    }
+  }
+
+  const deals = await prisma.deal.findMany({
+    where: whereClause,
+    take: limit,
+    skip: skip,
+    orderBy: { createdAt: sort === "asc" ? "asc" : "desc" },
+  });
+
+  const totalPromotions = await prisma.promotion.count();
+  return {
+    data: deals,
+    currentPage: page,
+    totalPages: Math.ceil(totalPromotions / limit),
+    totalCount: totalPromotions,
+  };
 }

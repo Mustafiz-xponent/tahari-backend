@@ -10687,7 +10687,6 @@ export namespace Prisma {
 
   export type ProductAvgAggregateOutputType = {
     productId: number | null
-    price: Decimal | null
     unitPrice: Decimal | null
     packageSize: number | null
     stockQuantity: number | null
@@ -10699,7 +10698,6 @@ export namespace Prisma {
 
   export type ProductSumAggregateOutputType = {
     productId: bigint | null
-    price: Decimal | null
     unitPrice: Decimal | null
     packageSize: number | null
     stockQuantity: number | null
@@ -10714,7 +10712,6 @@ export namespace Prisma {
     name: string | null
     description: string | null
     unitType: $Enums.ProductUnitType | null
-    price: Decimal | null
     unitPrice: Decimal | null
     packageSize: number | null
     stockQuantity: number | null
@@ -10735,7 +10732,6 @@ export namespace Prisma {
     name: string | null
     description: string | null
     unitType: $Enums.ProductUnitType | null
-    price: Decimal | null
     unitPrice: Decimal | null
     packageSize: number | null
     stockQuantity: number | null
@@ -10756,7 +10752,6 @@ export namespace Prisma {
     name: number
     description: number
     unitType: number
-    price: number
     unitPrice: number
     packageSize: number
     stockQuantity: number
@@ -10777,7 +10772,6 @@ export namespace Prisma {
 
   export type ProductAvgAggregateInputType = {
     productId?: true
-    price?: true
     unitPrice?: true
     packageSize?: true
     stockQuantity?: true
@@ -10789,7 +10783,6 @@ export namespace Prisma {
 
   export type ProductSumAggregateInputType = {
     productId?: true
-    price?: true
     unitPrice?: true
     packageSize?: true
     stockQuantity?: true
@@ -10804,7 +10797,6 @@ export namespace Prisma {
     name?: true
     description?: true
     unitType?: true
-    price?: true
     unitPrice?: true
     packageSize?: true
     stockQuantity?: true
@@ -10825,7 +10817,6 @@ export namespace Prisma {
     name?: true
     description?: true
     unitType?: true
-    price?: true
     unitPrice?: true
     packageSize?: true
     stockQuantity?: true
@@ -10846,7 +10837,6 @@ export namespace Prisma {
     name?: true
     description?: true
     unitType?: true
-    price?: true
     unitPrice?: true
     packageSize?: true
     stockQuantity?: true
@@ -10955,7 +10945,6 @@ export namespace Prisma {
     name: string
     description: string | null
     unitType: $Enums.ProductUnitType
-    price: Decimal
     unitPrice: Decimal
     packageSize: number
     stockQuantity: number
@@ -10996,7 +10985,6 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     unitType?: boolean
-    price?: boolean
     unitPrice?: boolean
     packageSize?: boolean
     stockQuantity?: boolean
@@ -11027,7 +11015,6 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     unitType?: boolean
-    price?: boolean
     unitPrice?: boolean
     packageSize?: boolean
     stockQuantity?: boolean
@@ -11052,7 +11039,6 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     unitType?: boolean
-    price?: boolean
     unitPrice?: boolean
     packageSize?: boolean
     stockQuantity?: boolean
@@ -11077,7 +11063,6 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     unitType?: boolean
-    price?: boolean
     unitPrice?: boolean
     packageSize?: boolean
     stockQuantity?: boolean
@@ -11094,7 +11079,7 @@ export namespace Prisma {
     dealId?: boolean
   }
 
-  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"productId" | "name" | "description" | "unitType" | "price" | "unitPrice" | "packageSize" | "stockQuantity" | "reorderLevel" | "isSubscription" | "isPreorder" | "isPrivateImages" | "preorderAvailabilityDate" | "imageUrls" | "createdAt" | "updatedAt" | "categoryId" | "farmerId" | "dealId", ExtArgs["result"]["product"]>
+  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"productId" | "name" | "description" | "unitType" | "unitPrice" | "packageSize" | "stockQuantity" | "reorderLevel" | "isSubscription" | "isPreorder" | "isPrivateImages" | "preorderAvailabilityDate" | "imageUrls" | "createdAt" | "updatedAt" | "categoryId" | "farmerId" | "dealId", ExtArgs["result"]["product"]>
   export type ProductInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
@@ -11134,7 +11119,6 @@ export namespace Prisma {
       name: string
       description: string | null
       unitType: $Enums.ProductUnitType
-      price: Prisma.Decimal
       unitPrice: Prisma.Decimal
       packageSize: number
       stockQuantity: number
@@ -11584,7 +11568,6 @@ export namespace Prisma {
     readonly name: FieldRef<"Product", 'String'>
     readonly description: FieldRef<"Product", 'String'>
     readonly unitType: FieldRef<"Product", 'ProductUnitType'>
-    readonly price: FieldRef<"Product", 'Decimal'>
     readonly unitPrice: FieldRef<"Product", 'Decimal'>
     readonly packageSize: FieldRef<"Product", 'Float'>
     readonly stockQuantity: FieldRef<"Product", 'Int'>
@@ -32473,7 +32456,6 @@ export namespace Prisma {
     name: 'name',
     description: 'description',
     unitType: 'unitType',
-    price: 'price',
     unitPrice: 'unitPrice',
     packageSize: 'packageSize',
     stockQuantity: 'stockQuantity',
@@ -33480,7 +33462,6 @@ export namespace Prisma {
     name?: StringFilter<"Product"> | string
     description?: StringNullableFilter<"Product"> | string | null
     unitType?: EnumProductUnitTypeFilter<"Product"> | $Enums.ProductUnitType
-    price?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFilter<"Product"> | number
     stockQuantity?: IntFilter<"Product"> | number
@@ -33510,7 +33491,6 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrderInput | SortOrder
     unitType?: SortOrder
-    price?: SortOrder
     unitPrice?: SortOrder
     packageSize?: SortOrder
     stockQuantity?: SortOrder
@@ -33543,7 +33523,6 @@ export namespace Prisma {
     name?: StringFilter<"Product"> | string
     description?: StringNullableFilter<"Product"> | string | null
     unitType?: EnumProductUnitTypeFilter<"Product"> | $Enums.ProductUnitType
-    price?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFilter<"Product"> | number
     stockQuantity?: IntFilter<"Product"> | number
@@ -33573,7 +33552,6 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrderInput | SortOrder
     unitType?: SortOrder
-    price?: SortOrder
     unitPrice?: SortOrder
     packageSize?: SortOrder
     stockQuantity?: SortOrder
@@ -33603,7 +33581,6 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Product"> | string
     description?: StringNullableWithAggregatesFilter<"Product"> | string | null
     unitType?: EnumProductUnitTypeWithAggregatesFilter<"Product"> | $Enums.ProductUnitType
-    price?: DecimalWithAggregatesFilter<"Product"> | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalWithAggregatesFilter<"Product"> | Decimal | DecimalJsLike | number | string
     packageSize?: FloatWithAggregatesFilter<"Product"> | number
     stockQuantity?: IntWithAggregatesFilter<"Product"> | number
@@ -35387,7 +35364,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -35414,7 +35390,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -35441,7 +35416,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -35468,7 +35442,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -35495,7 +35468,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -35517,7 +35489,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -35536,7 +35507,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -37596,7 +37566,6 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     unitType?: SortOrder
-    price?: SortOrder
     unitPrice?: SortOrder
     packageSize?: SortOrder
     stockQuantity?: SortOrder
@@ -37615,7 +37584,6 @@ export namespace Prisma {
 
   export type ProductAvgOrderByAggregateInput = {
     productId?: SortOrder
-    price?: SortOrder
     unitPrice?: SortOrder
     packageSize?: SortOrder
     stockQuantity?: SortOrder
@@ -37630,7 +37598,6 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     unitType?: SortOrder
-    price?: SortOrder
     unitPrice?: SortOrder
     packageSize?: SortOrder
     stockQuantity?: SortOrder
@@ -37651,7 +37618,6 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     unitType?: SortOrder
-    price?: SortOrder
     unitPrice?: SortOrder
     packageSize?: SortOrder
     stockQuantity?: SortOrder
@@ -37669,7 +37635,6 @@ export namespace Prisma {
 
   export type ProductSumOrderByAggregateInput = {
     productId?: SortOrder
-    price?: SortOrder
     unitPrice?: SortOrder
     packageSize?: SortOrder
     stockQuantity?: SortOrder
@@ -42239,7 +42204,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -42265,7 +42229,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -42426,7 +42389,6 @@ export namespace Prisma {
     name?: StringFilter<"Product"> | string
     description?: StringNullableFilter<"Product"> | string | null
     unitType?: EnumProductUnitTypeFilter<"Product"> | $Enums.ProductUnitType
-    price?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFilter<"Product"> | number
     stockQuantity?: IntFilter<"Product"> | number
@@ -42543,7 +42505,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -42569,7 +42530,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -43145,7 +43105,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -43171,7 +43130,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -43314,7 +43272,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -43340,7 +43297,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -43724,7 +43680,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -43750,7 +43705,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -43876,7 +43830,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -43902,7 +43855,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -44726,7 +44678,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -44752,7 +44703,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -44847,7 +44797,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -44873,7 +44822,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -45147,7 +45095,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -45173,7 +45120,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -45259,7 +45205,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -45285,7 +45230,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -45935,7 +45879,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -45961,7 +45904,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -46003,7 +45945,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -46029,7 +45970,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -46055,7 +45995,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -46081,7 +46020,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -46411,7 +46349,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -46467,7 +46404,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -46493,7 +46429,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -46519,7 +46454,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -46651,7 +46585,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -46672,7 +46605,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -46698,7 +46630,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -46724,7 +46655,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -47519,7 +47449,6 @@ export namespace Prisma {
     name: string
     description?: string | null
     unitType?: $Enums.ProductUnitType
-    price: Decimal | DecimalJsLike | number | string
     unitPrice?: Decimal | DecimalJsLike | number | string
     packageSize?: number
     stockQuantity?: number
@@ -47540,7 +47469,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -47566,7 +47494,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number
@@ -47592,7 +47519,6 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
-    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     packageSize?: FloatFieldUpdateOperationsInput | number
     stockQuantity?: IntFieldUpdateOperationsInput | number

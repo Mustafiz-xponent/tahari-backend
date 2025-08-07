@@ -78,3 +78,17 @@ export const zCreateDealDto = {
     ),
 };
 export type CreateDealDto = z.infer<typeof zCreateDealDto.body>;
+
+/*
+ ** Schema: Get All Deals (Query Parameters)
+ ** Includes pagination, sorting
+ */
+export const zGetAllDealsDto = {
+  query: z.object({
+    page: z.coerce.number().int().positive().optional().default(1),
+    limit: z.coerce.number().int().positive().max(100).optional().default(10),
+    sort: z.enum(["asc", "desc"]).optional().default("desc"),
+    isActive: z.coerce.boolean().optional(),
+  }),
+};
+export type GetAllDealsQueryDto = z.infer<typeof zGetAllDealsDto.query>;

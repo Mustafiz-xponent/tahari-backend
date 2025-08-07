@@ -2,7 +2,6 @@
  * Service layer for Product entity operations.
  * Updated to handle image uploads with product creation and updates.
  */
-
 import { Product } from "@/generated/prisma/client";
 import prisma from "@/prisma-client/prismaClient";
 import { getErrorMessage } from "@/utils/errorHandler";
@@ -19,7 +18,6 @@ import {
   UpdateProductDto,
 } from "@/modules/products/product.dto";
 import logger from "@/utils/logger";
-import { Prisma } from "@prisma/client";
 
 // Add interface for product with accessible URLs
 interface ProductWithAccessibleImages extends Omit<Product, "imageUrls"> {
@@ -59,7 +57,6 @@ export async function createProduct(
       data: {
         name: data.name,
         description: data.description,
-        price: data.unitPrice * data.packageSize,
         unitPrice: data.unitPrice,
         unitType: data.unitType,
         packageSize: data.packageSize,
@@ -330,9 +327,7 @@ export async function getProductById(
         : undefined,
     });
 
-    if (!product) {
-      return null;
-    }
+    if (!product) return null;
 
     // Generate accessible URLs if requested
     if (generateAccessibleUrls && product.imageUrls.length > 0) {
@@ -378,7 +373,6 @@ export async function updateProduct(
       select: {
         imageUrls: true,
         isPrivateImages: true,
-        price: true,
         unitPrice: true,
         packageSize: true,
       },
@@ -432,19 +426,13 @@ export async function updateProduct(
     ): number {
       return unitPrice * packageSize;
     }
-    const displayPrice = calculateDisplayPrice(
-      data.unitPrice
-        ? Number(data.unitPrice)
-        : Number(currentProduct.unitPrice),
-      data.packageSize ? data.packageSize : currentProduct.packageSize
-    );
+
     // Update the product
     const product = await prisma.product.update({
       where: { productId: Number(productId) },
       data: {
         name: data.name,
         description: data.description,
-        price: displayPrice,
         unitPrice: data.unitPrice,
         unitType: data.unitType,
         packageSize: data.packageSize,
