@@ -3,7 +3,12 @@ import * as dealController from "@/modules/deals/deal.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 import validator from "@/middlewares/validator";
 import { UserRole } from "@/generated/prisma/client";
-import { zCreateDealDto, zGetAllDealsDto } from "@/modules/deals/deal.dto";
+import {
+  zCreateDealDto,
+  zDeleteDealDto,
+  zGetAllDealsDto,
+  zGetDealDto,
+} from "@/modules/deals/deal.dto";
 
 const router = Router();
 
@@ -23,6 +28,17 @@ router.get(
   authorizeRoles(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   validator(zGetAllDealsDto),
   dealController.getAllDeals
+);
+// Route to get a deal by ID
+router.get("/:id", validator(zGetDealDto), dealController.getDealById);
+
+// Route to delete a promotion
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validator(zDeleteDealDto),
+  dealController.deleteDeal
 );
 
 export default router;

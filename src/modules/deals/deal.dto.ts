@@ -92,3 +92,20 @@ export const zGetAllDealsDto = {
   }),
 };
 export type GetAllDealsQueryDto = z.infer<typeof zGetAllDealsDto.query>;
+
+/*
+ **   Schema: Get Single Deal by ID (Route Param)
+ */
+export const zGetDealDto = {
+  params: z.object({
+    id: zBigIntId("Deal ID"),
+  }),
+};
+/*
+ ** Schema: Delete Deal by ID (Route Param)
+ */
+export const zDeleteDealDto = {
+  params: z.object({
+    id: zBigIntId("Deal ID"),
+  }),
+};

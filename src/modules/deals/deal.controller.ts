@@ -58,3 +58,41 @@ export const getAllDeals = asyncHandler(
     });
   }
 );
+
+/**
+ * Get a single deal by its ID
+ * - Converts the string ID from URL param into BigInt
+ * - Calls service to get promotion by ID
+ */
+export const getDealById = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const dealId = BigInt(req.params.id);
+    const deal = await dealService.getDealById(dealId);
+
+    sendResponse<Deal>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Deal retrieved successfully",
+      data: deal,
+    });
+  }
+);
+
+/**
+ * Delete a delete by ID
+ * - Converts ID to BigInt
+ * - Calls service to delete deal
+ */
+export const deleteDeal = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const dealId = BigInt(req.params.id);
+    await dealService.deleteDeal(dealId);
+
+    sendResponse<null>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Deal deleted successfully",
+      data: null,
+    });
+  }
+);

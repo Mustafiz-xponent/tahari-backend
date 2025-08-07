@@ -90,7 +90,7 @@ export async function createDeal(data: CreateDealDto): Promise<Deal> {
 }
 
 /**
- * - Retrieves all deals with optional pagination
+ * - Retrieves all deals with optional pagination and filtering
  */
 export async function getAllDeals(
   paginationParams: { page: number; limit: number; skip: number; sort: string },
@@ -124,4 +124,32 @@ export async function getAllDeals(
     totalPages: Math.ceil(totalPromotions / limit),
     totalCount: totalPromotions,
   };
+}
+/**
+ * Retrieves a single deal by its ID
+ * - Throws an error if promotion is not found
+ */
+export async function getDealById(dealId: bigint): Promise<Deal> {
+  const deal = await prisma.deal.findUnique({
+    where: { dealId },
+  });
+  if (!deal) {
+    throw new AppError("Deal not found", httpStatus.NOT_FOUND);
+  }
+  return deal;
+}
+
+/**
+ * Deletes a deal by its ID
+ * - Throws an error if deal not found
+ */
+export async function deleteDeal(dealId: bigint): Promise<void> {
+  const deal = await prisma.deal.findUnique({
+    where: { dealId },
+  });
+  if (!deal) {
+    throw new AppError("Deal not found", httpStatus.NOT_FOUND);
+  }
+  // Delete deal
+  await prisma.deal.delete({ where: { dealId } });
 }
