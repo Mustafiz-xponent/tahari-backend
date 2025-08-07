@@ -7,6 +7,8 @@ import { Router } from "express";
 import * as ProductController from "@/modules/products/product.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 import { UserRole } from "@/generated/prisma/client";
+import validator from "@/middlewares/validator";
+import { zGetAllProductsDto } from "./product.dto";
 
 const router = Router();
 
@@ -19,7 +21,11 @@ router.post(
 );
 
 // Route to get all products
-router.get("/", ProductController.getAllProducts);
+router.get(
+  "/",
+  validator(zGetAllProductsDto),
+  ProductController.getAllProducts
+);
 
 // Route to get a product by ID
 // router.get("/:id", ProductController.getProductById);

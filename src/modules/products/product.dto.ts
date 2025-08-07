@@ -74,6 +74,36 @@ export const zCreateProductDto = z.object({
  * Use this type in services or elsewhere.
  */
 export type CreateProductDto = z.infer<typeof zCreateProductDto>;
+/*
+ ** Schema: Get All Products (Query Parameters)
+ ** Includes pagination, sorting, filtering
+ */
+export const zGetAllProductsDto = {
+  query: z.object({
+    page: z.coerce.number().int().positive().optional().default(1),
+    limit: z.coerce.number().int().positive().max(100).optional().default(10),
+    sort: z.enum(["asc", "desc"]).optional().default("desc"),
+
+    isSubscription: z
+      .union([z.literal("true"), z.literal("false")])
+      .optional()
+      .transform((val) => val === "true"),
+
+    isPreorder: z
+      .union([z.literal("true"), z.literal("false")])
+      .optional()
+      .transform((val) => val === "true"),
+    name: z.string().optional(),
+    categoryId: z
+      .union([z.string(), z.number()])
+      .transform((val) => BigInt(val))
+      .refine((val) => val > 0n, {
+        message: "Category ID must be a positive integer",
+      })
+      .optional(),
+  }),
+};
+export type GetAllProductsQueryDto = z.infer<typeof zGetAllProductsDto.query>;
 
 /**
  * Zod schema for updating a product.

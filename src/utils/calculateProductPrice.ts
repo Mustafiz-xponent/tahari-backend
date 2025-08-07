@@ -30,7 +30,6 @@ export function calculateProductPricing(product: ProductWithDeal) {
 
   return {
     isUnderDeal,
-    unitPrice,
     dealUnitPrice,
   };
 }

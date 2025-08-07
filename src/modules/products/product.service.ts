@@ -106,59 +106,6 @@ export async function createProduct(
   }
 }
 
-// /**
-//  * Retrieve all products with optional filtering and relations
-//  * @param includeRelations - Whether to include category and farmer relations
-//  * @param generateAccessibleUrls - Whether to generate presigned URLs for private images
-//  * @param urlExpiresIn - Expiration time for presigned URLs in seconds
-//  * @returns An array of all products with accessible image URLs
-//  * @throws Error if the query fails
-//  */
-// export async function getAllProducts(
-//   includeRelations = false,
-//   generateAccessibleUrls = true,
-//   urlExpiresIn = 300
-// ): Promise<ProductWithAccessibleImages[]> {
-//   try {
-//     const products = await prisma.product.findMany({
-//       include: includeRelations
-//         ? {
-//             category: true,
-//             farmer: true,
-//           }
-//         : undefined,
-//     });
-
-//     // Generate accessible URLs if requested
-//     if (generateAccessibleUrls) {
-//       const productsWithAccessibleUrls = await Promise.all(
-//         products.map(async (product) => {
-//           if (product.imageUrls.length === 0) {
-//             return { ...product, accessibleImageUrls: [] };
-//           }
-
-//           const accessibleUrls = await getBatchAccessibleImageUrls(
-//             product.imageUrls,
-//             product.isPrivateImages || false,
-//             urlExpiresIn
-//           );
-
-//           return {
-//             ...product,
-//             accessibleImageUrls: accessibleUrls,
-//           };
-//         })
-//       );
-
-//       return productsWithAccessibleUrls;
-//     }
-
-//     return products.map((product) => ({ ...product, accessibleImageUrls: [] }));
-//   } catch (error) {
-//     throw new Error(`Failed to fetch products: ${getErrorMessage(error)}`);
-//   }
-// }
-
 /**
  * Retrieve all products with optional filtering, relations, and pagination
  * @param includeRelations - Whether to include category and farmer relations
@@ -173,18 +120,24 @@ export async function getAllProducts(
   generateAccessibleUrls = true,
   urlExpiresIn = 300,
   paginationParams?: PaginationParams,
-  filters?: { isSubscription?: string; isPreorder?: string }
+  filters?: {
+    isSubscription?: boolean;
+    isPreorder?: boolean;
+    name?: string;
+    categoryId?: bigint;
+  }
 ): Promise<PaginatedProductResult> {
   try {
+    // TODO: filter by categoryID & name
     const whereClause: { isSubscription?: boolean; isPreorder?: boolean } = {};
-    if (filters?.isSubscription === "true") {
+    if (filters?.isSubscription === true) {
       whereClause.isSubscription = true;
-    } else if (filters?.isSubscription === "false") {
+    } else if (filters?.isSubscription === false) {
       whereClause.isSubscription = false;
     }
-    if (filters?.isPreorder === "true") {
+    if (filters?.isPreorder === true) {
       whereClause.isPreorder = true;
-    } else if (filters?.isPreorder === "false") {
+    } else if (filters?.isPreorder === false) {
       whereClause.isPreorder = false;
     }
     // If no pagination params provided, return all products (backward compatibility)
@@ -419,12 +372,6 @@ export async function updateProduct(
         );
         // Continue with update without new images
       }
-    }
-    function calculateDisplayPrice(
-      unitPrice: number,
-      packageSize: number
-    ): number {
-      return unitPrice * packageSize;
     }
 
     // Update the product
