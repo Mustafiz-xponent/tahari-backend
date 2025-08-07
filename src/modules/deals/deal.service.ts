@@ -6,7 +6,7 @@ import { Deal } from "@/generated/prisma/client";
 
 /**
  * Creates a new deal entry in the database
- * - Accepts deal metadata in `CreateDealDto`
+ * - Accepts deal data in `CreateDealDto`
  * - Returns the created deal
  */
 export async function createDeal(data: CreateDealDto): Promise<Deal> {

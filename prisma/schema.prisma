@@ -569,8 +569,7 @@ model Deal {
   discountValue Float // e.g. 10% or 50 BDT off
   startDate     DateTime
   endDate       DateTime
-
-  isGlobal Boolean @default(false) // True = applies to all products
+  isGlobal      Boolean      @default(false) // True = applies to all products
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
