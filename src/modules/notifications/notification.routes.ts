@@ -13,6 +13,7 @@ import {
   zMarkNotificationAsReadDto,
   zUpdateNotificationDto,
 } from "@/modules/notifications/notification.dto";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -20,7 +21,7 @@ const router = Router();
 router.post(
   "/",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validator(zCreateNotificationDto),
   NotificationController.createNotification
 );
@@ -32,7 +33,7 @@ router.get("/", NotificationController.getAllNotifications);
 router.get(
   "/user",
   authMiddleware,
-  authorizeRoles("CUSTOMER"),
+  authorizeRoles(UserRole.CUSTOMER),
   NotificationController.getUserNotifications
 );
 
@@ -40,21 +41,21 @@ router.get(
 router.patch(
   "/read/all",
   authMiddleware,
-  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.CUSTOMER, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   NotificationController.markAllNotificationsAsRead
 );
 // Route to mark all notifications as seen
 router.patch(
   "/seen/all",
   authMiddleware,
-  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.CUSTOMER, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   NotificationController.markAllNotificationsAsSeen
 );
 // Route to mark single notifications as read
 router.patch(
   "/read/:id",
   authMiddleware,
-  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.CUSTOMER, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validator(zMarkNotificationAsReadDto),
   NotificationController.markNotificationAsReadById
 );
@@ -65,7 +66,7 @@ router.get("/:id", NotificationController.getNotificationById);
 router.put(
   "/:id",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validator(zUpdateNotificationDto),
   NotificationController.updateNotification
 );
@@ -74,7 +75,7 @@ router.put(
 router.delete(
   "/:id",
   authMiddleware,
-  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.CUSTOMER, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validator(zDeleteNotificationDto),
   NotificationController.deleteNotification
 );

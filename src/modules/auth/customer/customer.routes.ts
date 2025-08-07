@@ -6,6 +6,7 @@
 import { Router } from "express";
 import * as CustomerController from "@/modules/auth/customer/customer.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -25,7 +26,7 @@ router.post("/verify-otp", CustomerController.verifyCustomerOtp);
 router.put(
   "/:id",
   authMiddleware,
-  authorizeRoles("CUSTOMER"),
+  authorizeRoles(UserRole.CUSTOMER),
   CustomerController.updateCustomerProfile
 );
 
@@ -33,7 +34,7 @@ router.put(
 router.get(
   "/:id",
   authMiddleware,
-  authorizeRoles("CUSTOMER"),
+  authorizeRoles(UserRole.CUSTOMER),
   CustomerController.getCustomerById
 );
 

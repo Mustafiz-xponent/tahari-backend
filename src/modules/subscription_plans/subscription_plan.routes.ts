@@ -6,6 +6,7 @@
 import { Router } from "express";
 import * as SubscriptionPlanController from "@/modules/subscription_plans/subscription_plan.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -13,7 +14,7 @@ const router = Router();
 router.post(
   "/",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   SubscriptionPlanController.createSubscriptionPlan
 );
 
@@ -27,7 +28,7 @@ router.get("/:id", SubscriptionPlanController.getSubscriptionPlanById);
 router.put(
   "/:id",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   SubscriptionPlanController.updateSubscriptionPlan
 );
 
@@ -35,7 +36,7 @@ router.put(
 router.delete(
   "/:id",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   SubscriptionPlanController.deleteSubscriptionPlan
 );
 

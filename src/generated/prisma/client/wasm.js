@@ -187,7 +187,8 @@ exports.Prisma.ProductScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   categoryId: 'categoryId',
-  farmerId: 'farmerId'
+  farmerId: 'farmerId',
+  dealId: 'dealId'
 };
 
 exports.Prisma.InventoryPurchaseScalarFieldEnum = {
@@ -378,6 +379,20 @@ exports.Prisma.PromotionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.DealScalarFieldEnum = {
+  dealId: 'dealId',
+  title: 'title',
+  description: 'description',
+  discountType: 'discountType',
+  discountValue: 'discountValue',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  isActive: 'isActive',
+  isGlobal: 'isGlobal',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -500,6 +515,11 @@ exports.PromoPlacement = exports.$Enums.PromoPlacement = {
   HOME_MIDDLE: 'HOME_MIDDLE'
 };
 
+exports.DiscountType = exports.$Enums.DiscountType = {
+  PERCENTAGE: 'PERCENTAGE',
+  FLAT: 'FLAT'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Admin: 'Admin',
@@ -523,7 +543,8 @@ exports.Prisma.ModelName = {
   Payment: 'Payment',
   Message: 'Message',
   Notification: 'Notification',
-  Promotion: 'Promotion'
+  Promotion: 'Promotion',
+  Deal: 'Deal'
 };
 
 /**

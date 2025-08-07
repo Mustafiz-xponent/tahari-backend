@@ -6,6 +6,7 @@
 import { Router } from "express";
 import * as WalletTransactionController from "@/modules/wallet_transactions/wallet_transaction.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -19,7 +20,7 @@ router.get("/", WalletTransactionController.getAllWalletTransactions);
 router.get(
   "/customer",
   authMiddleware,
-  authorizeRoles("CUSTOMER"),
+  authorizeRoles(UserRole.CUSTOMER),
   WalletTransactionController.getCustomerWalletTransactions
 );
 // Route to get a wallet transaction by ID

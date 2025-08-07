@@ -128,6 +128,11 @@ export type Notification = $Result.DefaultSelection<Prisma.$NotificationPayload>
  * 
  */
 export type Promotion = $Result.DefaultSelection<Prisma.$PromotionPayload>
+/**
+ * Model Deal
+ * 
+ */
+export type Deal = $Result.DefaultSelection<Prisma.$DealPayload>
 
 /**
  * Enums
@@ -739,6 +744,16 @@ export class PrismaClient<
     * ```
     */
   get promotion(): Prisma.PromotionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.deal`: Exposes CRUD operations for the **Deal** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Deals
+    * const deals = await prisma.deal.findMany()
+    * ```
+    */
+  get deal(): Prisma.DealDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1201,7 +1216,8 @@ export namespace Prisma {
     Payment: 'Payment',
     Message: 'Message',
     Notification: 'Notification',
-    Promotion: 'Promotion'
+    Promotion: 'Promotion',
+    Deal: 'Deal'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1220,7 +1236,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "admin" | "customer" | "otp" | "farmer" | "category" | "product" | "inventoryPurchase" | "farmerTransaction" | "farmerPayment" | "stockTransaction" | "wallet" | "walletTransaction" | "order" | "orderItem" | "orderTracking" | "subscription" | "subscriptionPlan" | "subscriptionDelivery" | "payment" | "message" | "notification" | "promotion"
+      modelProps: "user" | "admin" | "customer" | "otp" | "farmer" | "category" | "product" | "inventoryPurchase" | "farmerTransaction" | "farmerPayment" | "stockTransaction" | "wallet" | "walletTransaction" | "order" | "orderItem" | "orderTracking" | "subscription" | "subscriptionPlan" | "subscriptionDelivery" | "payment" | "message" | "notification" | "promotion" | "deal"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2926,6 +2942,80 @@ export namespace Prisma {
           }
         }
       }
+      Deal: {
+        payload: Prisma.$DealPayload<ExtArgs>
+        fields: Prisma.DealFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DealFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DealFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealPayload>
+          }
+          findFirst: {
+            args: Prisma.DealFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DealFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealPayload>
+          }
+          findMany: {
+            args: Prisma.DealFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealPayload>[]
+          }
+          create: {
+            args: Prisma.DealCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealPayload>
+          }
+          createMany: {
+            args: Prisma.DealCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DealCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealPayload>[]
+          }
+          delete: {
+            args: Prisma.DealDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealPayload>
+          }
+          update: {
+            args: Prisma.DealUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealPayload>
+          }
+          deleteMany: {
+            args: Prisma.DealDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DealUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DealUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealPayload>[]
+          }
+          upsert: {
+            args: Prisma.DealUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DealPayload>
+          }
+          aggregate: {
+            args: Prisma.DealAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDeal>
+          }
+          groupBy: {
+            args: Prisma.DealGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DealGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DealCountArgs<ExtArgs>
+            result: $Utils.Optional<DealCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -3033,6 +3123,7 @@ export namespace Prisma {
     message?: MessageOmit
     notification?: NotificationOmit
     promotion?: PromotionOmit
+    deal?: DealOmit
   }
 
   /* Types for Logging */
@@ -3644,6 +3735,37 @@ export namespace Prisma {
    */
   export type SubscriptionPlanCountOutputTypeCountSubscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SubscriptionWhereInput
+  }
+
+
+  /**
+   * Count Type DealCountOutputType
+   */
+
+  export type DealCountOutputType = {
+    Product: number
+  }
+
+  export type DealCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    Product?: boolean | DealCountOutputTypeCountProductArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * DealCountOutputType without action
+   */
+  export type DealCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DealCountOutputType
+     */
+    select?: DealCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * DealCountOutputType without action
+   */
+  export type DealCountOutputTypeCountProductArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductWhereInput
   }
 
 
@@ -10572,6 +10694,7 @@ export namespace Prisma {
     reorderLevel: number | null
     categoryId: number | null
     farmerId: number | null
+    dealId: number | null
   }
 
   export type ProductSumAggregateOutputType = {
@@ -10583,6 +10706,7 @@ export namespace Prisma {
     reorderLevel: number | null
     categoryId: bigint | null
     farmerId: bigint | null
+    dealId: bigint | null
   }
 
   export type ProductMinAggregateOutputType = {
@@ -10603,6 +10727,7 @@ export namespace Prisma {
     updatedAt: Date | null
     categoryId: bigint | null
     farmerId: bigint | null
+    dealId: bigint | null
   }
 
   export type ProductMaxAggregateOutputType = {
@@ -10623,6 +10748,7 @@ export namespace Prisma {
     updatedAt: Date | null
     categoryId: bigint | null
     farmerId: bigint | null
+    dealId: bigint | null
   }
 
   export type ProductCountAggregateOutputType = {
@@ -10644,6 +10770,7 @@ export namespace Prisma {
     updatedAt: number
     categoryId: number
     farmerId: number
+    dealId: number
     _all: number
   }
 
@@ -10657,6 +10784,7 @@ export namespace Prisma {
     reorderLevel?: true
     categoryId?: true
     farmerId?: true
+    dealId?: true
   }
 
   export type ProductSumAggregateInputType = {
@@ -10668,6 +10796,7 @@ export namespace Prisma {
     reorderLevel?: true
     categoryId?: true
     farmerId?: true
+    dealId?: true
   }
 
   export type ProductMinAggregateInputType = {
@@ -10688,6 +10817,7 @@ export namespace Prisma {
     updatedAt?: true
     categoryId?: true
     farmerId?: true
+    dealId?: true
   }
 
   export type ProductMaxAggregateInputType = {
@@ -10708,6 +10838,7 @@ export namespace Prisma {
     updatedAt?: true
     categoryId?: true
     farmerId?: true
+    dealId?: true
   }
 
   export type ProductCountAggregateInputType = {
@@ -10729,6 +10860,7 @@ export namespace Prisma {
     updatedAt?: true
     categoryId?: true
     farmerId?: true
+    dealId?: true
     _all?: true
   }
 
@@ -10837,6 +10969,7 @@ export namespace Prisma {
     updatedAt: Date
     categoryId: bigint
     farmerId: bigint
+    dealId: bigint | null
     _count: ProductCountAggregateOutputType | null
     _avg: ProductAvgAggregateOutputType | null
     _sum: ProductSumAggregateOutputType | null
@@ -10877,8 +11010,10 @@ export namespace Prisma {
     updatedAt?: boolean
     categoryId?: boolean
     farmerId?: boolean
+    dealId?: boolean
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
+    Deal?: boolean | Product$DealArgs<ExtArgs>
     inventoryPurchases?: boolean | Product$inventoryPurchasesArgs<ExtArgs>
     stockTransactions?: boolean | Product$stockTransactionsArgs<ExtArgs>
     subscriptionPlans?: boolean | Product$subscriptionPlansArgs<ExtArgs>
@@ -10906,8 +11041,10 @@ export namespace Prisma {
     updatedAt?: boolean
     categoryId?: boolean
     farmerId?: boolean
+    dealId?: boolean
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
+    Deal?: boolean | Product$DealArgs<ExtArgs>
   }, ExtArgs["result"]["product"]>
 
   export type ProductSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -10929,8 +11066,10 @@ export namespace Prisma {
     updatedAt?: boolean
     categoryId?: boolean
     farmerId?: boolean
+    dealId?: boolean
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
+    Deal?: boolean | Product$DealArgs<ExtArgs>
   }, ExtArgs["result"]["product"]>
 
   export type ProductSelectScalar = {
@@ -10952,12 +11091,14 @@ export namespace Prisma {
     updatedAt?: boolean
     categoryId?: boolean
     farmerId?: boolean
+    dealId?: boolean
   }
 
-  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"productId" | "name" | "description" | "unitType" | "price" | "unitPrice" | "packageSize" | "stockQuantity" | "reorderLevel" | "isSubscription" | "isPreorder" | "isPrivateImages" | "preorderAvailabilityDate" | "imageUrls" | "createdAt" | "updatedAt" | "categoryId" | "farmerId", ExtArgs["result"]["product"]>
+  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"productId" | "name" | "description" | "unitType" | "price" | "unitPrice" | "packageSize" | "stockQuantity" | "reorderLevel" | "isSubscription" | "isPreorder" | "isPrivateImages" | "preorderAvailabilityDate" | "imageUrls" | "createdAt" | "updatedAt" | "categoryId" | "farmerId" | "dealId", ExtArgs["result"]["product"]>
   export type ProductInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
+    Deal?: boolean | Product$DealArgs<ExtArgs>
     inventoryPurchases?: boolean | Product$inventoryPurchasesArgs<ExtArgs>
     stockTransactions?: boolean | Product$stockTransactionsArgs<ExtArgs>
     subscriptionPlans?: boolean | Product$subscriptionPlansArgs<ExtArgs>
@@ -10968,10 +11109,12 @@ export namespace Prisma {
   export type ProductIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
+    Deal?: boolean | Product$DealArgs<ExtArgs>
   }
   export type ProductIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     farmer?: boolean | FarmerDefaultArgs<ExtArgs>
+    Deal?: boolean | Product$DealArgs<ExtArgs>
   }
 
   export type $ProductPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10979,6 +11122,7 @@ export namespace Prisma {
     objects: {
       category: Prisma.$CategoryPayload<ExtArgs>
       farmer: Prisma.$FarmerPayload<ExtArgs>
+      Deal: Prisma.$DealPayload<ExtArgs> | null
       inventoryPurchases: Prisma.$InventoryPurchasePayload<ExtArgs>[]
       stockTransactions: Prisma.$StockTransactionPayload<ExtArgs>[]
       subscriptionPlans: Prisma.$SubscriptionPlanPayload<ExtArgs>[]
@@ -11004,6 +11148,7 @@ export namespace Prisma {
       updatedAt: Date
       categoryId: bigint
       farmerId: bigint
+      dealId: bigint | null
     }, ExtArgs["result"]["product"]>
     composites: {}
   }
@@ -11400,6 +11545,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     category<T extends CategoryDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CategoryDefaultArgs<ExtArgs>>): Prisma__CategoryClient<$Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     farmer<T extends FarmerDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FarmerDefaultArgs<ExtArgs>>): Prisma__FarmerClient<$Result.GetResult<Prisma.$FarmerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    Deal<T extends Product$DealArgs<ExtArgs> = {}>(args?: Subset<T, Product$DealArgs<ExtArgs>>): Prisma__DealClient<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     inventoryPurchases<T extends Product$inventoryPurchasesArgs<ExtArgs> = {}>(args?: Subset<T, Product$inventoryPurchasesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryPurchasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     stockTransactions<T extends Product$stockTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Product$stockTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     subscriptionPlans<T extends Product$subscriptionPlansArgs<ExtArgs> = {}>(args?: Subset<T, Product$subscriptionPlansArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPlanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -11452,6 +11598,7 @@ export namespace Prisma {
     readonly updatedAt: FieldRef<"Product", 'DateTime'>
     readonly categoryId: FieldRef<"Product", 'BigInt'>
     readonly farmerId: FieldRef<"Product", 'BigInt'>
+    readonly dealId: FieldRef<"Product", 'BigInt'>
   }
     
 
@@ -11845,6 +11992,25 @@ export namespace Prisma {
      * Limit how many Products to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Product.Deal
+   */
+  export type Product$DealArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealInclude<ExtArgs> | null
+    where?: DealWhereInput
   }
 
   /**
@@ -31049,6 +31215,1192 @@ export namespace Prisma {
 
 
   /**
+   * Model Deal
+   */
+
+  export type AggregateDeal = {
+    _count: DealCountAggregateOutputType | null
+    _avg: DealAvgAggregateOutputType | null
+    _sum: DealSumAggregateOutputType | null
+    _min: DealMinAggregateOutputType | null
+    _max: DealMaxAggregateOutputType | null
+  }
+
+  export type DealAvgAggregateOutputType = {
+    dealId: number | null
+    discountValue: Decimal | null
+  }
+
+  export type DealSumAggregateOutputType = {
+    dealId: bigint | null
+    discountValue: Decimal | null
+  }
+
+  export type DealMinAggregateOutputType = {
+    dealId: bigint | null
+    title: string | null
+    description: string | null
+    discountType: $Enums.DiscountType | null
+    discountValue: Decimal | null
+    startDate: Date | null
+    endDate: Date | null
+    isActive: boolean | null
+    isGlobal: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DealMaxAggregateOutputType = {
+    dealId: bigint | null
+    title: string | null
+    description: string | null
+    discountType: $Enums.DiscountType | null
+    discountValue: Decimal | null
+    startDate: Date | null
+    endDate: Date | null
+    isActive: boolean | null
+    isGlobal: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DealCountAggregateOutputType = {
+    dealId: number
+    title: number
+    description: number
+    discountType: number
+    discountValue: number
+    startDate: number
+    endDate: number
+    isActive: number
+    isGlobal: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DealAvgAggregateInputType = {
+    dealId?: true
+    discountValue?: true
+  }
+
+  export type DealSumAggregateInputType = {
+    dealId?: true
+    discountValue?: true
+  }
+
+  export type DealMinAggregateInputType = {
+    dealId?: true
+    title?: true
+    description?: true
+    discountType?: true
+    discountValue?: true
+    startDate?: true
+    endDate?: true
+    isActive?: true
+    isGlobal?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DealMaxAggregateInputType = {
+    dealId?: true
+    title?: true
+    description?: true
+    discountType?: true
+    discountValue?: true
+    startDate?: true
+    endDate?: true
+    isActive?: true
+    isGlobal?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DealCountAggregateInputType = {
+    dealId?: true
+    title?: true
+    description?: true
+    discountType?: true
+    discountValue?: true
+    startDate?: true
+    endDate?: true
+    isActive?: true
+    isGlobal?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DealAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Deal to aggregate.
+     */
+    where?: DealWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Deals to fetch.
+     */
+    orderBy?: DealOrderByWithRelationInput | DealOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DealWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Deals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Deals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Deals
+    **/
+    _count?: true | DealCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DealAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DealSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DealMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DealMaxAggregateInputType
+  }
+
+  export type GetDealAggregateType<T extends DealAggregateArgs> = {
+        [P in keyof T & keyof AggregateDeal]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDeal[P]>
+      : GetScalarType<T[P], AggregateDeal[P]>
+  }
+
+
+
+
+  export type DealGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DealWhereInput
+    orderBy?: DealOrderByWithAggregationInput | DealOrderByWithAggregationInput[]
+    by: DealScalarFieldEnum[] | DealScalarFieldEnum
+    having?: DealScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DealCountAggregateInputType | true
+    _avg?: DealAvgAggregateInputType
+    _sum?: DealSumAggregateInputType
+    _min?: DealMinAggregateInputType
+    _max?: DealMaxAggregateInputType
+  }
+
+  export type DealGroupByOutputType = {
+    dealId: bigint
+    title: string
+    description: string | null
+    discountType: $Enums.DiscountType
+    discountValue: Decimal
+    startDate: Date
+    endDate: Date
+    isActive: boolean
+    isGlobal: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: DealCountAggregateOutputType | null
+    _avg: DealAvgAggregateOutputType | null
+    _sum: DealSumAggregateOutputType | null
+    _min: DealMinAggregateOutputType | null
+    _max: DealMaxAggregateOutputType | null
+  }
+
+  type GetDealGroupByPayload<T extends DealGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DealGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DealGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DealGroupByOutputType[P]>
+            : GetScalarType<T[P], DealGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DealSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    dealId?: boolean
+    title?: boolean
+    description?: boolean
+    discountType?: boolean
+    discountValue?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    isActive?: boolean
+    isGlobal?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    Product?: boolean | Deal$ProductArgs<ExtArgs>
+    _count?: boolean | DealCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deal"]>
+
+  export type DealSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    dealId?: boolean
+    title?: boolean
+    description?: boolean
+    discountType?: boolean
+    discountValue?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    isActive?: boolean
+    isGlobal?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["deal"]>
+
+  export type DealSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    dealId?: boolean
+    title?: boolean
+    description?: boolean
+    discountType?: boolean
+    discountValue?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    isActive?: boolean
+    isGlobal?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["deal"]>
+
+  export type DealSelectScalar = {
+    dealId?: boolean
+    title?: boolean
+    description?: boolean
+    discountType?: boolean
+    discountValue?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    isActive?: boolean
+    isGlobal?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DealOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"dealId" | "title" | "description" | "discountType" | "discountValue" | "startDate" | "endDate" | "isActive" | "isGlobal" | "createdAt" | "updatedAt", ExtArgs["result"]["deal"]>
+  export type DealInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    Product?: boolean | Deal$ProductArgs<ExtArgs>
+    _count?: boolean | DealCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type DealIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type DealIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $DealPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Deal"
+    objects: {
+      Product: Prisma.$ProductPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      dealId: bigint
+      title: string
+      description: string | null
+      discountType: $Enums.DiscountType
+      discountValue: Prisma.Decimal
+      startDate: Date
+      endDate: Date
+      isActive: boolean
+      isGlobal: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["deal"]>
+    composites: {}
+  }
+
+  type DealGetPayload<S extends boolean | null | undefined | DealDefaultArgs> = $Result.GetResult<Prisma.$DealPayload, S>
+
+  type DealCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DealFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DealCountAggregateInputType | true
+    }
+
+  export interface DealDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Deal'], meta: { name: 'Deal' } }
+    /**
+     * Find zero or one Deal that matches the filter.
+     * @param {DealFindUniqueArgs} args - Arguments to find a Deal
+     * @example
+     * // Get one Deal
+     * const deal = await prisma.deal.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DealFindUniqueArgs>(args: SelectSubset<T, DealFindUniqueArgs<ExtArgs>>): Prisma__DealClient<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Deal that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DealFindUniqueOrThrowArgs} args - Arguments to find a Deal
+     * @example
+     * // Get one Deal
+     * const deal = await prisma.deal.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DealFindUniqueOrThrowArgs>(args: SelectSubset<T, DealFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DealClient<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Deal that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealFindFirstArgs} args - Arguments to find a Deal
+     * @example
+     * // Get one Deal
+     * const deal = await prisma.deal.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DealFindFirstArgs>(args?: SelectSubset<T, DealFindFirstArgs<ExtArgs>>): Prisma__DealClient<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Deal that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealFindFirstOrThrowArgs} args - Arguments to find a Deal
+     * @example
+     * // Get one Deal
+     * const deal = await prisma.deal.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DealFindFirstOrThrowArgs>(args?: SelectSubset<T, DealFindFirstOrThrowArgs<ExtArgs>>): Prisma__DealClient<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Deals that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Deals
+     * const deals = await prisma.deal.findMany()
+     * 
+     * // Get first 10 Deals
+     * const deals = await prisma.deal.findMany({ take: 10 })
+     * 
+     * // Only select the `dealId`
+     * const dealWithDealIdOnly = await prisma.deal.findMany({ select: { dealId: true } })
+     * 
+     */
+    findMany<T extends DealFindManyArgs>(args?: SelectSubset<T, DealFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Deal.
+     * @param {DealCreateArgs} args - Arguments to create a Deal.
+     * @example
+     * // Create one Deal
+     * const Deal = await prisma.deal.create({
+     *   data: {
+     *     // ... data to create a Deal
+     *   }
+     * })
+     * 
+     */
+    create<T extends DealCreateArgs>(args: SelectSubset<T, DealCreateArgs<ExtArgs>>): Prisma__DealClient<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Deals.
+     * @param {DealCreateManyArgs} args - Arguments to create many Deals.
+     * @example
+     * // Create many Deals
+     * const deal = await prisma.deal.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DealCreateManyArgs>(args?: SelectSubset<T, DealCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Deals and returns the data saved in the database.
+     * @param {DealCreateManyAndReturnArgs} args - Arguments to create many Deals.
+     * @example
+     * // Create many Deals
+     * const deal = await prisma.deal.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Deals and only return the `dealId`
+     * const dealWithDealIdOnly = await prisma.deal.createManyAndReturn({
+     *   select: { dealId: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DealCreateManyAndReturnArgs>(args?: SelectSubset<T, DealCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Deal.
+     * @param {DealDeleteArgs} args - Arguments to delete one Deal.
+     * @example
+     * // Delete one Deal
+     * const Deal = await prisma.deal.delete({
+     *   where: {
+     *     // ... filter to delete one Deal
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DealDeleteArgs>(args: SelectSubset<T, DealDeleteArgs<ExtArgs>>): Prisma__DealClient<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Deal.
+     * @param {DealUpdateArgs} args - Arguments to update one Deal.
+     * @example
+     * // Update one Deal
+     * const deal = await prisma.deal.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DealUpdateArgs>(args: SelectSubset<T, DealUpdateArgs<ExtArgs>>): Prisma__DealClient<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Deals.
+     * @param {DealDeleteManyArgs} args - Arguments to filter Deals to delete.
+     * @example
+     * // Delete a few Deals
+     * const { count } = await prisma.deal.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DealDeleteManyArgs>(args?: SelectSubset<T, DealDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Deals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Deals
+     * const deal = await prisma.deal.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DealUpdateManyArgs>(args: SelectSubset<T, DealUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Deals and returns the data updated in the database.
+     * @param {DealUpdateManyAndReturnArgs} args - Arguments to update many Deals.
+     * @example
+     * // Update many Deals
+     * const deal = await prisma.deal.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Deals and only return the `dealId`
+     * const dealWithDealIdOnly = await prisma.deal.updateManyAndReturn({
+     *   select: { dealId: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DealUpdateManyAndReturnArgs>(args: SelectSubset<T, DealUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Deal.
+     * @param {DealUpsertArgs} args - Arguments to update or create a Deal.
+     * @example
+     * // Update or create a Deal
+     * const deal = await prisma.deal.upsert({
+     *   create: {
+     *     // ... data to create a Deal
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Deal we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DealUpsertArgs>(args: SelectSubset<T, DealUpsertArgs<ExtArgs>>): Prisma__DealClient<$Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Deals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealCountArgs} args - Arguments to filter Deals to count.
+     * @example
+     * // Count the number of Deals
+     * const count = await prisma.deal.count({
+     *   where: {
+     *     // ... the filter for the Deals we want to count
+     *   }
+     * })
+    **/
+    count<T extends DealCountArgs>(
+      args?: Subset<T, DealCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DealCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Deal.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DealAggregateArgs>(args: Subset<T, DealAggregateArgs>): Prisma.PrismaPromise<GetDealAggregateType<T>>
+
+    /**
+     * Group by Deal.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DealGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DealGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DealGroupByArgs['orderBy'] }
+        : { orderBy?: DealGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DealGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDealGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Deal model
+   */
+  readonly fields: DealFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Deal.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DealClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    Product<T extends Deal$ProductArgs<ExtArgs> = {}>(args?: Subset<T, Deal$ProductArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Deal model
+   */
+  interface DealFieldRefs {
+    readonly dealId: FieldRef<"Deal", 'BigInt'>
+    readonly title: FieldRef<"Deal", 'String'>
+    readonly description: FieldRef<"Deal", 'String'>
+    readonly discountType: FieldRef<"Deal", 'DiscountType'>
+    readonly discountValue: FieldRef<"Deal", 'Decimal'>
+    readonly startDate: FieldRef<"Deal", 'DateTime'>
+    readonly endDate: FieldRef<"Deal", 'DateTime'>
+    readonly isActive: FieldRef<"Deal", 'Boolean'>
+    readonly isGlobal: FieldRef<"Deal", 'Boolean'>
+    readonly createdAt: FieldRef<"Deal", 'DateTime'>
+    readonly updatedAt: FieldRef<"Deal", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Deal findUnique
+   */
+  export type DealFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealInclude<ExtArgs> | null
+    /**
+     * Filter, which Deal to fetch.
+     */
+    where: DealWhereUniqueInput
+  }
+
+  /**
+   * Deal findUniqueOrThrow
+   */
+  export type DealFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealInclude<ExtArgs> | null
+    /**
+     * Filter, which Deal to fetch.
+     */
+    where: DealWhereUniqueInput
+  }
+
+  /**
+   * Deal findFirst
+   */
+  export type DealFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealInclude<ExtArgs> | null
+    /**
+     * Filter, which Deal to fetch.
+     */
+    where?: DealWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Deals to fetch.
+     */
+    orderBy?: DealOrderByWithRelationInput | DealOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Deals.
+     */
+    cursor?: DealWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Deals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Deals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Deals.
+     */
+    distinct?: DealScalarFieldEnum | DealScalarFieldEnum[]
+  }
+
+  /**
+   * Deal findFirstOrThrow
+   */
+  export type DealFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealInclude<ExtArgs> | null
+    /**
+     * Filter, which Deal to fetch.
+     */
+    where?: DealWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Deals to fetch.
+     */
+    orderBy?: DealOrderByWithRelationInput | DealOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Deals.
+     */
+    cursor?: DealWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Deals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Deals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Deals.
+     */
+    distinct?: DealScalarFieldEnum | DealScalarFieldEnum[]
+  }
+
+  /**
+   * Deal findMany
+   */
+  export type DealFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealInclude<ExtArgs> | null
+    /**
+     * Filter, which Deals to fetch.
+     */
+    where?: DealWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Deals to fetch.
+     */
+    orderBy?: DealOrderByWithRelationInput | DealOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Deals.
+     */
+    cursor?: DealWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Deals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Deals.
+     */
+    skip?: number
+    distinct?: DealScalarFieldEnum | DealScalarFieldEnum[]
+  }
+
+  /**
+   * Deal create
+   */
+  export type DealCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Deal.
+     */
+    data: XOR<DealCreateInput, DealUncheckedCreateInput>
+  }
+
+  /**
+   * Deal createMany
+   */
+  export type DealCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Deals.
+     */
+    data: DealCreateManyInput | DealCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Deal createManyAndReturn
+   */
+  export type DealCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * The data used to create many Deals.
+     */
+    data: DealCreateManyInput | DealCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Deal update
+   */
+  export type DealUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Deal.
+     */
+    data: XOR<DealUpdateInput, DealUncheckedUpdateInput>
+    /**
+     * Choose, which Deal to update.
+     */
+    where: DealWhereUniqueInput
+  }
+
+  /**
+   * Deal updateMany
+   */
+  export type DealUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Deals.
+     */
+    data: XOR<DealUpdateManyMutationInput, DealUncheckedUpdateManyInput>
+    /**
+     * Filter which Deals to update
+     */
+    where?: DealWhereInput
+    /**
+     * Limit how many Deals to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Deal updateManyAndReturn
+   */
+  export type DealUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * The data used to update Deals.
+     */
+    data: XOR<DealUpdateManyMutationInput, DealUncheckedUpdateManyInput>
+    /**
+     * Filter which Deals to update
+     */
+    where?: DealWhereInput
+    /**
+     * Limit how many Deals to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Deal upsert
+   */
+  export type DealUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Deal to update in case it exists.
+     */
+    where: DealWhereUniqueInput
+    /**
+     * In case the Deal found by the `where` argument doesn't exist, create a new Deal with this data.
+     */
+    create: XOR<DealCreateInput, DealUncheckedCreateInput>
+    /**
+     * In case the Deal was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DealUpdateInput, DealUncheckedUpdateInput>
+  }
+
+  /**
+   * Deal delete
+   */
+  export type DealDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealInclude<ExtArgs> | null
+    /**
+     * Filter which Deal to delete.
+     */
+    where: DealWhereUniqueInput
+  }
+
+  /**
+   * Deal deleteMany
+   */
+  export type DealDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Deals to delete
+     */
+    where?: DealWhereInput
+    /**
+     * Limit how many Deals to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Deal.Product
+   */
+  export type Deal$ProductArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Product
+     */
+    select?: ProductSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Product
+     */
+    omit?: ProductOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductInclude<ExtArgs> | null
+    where?: ProductWhereInput
+    orderBy?: ProductOrderByWithRelationInput | ProductOrderByWithRelationInput[]
+    cursor?: ProductWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProductScalarFieldEnum | ProductScalarFieldEnum[]
+  }
+
+  /**
+   * Deal without action
+   */
+  export type DealDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deal
+     */
+    select?: DealSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Deal
+     */
+    omit?: DealOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DealInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -31147,7 +32499,8 @@ export namespace Prisma {
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     categoryId: 'categoryId',
-    farmerId: 'farmerId'
+    farmerId: 'farmerId',
+    dealId: 'dealId'
   };
 
   export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
@@ -31387,6 +32740,23 @@ export namespace Prisma {
   };
 
   export type PromotionScalarFieldEnum = (typeof PromotionScalarFieldEnum)[keyof typeof PromotionScalarFieldEnum]
+
+
+  export const DealScalarFieldEnum: {
+    dealId: 'dealId',
+    title: 'title',
+    description: 'description',
+    discountType: 'discountType',
+    discountValue: 'discountValue',
+    startDate: 'startDate',
+    endDate: 'endDate',
+    isActive: 'isActive',
+    isGlobal: 'isGlobal',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DealScalarFieldEnum = (typeof DealScalarFieldEnum)[keyof typeof DealScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -31716,6 +33086,20 @@ export namespace Prisma {
    * Reference to a field of type 'PromoPlacement[]'
    */
   export type ListEnumPromoPlacementFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PromoPlacement[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'DiscountType'
+   */
+  export type EnumDiscountTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DiscountType'>
+    
+
+
+  /**
+   * Reference to a field of type 'DiscountType[]'
+   */
+  export type ListEnumDiscountTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DiscountType[]'>
     
   /**
    * Deep Input Types
@@ -32124,8 +33508,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Product"> | Date | string
     categoryId?: BigIntFilter<"Product"> | bigint | number
     farmerId?: BigIntFilter<"Product"> | bigint | number
+    dealId?: BigIntNullableFilter<"Product"> | bigint | number | null
     category?: XOR<CategoryScalarRelationFilter, CategoryWhereInput>
     farmer?: XOR<FarmerScalarRelationFilter, FarmerWhereInput>
+    Deal?: XOR<DealNullableScalarRelationFilter, DealWhereInput> | null
     inventoryPurchases?: InventoryPurchaseListRelationFilter
     stockTransactions?: StockTransactionListRelationFilter
     subscriptionPlans?: SubscriptionPlanListRelationFilter
@@ -32152,8 +33538,10 @@ export namespace Prisma {
     updatedAt?: SortOrder
     categoryId?: SortOrder
     farmerId?: SortOrder
+    dealId?: SortOrderInput | SortOrder
     category?: CategoryOrderByWithRelationInput
     farmer?: FarmerOrderByWithRelationInput
+    Deal?: DealOrderByWithRelationInput
     inventoryPurchases?: InventoryPurchaseOrderByRelationAggregateInput
     stockTransactions?: StockTransactionOrderByRelationAggregateInput
     subscriptionPlans?: SubscriptionPlanOrderByRelationAggregateInput
@@ -32183,8 +33571,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Product"> | Date | string
     categoryId?: BigIntFilter<"Product"> | bigint | number
     farmerId?: BigIntFilter<"Product"> | bigint | number
+    dealId?: BigIntNullableFilter<"Product"> | bigint | number | null
     category?: XOR<CategoryScalarRelationFilter, CategoryWhereInput>
     farmer?: XOR<FarmerScalarRelationFilter, FarmerWhereInput>
+    Deal?: XOR<DealNullableScalarRelationFilter, DealWhereInput> | null
     inventoryPurchases?: InventoryPurchaseListRelationFilter
     stockTransactions?: StockTransactionListRelationFilter
     subscriptionPlans?: SubscriptionPlanListRelationFilter
@@ -32211,6 +33601,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     categoryId?: SortOrder
     farmerId?: SortOrder
+    dealId?: SortOrderInput | SortOrder
     _count?: ProductCountOrderByAggregateInput
     _avg?: ProductAvgOrderByAggregateInput
     _max?: ProductMaxOrderByAggregateInput
@@ -32240,6 +33631,7 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     categoryId?: BigIntWithAggregatesFilter<"Product"> | bigint | number
     farmerId?: BigIntWithAggregatesFilter<"Product"> | bigint | number
+    dealId?: BigIntNullableWithAggregatesFilter<"Product"> | bigint | number | null
   }
 
   export type InventoryPurchaseWhereInput = {
@@ -33526,6 +34918,93 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Promotion"> | Date | string
   }
 
+  export type DealWhereInput = {
+    AND?: DealWhereInput | DealWhereInput[]
+    OR?: DealWhereInput[]
+    NOT?: DealWhereInput | DealWhereInput[]
+    dealId?: BigIntFilter<"Deal"> | bigint | number
+    title?: StringFilter<"Deal"> | string
+    description?: StringNullableFilter<"Deal"> | string | null
+    discountType?: EnumDiscountTypeFilter<"Deal"> | $Enums.DiscountType
+    discountValue?: DecimalFilter<"Deal"> | Decimal | DecimalJsLike | number | string
+    startDate?: DateTimeFilter<"Deal"> | Date | string
+    endDate?: DateTimeFilter<"Deal"> | Date | string
+    isActive?: BoolFilter<"Deal"> | boolean
+    isGlobal?: BoolFilter<"Deal"> | boolean
+    createdAt?: DateTimeFilter<"Deal"> | Date | string
+    updatedAt?: DateTimeFilter<"Deal"> | Date | string
+    Product?: ProductListRelationFilter
+  }
+
+  export type DealOrderByWithRelationInput = {
+    dealId?: SortOrder
+    title?: SortOrder
+    description?: SortOrderInput | SortOrder
+    discountType?: SortOrder
+    discountValue?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    isActive?: SortOrder
+    isGlobal?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    Product?: ProductOrderByRelationAggregateInput
+  }
+
+  export type DealWhereUniqueInput = Prisma.AtLeast<{
+    dealId?: bigint | number
+    AND?: DealWhereInput | DealWhereInput[]
+    OR?: DealWhereInput[]
+    NOT?: DealWhereInput | DealWhereInput[]
+    title?: StringFilter<"Deal"> | string
+    description?: StringNullableFilter<"Deal"> | string | null
+    discountType?: EnumDiscountTypeFilter<"Deal"> | $Enums.DiscountType
+    discountValue?: DecimalFilter<"Deal"> | Decimal | DecimalJsLike | number | string
+    startDate?: DateTimeFilter<"Deal"> | Date | string
+    endDate?: DateTimeFilter<"Deal"> | Date | string
+    isActive?: BoolFilter<"Deal"> | boolean
+    isGlobal?: BoolFilter<"Deal"> | boolean
+    createdAt?: DateTimeFilter<"Deal"> | Date | string
+    updatedAt?: DateTimeFilter<"Deal"> | Date | string
+    Product?: ProductListRelationFilter
+  }, "dealId">
+
+  export type DealOrderByWithAggregationInput = {
+    dealId?: SortOrder
+    title?: SortOrder
+    description?: SortOrderInput | SortOrder
+    discountType?: SortOrder
+    discountValue?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    isActive?: SortOrder
+    isGlobal?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DealCountOrderByAggregateInput
+    _avg?: DealAvgOrderByAggregateInput
+    _max?: DealMaxOrderByAggregateInput
+    _min?: DealMinOrderByAggregateInput
+    _sum?: DealSumOrderByAggregateInput
+  }
+
+  export type DealScalarWhereWithAggregatesInput = {
+    AND?: DealScalarWhereWithAggregatesInput | DealScalarWhereWithAggregatesInput[]
+    OR?: DealScalarWhereWithAggregatesInput[]
+    NOT?: DealScalarWhereWithAggregatesInput | DealScalarWhereWithAggregatesInput[]
+    dealId?: BigIntWithAggregatesFilter<"Deal"> | bigint | number
+    title?: StringWithAggregatesFilter<"Deal"> | string
+    description?: StringNullableWithAggregatesFilter<"Deal"> | string | null
+    discountType?: EnumDiscountTypeWithAggregatesFilter<"Deal"> | $Enums.DiscountType
+    discountValue?: DecimalWithAggregatesFilter<"Deal"> | Decimal | DecimalJsLike | number | string
+    startDate?: DateTimeWithAggregatesFilter<"Deal"> | Date | string
+    endDate?: DateTimeWithAggregatesFilter<"Deal"> | Date | string
+    isActive?: BoolWithAggregatesFilter<"Deal"> | boolean
+    isGlobal?: BoolWithAggregatesFilter<"Deal"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"Deal"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Deal"> | Date | string
+  }
+
   export type UserCreateInput = {
     userId?: bigint | number
     email?: string | null
@@ -33941,6 +35420,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     farmer: FarmerCreateNestedOneWithoutProductsInput
+    Deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
@@ -33967,6 +35447,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     categoryId: bigint | number
     farmerId: bigint | number
+    dealId?: bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionUncheckedCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanUncheckedCreateNestedManyWithoutProductInput
@@ -33993,6 +35474,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
+    Deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
@@ -34019,6 +35501,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     farmerId?: BigIntFieldUpdateOperationsInput | bigint | number
+    dealId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUncheckedUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUncheckedUpdateManyWithoutProductNestedInput
@@ -34045,6 +35528,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     categoryId: bigint | number
     farmerId: bigint | number
+    dealId?: bigint | number | null
   }
 
   export type ProductUpdateManyMutationInput = {
@@ -34085,6 +35569,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     farmerId?: BigIntFieldUpdateOperationsInput | bigint | number
+    dealId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   }
 
   export type InventoryPurchaseCreateInput = {
@@ -35428,6 +36913,108 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type DealCreateInput = {
+    dealId?: bigint | number
+    title: string
+    description?: string | null
+    discountType: $Enums.DiscountType
+    discountValue: Decimal | DecimalJsLike | number | string
+    startDate: Date | string
+    endDate: Date | string
+    isActive?: boolean
+    isGlobal?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    Product?: ProductCreateNestedManyWithoutDealInput
+  }
+
+  export type DealUncheckedCreateInput = {
+    dealId?: bigint | number
+    title: string
+    description?: string | null
+    discountType: $Enums.DiscountType
+    discountValue: Decimal | DecimalJsLike | number | string
+    startDate: Date | string
+    endDate: Date | string
+    isActive?: boolean
+    isGlobal?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    Product?: ProductUncheckedCreateNestedManyWithoutDealInput
+  }
+
+  export type DealUpdateInput = {
+    dealId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    discountType?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
+    discountValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isGlobal?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    Product?: ProductUpdateManyWithoutDealNestedInput
+  }
+
+  export type DealUncheckedUpdateInput = {
+    dealId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    discountType?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
+    discountValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isGlobal?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    Product?: ProductUncheckedUpdateManyWithoutDealNestedInput
+  }
+
+  export type DealCreateManyInput = {
+    dealId?: bigint | number
+    title: string
+    description?: string | null
+    discountType: $Enums.DiscountType
+    discountValue: Decimal | DecimalJsLike | number | string
+    startDate: Date | string
+    endDate: Date | string
+    isActive?: boolean
+    isGlobal?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DealUpdateManyMutationInput = {
+    dealId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    discountType?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
+    discountValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isGlobal?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DealUncheckedUpdateManyInput = {
+    dealId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    discountType?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
+    discountValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isGlobal?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type BigIntFilter<$PrismaModel = never> = {
     equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
@@ -35964,6 +37551,17 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type BigIntNullableFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
+  }
+
   export type CategoryScalarRelationFilter = {
     is?: CategoryWhereInput
     isNot?: CategoryWhereInput
@@ -35972,6 +37570,11 @@ export namespace Prisma {
   export type FarmerScalarRelationFilter = {
     is?: FarmerWhereInput
     isNot?: FarmerWhereInput
+  }
+
+  export type DealNullableScalarRelationFilter = {
+    is?: DealWhereInput | null
+    isNot?: DealWhereInput | null
   }
 
   export type StockTransactionListRelationFilter = {
@@ -36033,6 +37636,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     categoryId?: SortOrder
     farmerId?: SortOrder
+    dealId?: SortOrder
   }
 
   export type ProductAvgOrderByAggregateInput = {
@@ -36044,6 +37648,7 @@ export namespace Prisma {
     reorderLevel?: SortOrder
     categoryId?: SortOrder
     farmerId?: SortOrder
+    dealId?: SortOrder
   }
 
   export type ProductMaxOrderByAggregateInput = {
@@ -36064,6 +37669,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     categoryId?: SortOrder
     farmerId?: SortOrder
+    dealId?: SortOrder
   }
 
   export type ProductMinOrderByAggregateInput = {
@@ -36084,6 +37690,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     categoryId?: SortOrder
     farmerId?: SortOrder
+    dealId?: SortOrder
   }
 
   export type ProductSumOrderByAggregateInput = {
@@ -36095,6 +37702,7 @@ export namespace Prisma {
     reorderLevel?: SortOrder
     categoryId?: SortOrder
     farmerId?: SortOrder
+    dealId?: SortOrder
   }
 
   export type EnumProductUnitTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -36167,6 +37775,22 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type BigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedBigIntNullableFilter<$PrismaModel>
+    _min?: NestedBigIntNullableFilter<$PrismaModel>
+    _max?: NestedBigIntNullableFilter<$PrismaModel>
   }
 
   export type EnumInventoryPurchaseStatusFilter<$PrismaModel = never> = {
@@ -36332,17 +37956,6 @@ export namespace Prisma {
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
   }
 
-  export type BigIntNullableFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
-  }
-
   export type FarmerTransactionScalarRelationFilter = {
     is?: FarmerTransactionWhereInput
     isNot?: FarmerTransactionWhereInput
@@ -36398,22 +38011,6 @@ export namespace Prisma {
     amount?: SortOrder
     transactionId?: SortOrder
     farmerFarmerId?: SortOrder
-  }
-
-  export type BigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedBigIntNullableFilter<$PrismaModel>
-    _min?: NestedBigIntNullableFilter<$PrismaModel>
-    _max?: NestedBigIntNullableFilter<$PrismaModel>
   }
 
   export type EnumTransactionTypeFilter<$PrismaModel = never> = {
@@ -37298,6 +38895,75 @@ export namespace Prisma {
     _max?: NestedEnumPromoPlacementFilter<$PrismaModel>
   }
 
+  export type EnumDiscountTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.DiscountType | EnumDiscountTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDiscountTypeFilter<$PrismaModel> | $Enums.DiscountType
+  }
+
+  export type DealCountOrderByAggregateInput = {
+    dealId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    discountType?: SortOrder
+    discountValue?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    isActive?: SortOrder
+    isGlobal?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DealAvgOrderByAggregateInput = {
+    dealId?: SortOrder
+    discountValue?: SortOrder
+  }
+
+  export type DealMaxOrderByAggregateInput = {
+    dealId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    discountType?: SortOrder
+    discountValue?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    isActive?: SortOrder
+    isGlobal?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DealMinOrderByAggregateInput = {
+    dealId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    discountType?: SortOrder
+    discountValue?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    isActive?: SortOrder
+    isGlobal?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DealSumOrderByAggregateInput = {
+    dealId?: SortOrder
+    discountValue?: SortOrder
+  }
+
+  export type EnumDiscountTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DiscountType | EnumDiscountTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDiscountTypeWithAggregatesFilter<$PrismaModel> | $Enums.DiscountType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDiscountTypeFilter<$PrismaModel>
+    _max?: NestedEnumDiscountTypeFilter<$PrismaModel>
+  }
+
   export type UserCreateaddressInput = {
     set: string[]
   }
@@ -37955,6 +39621,12 @@ export namespace Prisma {
     connect?: FarmerWhereUniqueInput
   }
 
+  export type DealCreateNestedOneWithoutProductInput = {
+    create?: XOR<DealCreateWithoutProductInput, DealUncheckedCreateWithoutProductInput>
+    connectOrCreate?: DealCreateOrConnectWithoutProductInput
+    connect?: DealWhereUniqueInput
+  }
+
   export type InventoryPurchaseCreateNestedManyWithoutProductInput = {
     create?: XOR<InventoryPurchaseCreateWithoutProductInput, InventoryPurchaseUncheckedCreateWithoutProductInput> | InventoryPurchaseCreateWithoutProductInput[] | InventoryPurchaseUncheckedCreateWithoutProductInput[]
     connectOrCreate?: InventoryPurchaseCreateOrConnectWithoutProductInput | InventoryPurchaseCreateOrConnectWithoutProductInput[]
@@ -38078,6 +39750,16 @@ export namespace Prisma {
     update?: XOR<XOR<FarmerUpdateToOneWithWhereWithoutProductsInput, FarmerUpdateWithoutProductsInput>, FarmerUncheckedUpdateWithoutProductsInput>
   }
 
+  export type DealUpdateOneWithoutProductNestedInput = {
+    create?: XOR<DealCreateWithoutProductInput, DealUncheckedCreateWithoutProductInput>
+    connectOrCreate?: DealCreateOrConnectWithoutProductInput
+    upsert?: DealUpsertWithoutProductInput
+    disconnect?: DealWhereInput | boolean
+    delete?: DealWhereInput | boolean
+    connect?: DealWhereUniqueInput
+    update?: XOR<XOR<DealUpdateToOneWithWhereWithoutProductInput, DealUpdateWithoutProductInput>, DealUncheckedUpdateWithoutProductInput>
+  }
+
   export type InventoryPurchaseUpdateManyWithoutProductNestedInput = {
     create?: XOR<InventoryPurchaseCreateWithoutProductInput, InventoryPurchaseUncheckedCreateWithoutProductInput> | InventoryPurchaseCreateWithoutProductInput[] | InventoryPurchaseUncheckedCreateWithoutProductInput[]
     connectOrCreate?: InventoryPurchaseCreateOrConnectWithoutProductInput | InventoryPurchaseCreateOrConnectWithoutProductInput[]
@@ -38146,6 +39828,14 @@ export namespace Prisma {
     update?: PromotionUpdateWithWhereUniqueWithoutProductInput | PromotionUpdateWithWhereUniqueWithoutProductInput[]
     updateMany?: PromotionUpdateManyWithWhereWithoutProductInput | PromotionUpdateManyWithWhereWithoutProductInput[]
     deleteMany?: PromotionScalarWhereInput | PromotionScalarWhereInput[]
+  }
+
+  export type NullableBigIntFieldUpdateOperationsInput = {
+    set?: bigint | number | null
+    increment?: bigint | number
+    decrement?: bigint | number
+    multiply?: bigint | number
+    divide?: bigint | number
   }
 
   export type InventoryPurchaseUncheckedUpdateManyWithoutProductNestedInput = {
@@ -38436,14 +40126,6 @@ export namespace Prisma {
     delete?: FarmerWhereInput | boolean
     connect?: FarmerWhereUniqueInput
     update?: XOR<XOR<FarmerUpdateToOneWithWhereWithoutFarmerPaymentsInput, FarmerUpdateWithoutFarmerPaymentsInput>, FarmerUncheckedUpdateWithoutFarmerPaymentsInput>
-  }
-
-  export type NullableBigIntFieldUpdateOperationsInput = {
-    set?: bigint | number | null
-    increment?: bigint | number
-    decrement?: bigint | number
-    multiply?: bigint | number
-    divide?: bigint | number
   }
 
   export type ProductCreateNestedOneWithoutStockTransactionsInput = {
@@ -39214,6 +40896,52 @@ export namespace Prisma {
     update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutPromotionsInput, ProductUpdateWithoutPromotionsInput>, ProductUncheckedUpdateWithoutPromotionsInput>
   }
 
+  export type ProductCreateNestedManyWithoutDealInput = {
+    create?: XOR<ProductCreateWithoutDealInput, ProductUncheckedCreateWithoutDealInput> | ProductCreateWithoutDealInput[] | ProductUncheckedCreateWithoutDealInput[]
+    connectOrCreate?: ProductCreateOrConnectWithoutDealInput | ProductCreateOrConnectWithoutDealInput[]
+    createMany?: ProductCreateManyDealInputEnvelope
+    connect?: ProductWhereUniqueInput | ProductWhereUniqueInput[]
+  }
+
+  export type ProductUncheckedCreateNestedManyWithoutDealInput = {
+    create?: XOR<ProductCreateWithoutDealInput, ProductUncheckedCreateWithoutDealInput> | ProductCreateWithoutDealInput[] | ProductUncheckedCreateWithoutDealInput[]
+    connectOrCreate?: ProductCreateOrConnectWithoutDealInput | ProductCreateOrConnectWithoutDealInput[]
+    createMany?: ProductCreateManyDealInputEnvelope
+    connect?: ProductWhereUniqueInput | ProductWhereUniqueInput[]
+  }
+
+  export type EnumDiscountTypeFieldUpdateOperationsInput = {
+    set?: $Enums.DiscountType
+  }
+
+  export type ProductUpdateManyWithoutDealNestedInput = {
+    create?: XOR<ProductCreateWithoutDealInput, ProductUncheckedCreateWithoutDealInput> | ProductCreateWithoutDealInput[] | ProductUncheckedCreateWithoutDealInput[]
+    connectOrCreate?: ProductCreateOrConnectWithoutDealInput | ProductCreateOrConnectWithoutDealInput[]
+    upsert?: ProductUpsertWithWhereUniqueWithoutDealInput | ProductUpsertWithWhereUniqueWithoutDealInput[]
+    createMany?: ProductCreateManyDealInputEnvelope
+    set?: ProductWhereUniqueInput | ProductWhereUniqueInput[]
+    disconnect?: ProductWhereUniqueInput | ProductWhereUniqueInput[]
+    delete?: ProductWhereUniqueInput | ProductWhereUniqueInput[]
+    connect?: ProductWhereUniqueInput | ProductWhereUniqueInput[]
+    update?: ProductUpdateWithWhereUniqueWithoutDealInput | ProductUpdateWithWhereUniqueWithoutDealInput[]
+    updateMany?: ProductUpdateManyWithWhereWithoutDealInput | ProductUpdateManyWithWhereWithoutDealInput[]
+    deleteMany?: ProductScalarWhereInput | ProductScalarWhereInput[]
+  }
+
+  export type ProductUncheckedUpdateManyWithoutDealNestedInput = {
+    create?: XOR<ProductCreateWithoutDealInput, ProductUncheckedCreateWithoutDealInput> | ProductCreateWithoutDealInput[] | ProductUncheckedCreateWithoutDealInput[]
+    connectOrCreate?: ProductCreateOrConnectWithoutDealInput | ProductCreateOrConnectWithoutDealInput[]
+    upsert?: ProductUpsertWithWhereUniqueWithoutDealInput | ProductUpsertWithWhereUniqueWithoutDealInput[]
+    createMany?: ProductCreateManyDealInputEnvelope
+    set?: ProductWhereUniqueInput | ProductWhereUniqueInput[]
+    disconnect?: ProductWhereUniqueInput | ProductWhereUniqueInput[]
+    delete?: ProductWhereUniqueInput | ProductWhereUniqueInput[]
+    connect?: ProductWhereUniqueInput | ProductWhereUniqueInput[]
+    update?: ProductUpdateWithWhereUniqueWithoutDealInput | ProductUpdateWithWhereUniqueWithoutDealInput[]
+    updateMany?: ProductUpdateManyWithWhereWithoutDealInput | ProductUpdateManyWithWhereWithoutDealInput[]
+    deleteMany?: ProductScalarWhereInput | ProductScalarWhereInput[]
+  }
+
   export type NestedBigIntFilter<$PrismaModel = never> = {
     equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
@@ -39437,6 +41165,17 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type NestedBigIntNullableFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
+  }
+
   export type NestedEnumProductUnitTypeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.ProductUnitType | EnumProductUnitTypeFieldRefInput<$PrismaModel>
     in?: $Enums.ProductUnitType[] | ListEnumProductUnitTypeFieldRefInput<$PrismaModel>
@@ -39509,6 +41248,33 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type NestedBigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedBigIntNullableFilter<$PrismaModel>
+    _min?: NestedBigIntNullableFilter<$PrismaModel>
+    _max?: NestedBigIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedEnumInventoryPurchaseStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.InventoryPurchaseStatus | EnumInventoryPurchaseStatusFieldRefInput<$PrismaModel>
     in?: $Enums.InventoryPurchaseStatus[] | ListEnumInventoryPurchaseStatusFieldRefInput<$PrismaModel>
@@ -39541,44 +41307,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPaymentStatusFilter<$PrismaModel>
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
-  }
-
-  export type NestedBigIntNullableFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
-  }
-
-  export type NestedBigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedBigIntNullableFilter<$PrismaModel>
-    _min?: NestedBigIntNullableFilter<$PrismaModel>
-    _max?: NestedBigIntNullableFilter<$PrismaModel>
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedEnumTransactionTypeFilter<$PrismaModel = never> = {
@@ -39749,6 +41477,23 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPromoPlacementFilter<$PrismaModel>
     _max?: NestedEnumPromoPlacementFilter<$PrismaModel>
+  }
+
+  export type NestedEnumDiscountTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.DiscountType | EnumDiscountTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDiscountTypeFilter<$PrismaModel> | $Enums.DiscountType
+  }
+
+  export type NestedEnumDiscountTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DiscountType | EnumDiscountTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDiscountTypeWithAggregatesFilter<$PrismaModel> | $Enums.DiscountType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDiscountTypeFilter<$PrismaModel>
+    _max?: NestedEnumDiscountTypeFilter<$PrismaModel>
   }
 
   export type AdminCreateWithoutUserInput = {
@@ -40536,6 +42281,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
+    Deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
@@ -40561,6 +42307,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     categoryId: bigint | number
+    dealId?: bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionUncheckedCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanUncheckedCreateNestedManyWithoutProductInput
@@ -40722,6 +42469,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Product"> | Date | string
     categoryId?: BigIntFilter<"Product"> | bigint | number
     farmerId?: BigIntFilter<"Product"> | bigint | number
+    dealId?: BigIntNullableFilter<"Product"> | bigint | number | null
   }
 
   export type InventoryPurchaseUpsertWithWhereUniqueWithoutFarmerInput = {
@@ -40837,6 +42585,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     farmer: FarmerCreateNestedOneWithoutProductsInput
+    Deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
@@ -40862,6 +42611,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     farmerId: bigint | number
+    dealId?: bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionUncheckedCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanUncheckedCreateNestedManyWithoutProductInput
@@ -40945,6 +42695,39 @@ export namespace Prisma {
   export type FarmerCreateOrConnectWithoutProductsInput = {
     where: FarmerWhereUniqueInput
     create: XOR<FarmerCreateWithoutProductsInput, FarmerUncheckedCreateWithoutProductsInput>
+  }
+
+  export type DealCreateWithoutProductInput = {
+    dealId?: bigint | number
+    title: string
+    description?: string | null
+    discountType: $Enums.DiscountType
+    discountValue: Decimal | DecimalJsLike | number | string
+    startDate: Date | string
+    endDate: Date | string
+    isActive?: boolean
+    isGlobal?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DealUncheckedCreateWithoutProductInput = {
+    dealId?: bigint | number
+    title: string
+    description?: string | null
+    discountType: $Enums.DiscountType
+    discountValue: Decimal | DecimalJsLike | number | string
+    startDate: Date | string
+    endDate: Date | string
+    isActive?: boolean
+    isGlobal?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DealCreateOrConnectWithoutProductInput = {
+    where: DealWhereUniqueInput
+    create: XOR<DealCreateWithoutProductInput, DealUncheckedCreateWithoutProductInput>
   }
 
   export type InventoryPurchaseCreateWithoutProductInput = {
@@ -41181,6 +42964,45 @@ export namespace Prisma {
     farmerPayments?: FarmerPaymentUncheckedUpdateManyWithoutFarmerNestedInput
   }
 
+  export type DealUpsertWithoutProductInput = {
+    update: XOR<DealUpdateWithoutProductInput, DealUncheckedUpdateWithoutProductInput>
+    create: XOR<DealCreateWithoutProductInput, DealUncheckedCreateWithoutProductInput>
+    where?: DealWhereInput
+  }
+
+  export type DealUpdateToOneWithWhereWithoutProductInput = {
+    where?: DealWhereInput
+    data: XOR<DealUpdateWithoutProductInput, DealUncheckedUpdateWithoutProductInput>
+  }
+
+  export type DealUpdateWithoutProductInput = {
+    dealId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    discountType?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
+    discountValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isGlobal?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DealUncheckedUpdateWithoutProductInput = {
+    dealId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    discountType?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
+    discountValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isGlobal?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type InventoryPurchaseUpsertWithWhereUniqueWithoutProductInput = {
     where: InventoryPurchaseWhereUniqueInput
     update: XOR<InventoryPurchaseUpdateWithoutProductInput, InventoryPurchaseUncheckedUpdateWithoutProductInput>
@@ -41370,6 +43192,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     farmer: FarmerCreateNestedOneWithoutProductsInput
+    Deal?: DealCreateNestedOneWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
     orderItems?: OrderItemCreateNestedManyWithoutProductInput
@@ -41395,6 +43218,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     categoryId: bigint | number
     farmerId: bigint | number
+    dealId?: bigint | number | null
     stockTransactions?: StockTransactionUncheckedCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanUncheckedCreateNestedManyWithoutProductInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutProductInput
@@ -41537,6 +43361,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
+    Deal?: DealUpdateOneWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUpdateManyWithoutProductNestedInput
@@ -41562,6 +43387,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     farmerId?: BigIntFieldUpdateOperationsInput | bigint | number
+    dealId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     stockTransactions?: StockTransactionUncheckedUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUncheckedUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutProductNestedInput
@@ -41945,6 +43771,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     farmer: FarmerCreateNestedOneWithoutProductsInput
+    Deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
     orderItems?: OrderItemCreateNestedManyWithoutProductInput
@@ -41970,6 +43797,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     categoryId: bigint | number
     farmerId: bigint | number
+    dealId?: bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanUncheckedCreateNestedManyWithoutProductInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutProductInput
@@ -42095,6 +43923,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
+    Deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUpdateManyWithoutProductNestedInput
@@ -42120,6 +43949,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     farmerId?: BigIntFieldUpdateOperationsInput | bigint | number
+    dealId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUncheckedUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutProductNestedInput
@@ -42943,6 +44773,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     farmer: FarmerCreateNestedOneWithoutProductsInput
+    Deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
@@ -42968,6 +44799,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     categoryId: bigint | number
     farmerId: bigint | number
+    dealId?: bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionUncheckedCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanUncheckedCreateNestedManyWithoutProductInput
@@ -43062,6 +44894,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
+    Deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
@@ -43087,6 +44920,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     farmerId?: BigIntFieldUpdateOperationsInput | bigint | number
+    dealId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUncheckedUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUncheckedUpdateManyWithoutProductNestedInput
@@ -43360,6 +45194,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     farmer: FarmerCreateNestedOneWithoutProductsInput
+    Deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     orderItems?: OrderItemCreateNestedManyWithoutProductInput
@@ -43385,6 +45220,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     categoryId: bigint | number
     farmerId: bigint | number
+    dealId?: bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionUncheckedCreateNestedManyWithoutProductInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutProductInput
@@ -43470,6 +45306,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
+    Deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUpdateManyWithoutProductNestedInput
@@ -43495,6 +45332,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     farmerId?: BigIntFieldUpdateOperationsInput | bigint | number
+    dealId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUncheckedUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutProductNestedInput
@@ -44144,6 +45982,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     farmer: FarmerCreateNestedOneWithoutProductsInput
+    Deal?: DealCreateNestedOneWithoutProductInput
     inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
@@ -44169,6 +46008,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     categoryId: bigint | number
     farmerId: bigint | number
+    dealId?: bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedCreateNestedManyWithoutProductInput
     stockTransactions?: StockTransactionUncheckedCreateNestedManyWithoutProductInput
     subscriptionPlans?: SubscriptionPlanUncheckedCreateNestedManyWithoutProductInput
@@ -44210,6 +46050,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
+    Deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
@@ -44235,10 +46076,89 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     farmerId?: BigIntFieldUpdateOperationsInput | bigint | number
+    dealId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUncheckedUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUncheckedUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutProductNestedInput
+  }
+
+  export type ProductCreateWithoutDealInput = {
+    productId?: bigint | number
+    name: string
+    description?: string | null
+    unitType?: $Enums.ProductUnitType
+    price: Decimal | DecimalJsLike | number | string
+    unitPrice?: Decimal | DecimalJsLike | number | string
+    packageSize?: number
+    stockQuantity?: number
+    reorderLevel?: number
+    isSubscription?: boolean
+    isPreorder?: boolean
+    isPrivateImages?: boolean
+    preorderAvailabilityDate?: Date | string | null
+    imageUrls?: ProductCreateimageUrlsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    category: CategoryCreateNestedOneWithoutProductsInput
+    farmer: FarmerCreateNestedOneWithoutProductsInput
+    inventoryPurchases?: InventoryPurchaseCreateNestedManyWithoutProductInput
+    stockTransactions?: StockTransactionCreateNestedManyWithoutProductInput
+    subscriptionPlans?: SubscriptionPlanCreateNestedManyWithoutProductInput
+    orderItems?: OrderItemCreateNestedManyWithoutProductInput
+    promotions?: PromotionCreateNestedManyWithoutProductInput
+  }
+
+  export type ProductUncheckedCreateWithoutDealInput = {
+    productId?: bigint | number
+    name: string
+    description?: string | null
+    unitType?: $Enums.ProductUnitType
+    price: Decimal | DecimalJsLike | number | string
+    unitPrice?: Decimal | DecimalJsLike | number | string
+    packageSize?: number
+    stockQuantity?: number
+    reorderLevel?: number
+    isSubscription?: boolean
+    isPreorder?: boolean
+    isPrivateImages?: boolean
+    preorderAvailabilityDate?: Date | string | null
+    imageUrls?: ProductCreateimageUrlsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    categoryId: bigint | number
+    farmerId: bigint | number
+    inventoryPurchases?: InventoryPurchaseUncheckedCreateNestedManyWithoutProductInput
+    stockTransactions?: StockTransactionUncheckedCreateNestedManyWithoutProductInput
+    subscriptionPlans?: SubscriptionPlanUncheckedCreateNestedManyWithoutProductInput
+    orderItems?: OrderItemUncheckedCreateNestedManyWithoutProductInput
+    promotions?: PromotionUncheckedCreateNestedManyWithoutProductInput
+  }
+
+  export type ProductCreateOrConnectWithoutDealInput = {
+    where: ProductWhereUniqueInput
+    create: XOR<ProductCreateWithoutDealInput, ProductUncheckedCreateWithoutDealInput>
+  }
+
+  export type ProductCreateManyDealInputEnvelope = {
+    data: ProductCreateManyDealInput | ProductCreateManyDealInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ProductUpsertWithWhereUniqueWithoutDealInput = {
+    where: ProductWhereUniqueInput
+    update: XOR<ProductUpdateWithoutDealInput, ProductUncheckedUpdateWithoutDealInput>
+    create: XOR<ProductCreateWithoutDealInput, ProductUncheckedCreateWithoutDealInput>
+  }
+
+  export type ProductUpdateWithWhereUniqueWithoutDealInput = {
+    where: ProductWhereUniqueInput
+    data: XOR<ProductUpdateWithoutDealInput, ProductUncheckedUpdateWithoutDealInput>
+  }
+
+  export type ProductUpdateManyWithWhereWithoutDealInput = {
+    where: ProductScalarWhereInput
+    data: XOR<ProductUpdateManyMutationInput, ProductUncheckedUpdateManyWithoutDealInput>
   }
 
   export type OtpCreateManyUserInput = {
@@ -44537,6 +46457,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     categoryId: bigint | number
+    dealId?: bigint | number | null
   }
 
   export type InventoryPurchaseCreateManyFarmerInput = {
@@ -44592,6 +46513,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
+    Deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
@@ -44617,6 +46539,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
+    dealId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUncheckedUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUncheckedUpdateManyWithoutProductNestedInput
@@ -44642,6 +46565,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
+    dealId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   }
 
   export type InventoryPurchaseUpdateWithoutFarmerInput = {
@@ -44773,6 +46697,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     farmerId: bigint | number
+    dealId?: bigint | number | null
   }
 
   export type ProductUpdateWithoutCategoryInput = {
@@ -44793,6 +46718,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
+    Deal?: DealUpdateOneWithoutProductNestedInput
     inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
@@ -44818,6 +46744,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmerId?: BigIntFieldUpdateOperationsInput | bigint | number
+    dealId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     inventoryPurchases?: InventoryPurchaseUncheckedUpdateManyWithoutProductNestedInput
     stockTransactions?: StockTransactionUncheckedUpdateManyWithoutProductNestedInput
     subscriptionPlans?: SubscriptionPlanUncheckedUpdateManyWithoutProductNestedInput
@@ -44843,6 +46770,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     farmerId?: BigIntFieldUpdateOperationsInput | bigint | number
+    dealId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   }
 
   export type InventoryPurchaseCreateManyProductInput = {
@@ -45617,6 +47545,100 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     customerId?: BigIntFieldUpdateOperationsInput | bigint | number
+  }
+
+  export type ProductCreateManyDealInput = {
+    productId?: bigint | number
+    name: string
+    description?: string | null
+    unitType?: $Enums.ProductUnitType
+    price: Decimal | DecimalJsLike | number | string
+    unitPrice?: Decimal | DecimalJsLike | number | string
+    packageSize?: number
+    stockQuantity?: number
+    reorderLevel?: number
+    isSubscription?: boolean
+    isPreorder?: boolean
+    isPrivateImages?: boolean
+    preorderAvailabilityDate?: Date | string | null
+    imageUrls?: ProductCreateimageUrlsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    categoryId: bigint | number
+    farmerId: bigint | number
+  }
+
+  export type ProductUpdateWithoutDealInput = {
+    productId?: BigIntFieldUpdateOperationsInput | bigint | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    packageSize?: FloatFieldUpdateOperationsInput | number
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    isSubscription?: BoolFieldUpdateOperationsInput | boolean
+    isPreorder?: BoolFieldUpdateOperationsInput | boolean
+    isPrivateImages?: BoolFieldUpdateOperationsInput | boolean
+    preorderAvailabilityDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    imageUrls?: ProductUpdateimageUrlsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
+    farmer?: FarmerUpdateOneRequiredWithoutProductsNestedInput
+    inventoryPurchases?: InventoryPurchaseUpdateManyWithoutProductNestedInput
+    stockTransactions?: StockTransactionUpdateManyWithoutProductNestedInput
+    subscriptionPlans?: SubscriptionPlanUpdateManyWithoutProductNestedInput
+    orderItems?: OrderItemUpdateManyWithoutProductNestedInput
+    promotions?: PromotionUpdateManyWithoutProductNestedInput
+  }
+
+  export type ProductUncheckedUpdateWithoutDealInput = {
+    productId?: BigIntFieldUpdateOperationsInput | bigint | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    packageSize?: FloatFieldUpdateOperationsInput | number
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    isSubscription?: BoolFieldUpdateOperationsInput | boolean
+    isPreorder?: BoolFieldUpdateOperationsInput | boolean
+    isPrivateImages?: BoolFieldUpdateOperationsInput | boolean
+    preorderAvailabilityDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    imageUrls?: ProductUpdateimageUrlsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
+    farmerId?: BigIntFieldUpdateOperationsInput | bigint | number
+    inventoryPurchases?: InventoryPurchaseUncheckedUpdateManyWithoutProductNestedInput
+    stockTransactions?: StockTransactionUncheckedUpdateManyWithoutProductNestedInput
+    subscriptionPlans?: SubscriptionPlanUncheckedUpdateManyWithoutProductNestedInput
+    orderItems?: OrderItemUncheckedUpdateManyWithoutProductNestedInput
+    promotions?: PromotionUncheckedUpdateManyWithoutProductNestedInput
+  }
+
+  export type ProductUncheckedUpdateManyWithoutDealInput = {
+    productId?: BigIntFieldUpdateOperationsInput | bigint | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    unitType?: EnumProductUnitTypeFieldUpdateOperationsInput | $Enums.ProductUnitType
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    packageSize?: FloatFieldUpdateOperationsInput | number
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    isSubscription?: BoolFieldUpdateOperationsInput | boolean
+    isPreorder?: BoolFieldUpdateOperationsInput | boolean
+    isPrivateImages?: BoolFieldUpdateOperationsInput | boolean
+    preorderAvailabilityDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    imageUrls?: ProductUpdateimageUrlsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
+    farmerId?: BigIntFieldUpdateOperationsInput | bigint | number
   }
 
 

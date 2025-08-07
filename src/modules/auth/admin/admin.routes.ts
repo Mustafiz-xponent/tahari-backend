@@ -6,6 +6,7 @@
 import { Router } from "express";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 import * as AdminController from "@/modules/auth/admin/admin.controller";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -13,7 +14,7 @@ const router = Router();
 router.post(
   "/create",
   authMiddleware,
-  authorizeRoles("SUPER_ADMIN", "ADMIN"),
+  authorizeRoles(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   AdminController.createAdmin
 );
 
@@ -24,7 +25,7 @@ router.post("/login", AdminController.loginAdmin);
 router.delete(
   "/:id",
   authMiddleware,
-  authorizeRoles("SUPER_ADMIN", "ADMIN"),
+  authorizeRoles(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   AdminController.deleteAdmin
 );
 

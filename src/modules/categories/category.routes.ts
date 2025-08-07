@@ -6,6 +6,7 @@
 import { Router } from "express";
 import * as CategoryController from "@/modules/categories/category.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -13,7 +14,7 @@ const router = Router();
 router.post(
   "/",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   CategoryController.createCategory
 );
 
@@ -27,7 +28,7 @@ router.get("/:id", CategoryController.getCategoryById);
 router.put(
   "/:id",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   CategoryController.updateCategory
 );
 
@@ -35,7 +36,7 @@ router.put(
 router.delete(
   "/:id",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   CategoryController.deleteCategory
 );
 

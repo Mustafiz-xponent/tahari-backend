@@ -6,6 +6,7 @@
 import { Router } from "express";
 import * as OrderController from "@/modules/orders/orders.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -19,7 +20,7 @@ router.get("/", OrderController.getAllOrders);
 router.get(
   "/customer",
   authMiddleware,
-  authorizeRoles("CUSTOMER"),
+  authorizeRoles(UserRole.CUSTOMER),
   OrderController.getCustomerOrders
 );
 
@@ -30,11 +31,15 @@ router.get("/:id", OrderController.getOrderById);
 router.put(
   "/:id",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   OrderController.updateOrder
 );
 
 // Route to delete an order
-router.delete("/:id", OrderController.deleteOrder);
+router.delete(
+  "/:id",
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  OrderController.deleteOrder
+);
 
 export default router;

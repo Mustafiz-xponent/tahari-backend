@@ -14,6 +14,7 @@ import {
   zPauseSubscriptionDto,
   zResumeSubscriptionDto,
 } from "@/modules/subscriptions/subscription.dto";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -21,7 +22,7 @@ const router = Router();
 router.post(
   "/",
   authMiddleware,
-  authorizeRoles("CUSTOMER"),
+  authorizeRoles(UserRole.CUSTOMER),
   validator(zCreateSubscriptionDto),
   SubscriptionController.createSubscription
 );
@@ -29,14 +30,14 @@ router.post(
 router.get(
   "/customer",
   authMiddleware,
-  authorizeRoles("CUSTOMER"),
+  authorizeRoles(UserRole.CUSTOMER),
   SubscriptionController.getCustomerSubscriptions
 );
 // Route to pause a subscription
 router.patch(
   "/pause/:id",
   authMiddleware,
-  authorizeRoles("CUSTOMER"),
+  authorizeRoles(UserRole.CUSTOMER),
   validator(zPauseSubscriptionDto),
   SubscriptionController.pauseSubscription
 );
@@ -44,7 +45,7 @@ router.patch(
 router.patch(
   "/resume/:id",
   authMiddleware,
-  authorizeRoles("CUSTOMER"),
+  authorizeRoles(UserRole.CUSTOMER),
   validator(zResumeSubscriptionDto),
   SubscriptionController.resumeSubscription
 );
@@ -52,7 +53,7 @@ router.patch(
 router.patch(
   "/cancel/:id",
   authMiddleware,
-  authorizeRoles("CUSTOMER"),
+  authorizeRoles(UserRole.CUSTOMER),
   validator(zCancelSubscriptionDto),
   SubscriptionController.cancelSubscription
 );
@@ -60,7 +61,7 @@ router.patch(
 router.get(
   "/",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   SubscriptionController.getAllSubscriptions
 );
 
@@ -68,18 +69,24 @@ router.get(
 router.get(
   "/:id",
   authMiddleware,
-  authorizeRoles("CUSTOMER", "ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.CUSTOMER, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validator(zGetSubscriptionDto),
   SubscriptionController.getSubscriptionById
 );
 
 // Route to update a subscription's details
-router.put("/:id", authMiddleware, SubscriptionController.updateSubscription);
+router.put(
+  "/:id",
+  authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  SubscriptionController.updateSubscription
+);
 
 // Route to delete a subscription
 router.delete(
   "/:id",
   authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   SubscriptionController.deleteSubscription
 );
 

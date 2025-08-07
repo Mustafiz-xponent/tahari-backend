@@ -6,6 +6,7 @@
 import { Router } from "express";
 import * as ProductController from "@/modules/products/product.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -13,7 +14,7 @@ const router = Router();
 router.post(
   "/",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   ProductController.createProduct
 );
 
@@ -28,13 +29,18 @@ router.get("/id/:id", ProductController.getProductById);
 router.get("/name/:name", ProductController.getProductByName);
 
 // Route to update a product's details
-router.put("/:id", ProductController.updateProduct);
+router.put(
+  "/:id",
+  authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  ProductController.updateProduct
+);
 
 // Route to delete a product
 router.delete(
   "/:id",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   ProductController.deleteProduct
 );
 

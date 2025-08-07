@@ -13,6 +13,7 @@ import {
   zUpdateMessageDto,
 } from "@/modules/messages/message.dto";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -29,7 +30,7 @@ router.get("/:id", MessageController.getMessageById);
 router.put(
   "/:id",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN", "SUPPORT", "CUSTOMER"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.CUSTOMER),
   validator(zUpdateMessageDto),
   MessageController.updateMessage
 );
@@ -38,7 +39,7 @@ router.put(
 router.delete(
   "/:id",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN", "SUPPORT", "CUSTOMER"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.CUSTOMER),
   validator(zDeleteMessageDto),
   MessageController.deleteMessage
 );

@@ -30,6 +30,7 @@ import notificationsRoutes from "@/modules/notifications/notification.routes";
 import messageRoutes from "@/modules/messages/message.routes";
 import customerRoutes from "@/modules/customers/customer.routes";
 import promotionRoutes from "@/modules/promotions/promotion.routes";
+import dealRoutes from "@/modules/deal/deal.routes";
 import { rateLimiter } from "@/middlewares/rateLimiter";
 import { globalErrorHandler } from "@/middlewares/errorHandler";
 import cors from "cors";
@@ -82,6 +83,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/notifications", notificationsRoutes);
 app.use("/api/promotions", promotionRoutes);
+app.use("/api/deals", dealRoutes);
 
 // Health check route
 app.get("/health", (_req: Request, res: Response) => {

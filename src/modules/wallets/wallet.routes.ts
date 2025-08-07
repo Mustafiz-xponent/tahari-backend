@@ -6,6 +6,7 @@
 import { Router } from "express";
 import * as WalletController from "@/modules/wallets/wallet.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -16,7 +17,7 @@ router.post("/", WalletController.createWallet);
 router.post(
   "/deposit",
   authMiddleware,
-  authorizeRoles("CUSTOMER"),
+  authorizeRoles(UserRole.CUSTOMER),
   WalletController.initiateWalletDeposit
 );
 
@@ -24,7 +25,7 @@ router.post(
 router.get(
   "/",
   authMiddleware,
-  authorizeRoles("ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   WalletController.getAllWallets
 );
 
@@ -32,14 +33,14 @@ router.get(
 router.get(
   "/balance",
   authMiddleware,
-  authorizeRoles("CUSTOMER"),
+  authorizeRoles(UserRole.CUSTOMER),
   WalletController.getCustomerWalletBalanace
 );
 // Route to get a wallet by ID
 router.get(
   "/:id",
   authMiddleware,
-  authorizeRoles("ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   WalletController.getWalletById
 );
 

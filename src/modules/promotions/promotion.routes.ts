@@ -10,6 +10,7 @@ import {
   zUpdatePromotionDto,
 } from "@/modules/promotions/promotion.dto";
 import { upload } from "@/utils/fileUpload/configMulterUpload";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -17,7 +18,7 @@ const router = Router();
 router.post(
   "/",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   upload.single("image"),
   validator(zCreatePromotionDto),
   promotionController.createPromotion
@@ -41,7 +42,7 @@ router.get(
 router.put(
   "/:id",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   upload.single("image"),
   validator(zUpdatePromotionDto),
   promotionController.updatePromotion
@@ -51,7 +52,7 @@ router.put(
 router.delete(
   "/:id",
   authMiddleware,
-  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validator(zDeletePromotionDto),
   promotionController.deletePromotion
 );

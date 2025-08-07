@@ -241,15 +241,15 @@ model Product {
   updatedAt                DateTime            @updatedAt
   categoryId               BigInt
   farmerId                 BigInt
+  dealId                   BigInt?
   category                 Category            @relation(fields: [categoryId], references: [categoryId])
   farmer                   Farmer              @relation(fields: [farmerId], references: [farmerId])
+  Deal                     Deal?               @relation(fields: [dealId], references: [dealId])
   inventoryPurchases       InventoryPurchase[]
   stockTransactions        StockTransaction[]
   subscriptionPlans        SubscriptionPlan[]
   orderItems               OrderItem[]
   promotions               Promotion[]
-  // deal                     Deal?               @relation(fields: [dealId], references: [dealId])
-  // dealId                   BigInt?
 
   @@index([farmerId])
   @@index([categoryId])
@@ -561,33 +561,21 @@ model Promotion {
   product Product? @relation(fields: [productId], references: [productId])
 }
 
-// model Deal {
-//   dealId        BigInt       @id @default(autoincrement())
-//   title         String
-//   description   String? // Optional description for the deal
-//   discountType  DiscountType // PERCENTAGE or FLAT
-//   discountValue Decimal // e.g. 10% or 50 BDT off
-//   startDate     DateTime
-//   endDate       DateTime
+model Deal {
+  dealId        BigInt       @id @default(autoincrement())
+  title         String
+  description   String? // Optional description for the deal
+  discountType  DiscountType // PERCENTAGE or FLAT
+  discountValue Decimal // e.g. 10% or 50 BDT off
+  startDate     DateTime
+  endDate       DateTime
 
-//   isActive Boolean @default(true)
-//   isGlobal Boolean @default(false) // True = applies to all products
+  isActive Boolean @default(true)
+  isGlobal Boolean @default(false) // True = applies to all products
 
-//   createdAt DateTime  @default(now())
-//   updatedAt DateTime  @updatedAt
-//   Product   Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Product   Product[]
 
-//   @@index([startDate, endDate])
-// }
-
-// model DealProduct {
-//   id        BigInt  @id @default(autoincrement())
-//   dealId    BigInt
-//   productId BigInt
-//   deal      Deal    @relation(fields: [dealId], references: [dealId], onDelete: Cascade)
-//   product   Product @relation(fields: [productId], references: [productId], onDelete: Cascade)
-
-//   @@unique([dealId, productId])
-//   @@index([dealId])
-//   @@index([productId])
-// }
+  @@index([startDate, endDate])
+}
