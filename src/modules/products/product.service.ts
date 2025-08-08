@@ -2,7 +2,7 @@
  * Service layer for Product entity operations.
  * Updated to handle image uploads with product creation and updates.
  */
-import { Product } from "@/generated/prisma/client";
+import { Prisma, Product } from "@/generated/prisma/client";
 import prisma from "@/prisma-client/prismaClient";
 import { getErrorMessage } from "@/utils/errorHandler";
 import {
@@ -18,6 +18,7 @@ import {
   UpdateProductDto,
 } from "@/modules/products/product.dto";
 import logger from "@/utils/logger";
+import { calculateProductPricing } from "@/utils/calculateProductPrice";
 
 // Add interface for product with accessible URLs
 interface ProductWithAccessibleImages extends Omit<Product, "imageUrls"> {
@@ -29,6 +30,7 @@ interface PaginationParams {
   page: number;
   limit: number;
   skip: number;
+  sort: string;
 }
 
 interface PaginatedProductResult {
@@ -119,7 +121,7 @@ export async function getAllProducts(
   includeRelations = false,
   generateAccessibleUrls = true,
   urlExpiresIn = 300,
-  paginationParams?: PaginationParams,
+  paginationParams: PaginationParams,
   filters?: {
     isSubscription?: boolean;
     isPreorder?: boolean;
@@ -128,69 +130,64 @@ export async function getAllProducts(
   }
 ): Promise<PaginatedProductResult> {
   try {
-    // TODO: filter by categoryID & name
-    const whereClause: { isSubscription?: boolean; isPreorder?: boolean } = {};
-    if (filters?.isSubscription === true) {
-      whereClause.isSubscription = true;
-    } else if (filters?.isSubscription === false) {
-      whereClause.isSubscription = false;
-    }
-    if (filters?.isPreorder === true) {
-      whereClause.isPreorder = true;
-    } else if (filters?.isPreorder === false) {
-      whereClause.isPreorder = false;
-    }
-    // If no pagination params provided, return all products (backward compatibility)
-    if (!paginationParams) {
-      const products = await prisma.product.findMany({
-        where: whereClause,
-        include: includeRelations
-          ? {
-              category: true,
-              farmer: true,
-            }
-          : undefined,
-      });
+    const { limit, skip, page, sort } = paginationParams;
 
-      // Generate accessible URLs if requested
-      const processedProducts = generateAccessibleUrls
-        ? await processProductsWithAccessibleUrls(products, urlExpiresIn)
-        : products.map((product) => ({ ...product, accessibleImageUrls: [] }));
+    // Build dynamic where clause
+    const whereClause = {
+      ...(filters?.isSubscription !== undefined && {
+        isSubscription: filters.isSubscription,
+      }),
+      ...(filters?.isPreorder !== undefined && {
+        isPreorder: filters.isPreorder,
+      }),
+      ...(filters?.name && {
+        name: {
+          contains: filters.name,
+          mode: "insensitive" as Prisma.QueryMode,
+        },
+      }),
+      ...(filters?.categoryId && {
+        categoryId: filters.categoryId,
+      }),
+    };
 
-      return {
-        products: processedProducts,
-        totalCount: products.length,
-        totalPages: 1,
-        currentPage: 1,
-      };
-    }
-
-    const { limit, skip, page } = paginationParams;
-
-    // Get total count for pagination metadata
-    const totalCount = await prisma.product.count({ where: whereClause });
-
-    // Get paginated products
+    // Get paginated products with optional relations
     const products = await prisma.product.findMany({
       where: whereClause,
       include: includeRelations
         ? {
             category: true,
             farmer: true,
+            deal: true,
           }
-        : undefined,
+        : { deal: true }, // ensure we fetch deal for pricing calculation
       take: limit,
       skip: skip,
       orderBy: {
-        createdAt: "desc", // Order by newest first, you can modify this as needed
+        createdAt: sort === "asc" ? "asc" : "desc",
       },
     });
 
-    // Generate accessible URLs if requested
-    const processedProducts = generateAccessibleUrls
+    // Process images if needed
+    let processedProducts = generateAccessibleUrls
       ? await processProductsWithAccessibleUrls(products, urlExpiresIn)
-      : products.map((product) => ({ ...product, accessibleImageUrls: [] }));
+      : products.map((product) => ({
+          ...product,
+          accessibleImageUrls: [],
+        }));
 
+    // Apply pricing calculation
+    processedProducts = processedProducts.map((product) => {
+      const { isUnderDeal, dealUnitPrice } = calculateProductPricing(product);
+      return {
+        ...product,
+        isUnderDeal,
+        dealUnitPrice,
+      };
+    });
+
+    // Count for pagination
+    const totalCount = await prisma.product.count({ where: whereClause });
     const totalPages = Math.ceil(totalCount / limit);
 
     return {
@@ -200,6 +197,7 @@ export async function getAllProducts(
       currentPage: page,
     };
   } catch (error) {
+    console.log(error);
     throw new Error(`Failed to fetch products: ${getErrorMessage(error)}`);
   }
 }

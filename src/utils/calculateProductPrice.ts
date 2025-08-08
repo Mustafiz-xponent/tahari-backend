@@ -12,7 +12,7 @@ export function calculateProductPricing(product: ProductWithDeal) {
 
   const isUnderDeal = !!deal && deal.startDate <= now && deal.endDate >= now;
 
-  let dealUnitPrice = unitPrice;
+  let dealUnitPrice = null;
 
   if (isUnderDeal) {
     const discountValue = deal.discountValue;

@@ -63,13 +63,13 @@ export const getAllProducts = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { page, limit, isSubscription, isPreorder, name, categoryId } =
+    const { page, limit, isSubscription, sort, isPreorder, name, categoryId } =
       req.query as unknown as GetAllProductsQueryDto;
     const skip = (page - 1) * limit;
 
     const includeRelations = req.query.include === "relations";
     const filters = { isSubscription, isPreorder, name, categoryId };
-    const paginationParams = { page, limit, skip };
+    const paginationParams = { page, limit, skip, sort };
 
     const result = await productService.getAllProducts(
       includeRelations,
