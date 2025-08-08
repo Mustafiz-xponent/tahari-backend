@@ -274,8 +274,9 @@ export async function getProductById(
         ? {
             category: true,
             farmer: true,
+            deal: true,
           }
-        : undefined,
+        : { deal: true },
     });
 
     if (!product) return null;
