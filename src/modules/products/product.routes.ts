@@ -29,10 +29,10 @@ router.get(
 
 // Route to get a product by ID
 // router.get("/:id", ProductController.getProductById);
-router.get("/id/:id", ProductController.getProductById);
+router.get("/:id", ProductController.getProductById);
 
 // Route to get a product by name
-router.get("/name/:name", ProductController.getProductByName);
+// router.get("/name/:name", ProductController.getProductByName);
 
 // Route to update a product's details
 router.put(

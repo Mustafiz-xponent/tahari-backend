@@ -18,7 +18,8 @@ import {
   UpdateProductDto,
 } from "@/modules/products/product.dto";
 import logger from "@/utils/logger";
-import { calculateProductPricing } from "@/utils/calculateProductPrice";
+import { Decimal } from "@/generated/prisma/client/runtime/library";
+import { calculateDealPricing } from "@/utils/calculateDealPricing";
 
 // Add interface for product with accessible URLs
 interface ProductWithAccessibleImages extends Omit<Product, "imageUrls"> {
@@ -177,14 +178,18 @@ export async function getAllProducts(
         }));
 
     // Apply pricing calculation
-    processedProducts = processedProducts.map((product) => {
-      const { isUnderDeal, dealUnitPrice } = calculateProductPricing(product);
-      return {
-        ...product,
-        isUnderDeal,
-        dealUnitPrice,
-      };
-    });
+    processedProducts = await Promise.all(
+      processedProducts.map(async (product) => {
+        const { isUnderDeal, dealUnitPrice } = await calculateDealPricing(
+          product
+        );
+        return {
+          ...product,
+          isUnderDeal,
+          dealUnitPrice,
+        };
+      })
+    );
 
     // Count for pagination
     const totalCount = await prisma.product.count({ where: whereClause });
@@ -262,11 +267,17 @@ export async function getProductByName(
  * @throws Error if the query fails
  */
 export async function getProductById(
-  productId: BigInt,
+  productId: bigint,
   includeRelations = false,
   generateAccessibleUrls = true,
   urlExpiresIn = 300
-): Promise<ProductWithAccessibleImages | null> {
+): Promise<
+  | (ProductWithAccessibleImages & {
+      isUnderDeal: boolean;
+      dealUnitPrice: Decimal | null;
+    })
+  | null
+> {
   try {
     const product = await prisma.product.findUnique({
       where: { productId: Number(productId) },
@@ -279,23 +290,29 @@ export async function getProductById(
         : { deal: true },
     });
 
-    if (!product) return null;
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
+    // Calculate deal pricing
+    const { isUnderDeal, dealUnitPrice } = await calculateDealPricing(product);
 
     // Generate accessible URLs if requested
+    let accessibleImageUrls: string[] = [];
     if (generateAccessibleUrls && product.imageUrls.length > 0) {
-      const accessibleUrls = await getBatchAccessibleImageUrls(
+      accessibleImageUrls = await getBatchAccessibleImageUrls(
         product.imageUrls,
         product.isPrivateImages || false,
         urlExpiresIn
       );
-
-      return {
-        ...product,
-        accessibleImageUrls: accessibleUrls,
-      };
     }
 
-    return { ...product, accessibleImageUrls: [] };
+    return {
+      ...product,
+      accessibleImageUrls,
+      isUnderDeal,
+      dealUnitPrice,
+    };
   } catch (error) {
     throw new Error(`Failed to fetch product: ${getErrorMessage(error)}`);
   }
