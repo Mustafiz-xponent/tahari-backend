@@ -370,10 +370,11 @@ exports.Prisma.PromotionScalarFieldEnum = {
   description: 'description',
   imageUrl: 'imageUrl',
   targetType: 'targetType',
-  productId: 'productId',
   priority: 'priority',
   placement: 'placement',
   isActive: 'isActive',
+  productId: 'productId',
+  dealId: 'dealId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

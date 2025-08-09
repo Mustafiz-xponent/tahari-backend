@@ -3,7 +3,11 @@ import { AppError } from "@/utils/appError";
 import httpStatus from "http-status";
 import { CreateDealDto, UpdateDealDto } from "@/modules/deals/deal.dto";
 import { Deal } from "@/generated/prisma/client";
-import { IGetDealsResult } from "@/modules/deals/deal.interface";
+import {
+  DealWithProducts,
+  IGetDealsResult,
+} from "@/modules/deals/deal.interface";
+import { processProductsWithAccessibleUrls } from "@/utils/fileUpload/s3Aws";
 
 /**
  * Creates a new deal entry in the database
@@ -112,14 +116,30 @@ export async function getAllDeals(
 
   const deals = await prisma.deal.findMany({
     where: whereClause,
+    include: { products: true },
     take: limit,
     skip: skip,
     orderBy: { createdAt: sort === "asc" ? "asc" : "desc" },
   });
 
+  // Process products in each deal to add accessibleImageUrls
+  const processedDeals = await Promise.all(
+    deals.map(async (deal) => {
+      const processedProducts = await processProductsWithAccessibleUrls(
+        deal.products,
+        300
+      );
+
+      return {
+        ...deal,
+        products: processedProducts,
+      };
+    })
+  );
+
   const totalPromotions = await prisma.promotion.count();
   return {
-    data: deals,
+    data: processedDeals,
     currentPage: page,
     totalPages: Math.ceil(totalPromotions / limit),
     totalCount: totalPromotions,
@@ -129,14 +149,23 @@ export async function getAllDeals(
  * Retrieves a single deal by its ID
  * - Throws an error if promotion is not found
  */
-export async function getDealById(dealId: bigint): Promise<Deal> {
+export async function getDealById(dealId: bigint): Promise<DealWithProducts> {
   const deal = await prisma.deal.findUnique({
     where: { dealId },
+    include: { products: true },
   });
   if (!deal) {
     throw new AppError("Deal not found", httpStatus.NOT_FOUND);
   }
-  return deal;
+  const productsWithAccessibleUrls = await processProductsWithAccessibleUrls(
+    deal.products,
+    300
+  );
+
+  return {
+    ...deal,
+    products: productsWithAccessibleUrls,
+  };
 }
 /**
  * Updates an existing deal by its ID

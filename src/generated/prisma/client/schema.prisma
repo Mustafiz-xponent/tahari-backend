@@ -549,15 +549,17 @@ model Promotion {
   description String?
   imageUrl    String
   targetType  PromoTargetType // PRODUCT or ROUTE
-  productId   BigInt?
   priority    Int             @default(1)
   placement   PromoPlacement
   isActive    Boolean         @default(true)
+  productId   BigInt?
+  dealId      BigInt?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   product Product? @relation(fields: [productId], references: [productId])
+  deal    Deal?    @relation(fields: [dealId], references: [dealId])
 }
 
 model Deal {
@@ -570,9 +572,11 @@ model Deal {
   endDate       DateTime
   isGlobal      Boolean      @default(false) // True = applies to all products
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Product   Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([startDate, endDate])
+  products  Product[]
+  Promotion Promotion[]
+
+  @@index([dealId])
 }

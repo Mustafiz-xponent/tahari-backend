@@ -1,4 +1,4 @@
-import { Deal } from "@/generated/prisma/client";
+import { Deal, Product } from "@/generated/prisma/client";
 
 export interface IGetDealsResult {
   data: Deal[];
@@ -6,3 +6,10 @@ export interface IGetDealsResult {
   totalPages: number;
   totalCount: number;
 }
+export interface ProductWithAccessibleImages extends Product {
+  accessibleImageUrls?: string[];
+}
+
+export type DealWithProducts = Deal & {
+  products: ProductWithAccessibleImages[];
+};

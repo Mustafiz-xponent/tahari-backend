@@ -36,6 +36,7 @@ export const zCreatePromotionDto = {
         errorMap: () => ({ message: "Invalid target type" }),
       }),
       productId: zBigIntId("Product ID").optional(),
+      dealId: zBigIntId("Deal ID").optional(),
       placement: z.nativeEnum(PromoPlacement, {
         errorMap: () => ({ message: "Invalid placement" }),
       }),
@@ -53,8 +54,18 @@ export const zCreatePromotionDto = {
         message: "productId requires targetType 'PRODUCT', and vice versa.",
         path: ["productId"],
       }
+    )
+    .refine(
+      (data) =>
+        (data.dealId === undefined || data.targetType === "DEAL") &&
+        (data.targetType !== "DEAL" || data.dealId !== undefined),
+      {
+        message: "dealId requires targetType 'DEAL', and vice versa.",
+        path: ["dealId"],
+      }
     ),
 };
+
 export type CreatePromotionDto = z.infer<typeof zCreatePromotionDto.body>;
 
 /*
@@ -113,6 +124,7 @@ export const zUpdatePromotionDto = {
         .optional(),
 
       productId: zBigIntId("Product ID").optional(),
+      dealId: zBigIntId("Deal ID").optional(),
 
       placement: z
         .nativeEnum(PromoPlacement, {
@@ -129,16 +141,28 @@ export const zUpdatePromotionDto = {
     })
     .refine(
       (data) =>
-        (data.productId === undefined || data.targetType === "PRODUCT") &&
-        (data.targetType !== "PRODUCT" || data.productId !== undefined),
+        data.productId === undefined ||
+        data.targetType === undefined ||
+        (data.productId !== undefined && data.targetType === "PRODUCT") ||
+        (data.targetType !== "PRODUCT" && data.productId === undefined),
       {
         message: "productId requires targetType 'PRODUCT', and vice versa.",
         path: ["productId"],
       }
+    )
+    .refine(
+      (data) =>
+        data.dealId === undefined ||
+        data.targetType === undefined ||
+        (data.dealId !== undefined && data.targetType === "DEAL") ||
+        (data.targetType !== "DEAL" && data.dealId === undefined),
+      {
+        message: "dealId requires targetType 'DEAL', and vice versa.",
+        path: ["dealId"],
+      }
     ),
 };
 export type UpdatePromotionDto = z.infer<typeof zUpdatePromotionDto.body>;
-
 /*
  ** Schema: Delete Promotion by ID (Route Param)
  */
