@@ -553,7 +553,7 @@ model Promotion {
   placement   PromoPlacement
   isActive    Boolean         @default(true)
   productId   BigInt?
-  dealId      BigInt?
+  dealId      BigInt?         @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -575,8 +575,8 @@ model Deal {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  products  Product[]
-  Promotion Promotion[]
+  products   Product[]
+  promotions Promotion?
 
   @@index([dealId])
 }
