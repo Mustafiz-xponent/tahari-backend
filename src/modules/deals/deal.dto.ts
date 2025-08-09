@@ -23,11 +23,11 @@ export const zCreateDealDto = {
       description: z.string().max(255).optional(),
       discountType: z.nativeEnum(DiscountType),
       discountValue: z
-        .string()
+        .union([z.string(), z.number()])
         .refine((val) => !isNaN(Number(val)), {
           message: "Must be a valid number",
         })
-        .transform((val) => parseFloat(val)),
+        .transform((val) => Number(val)),
       startDate: z.coerce.date(),
       endDate: z.coerce.date(),
       isGlobal: z.boolean().optional().default(false),
@@ -115,11 +115,11 @@ export const zUpdateDealDto = {
       description: z.string().max(255).optional(),
       discountType: z.nativeEnum(DiscountType).optional(),
       discountValue: z
-        .string()
+        .union([z.string(), z.number()])
         .refine((val) => !isNaN(Number(val)), {
           message: "Must be a valid number",
         })
-        .transform((val) => parseFloat(val))
+        .transform((val) => Number(val))
         .optional(),
       startDate: z.coerce.date().optional(),
       endDate: z.coerce.date().optional(),
