@@ -25,12 +25,12 @@ export const zCreatePromotionDto = {
       title: z
         .string()
         .min(3, { message: "Title must be at least 3 characters long" })
-        .max(30, { message: "Title must be at most 30 characters long" })
+        .max(60, { message: "Title must be at most 60 characters long" })
         .optional(),
       description: z
         .string()
         .min(3, { message: "Description must be at least 3 characters long" })
-        .max(48, { message: "Description must be at most 48 characters long" })
+        .max(80, { message: "Description must be at most 80 characters long" })
         .optional(),
       targetType: z.nativeEnum(PromoTargetType, {
         errorMap: () => ({ message: "Invalid target type" }),
@@ -108,13 +108,13 @@ export const zUpdatePromotionDto = {
       title: z
         .string()
         .min(3, { message: "Title must be at least 3 characters long" })
-        .max(30, { message: "Title must be at most 30 characters long" })
+        .max(60, { message: "Title must be at most 60 characters long" })
         .optional(),
 
       description: z
         .string()
         .min(3, { message: "Description must be at least 3 characters long" })
-        .max(48, { message: "Description must be at most 48 characters long" })
+        .max(80, { message: "Description must be at most 80 characters long" })
         .optional(),
 
       targetType: z
