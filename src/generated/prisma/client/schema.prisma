@@ -549,7 +549,7 @@ model Promotion {
   description String?
   imageUrl    String
   targetType  PromoTargetType // PRODUCT or ROUTE
-  priority    Int             @default(1)
+  priority    Int             @unique @default(1)
   placement   PromoPlacement
   isActive    Boolean         @default(true)
   productId   BigInt?
@@ -575,8 +575,8 @@ model Deal {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  products   Product[]
-  promotions Promotion?
+  products  Product[]
+  promotion Promotion?
 
   @@index([dealId])
 }
