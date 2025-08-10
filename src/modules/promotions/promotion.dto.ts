@@ -22,16 +22,8 @@ const zBigIntId = (fieldName: string) =>
 export const zCreatePromotionDto = {
   body: z
     .object({
-      title: z
-        .string()
-        .min(3, { message: "Title must be at least 3 characters long" })
-        .max(60, { message: "Title must be at most 60 characters long" })
-        .optional(),
-      description: z
-        .string()
-        .min(3, { message: "Description must be at least 3 characters long" })
-        .max(80, { message: "Description must be at most 80 characters long" })
-        .optional(),
+      title: z.string().min(3).max(60).optional(),
+      description: z.string().min(3).max(80).optional(),
       targetType: z.nativeEnum(PromoTargetType, {
         errorMap: () => ({ message: "Invalid target type" }),
       }),
@@ -40,18 +32,24 @@ export const zCreatePromotionDto = {
       placement: z.nativeEnum(PromoPlacement, {
         errorMap: () => ({ message: "Invalid placement" }),
       }),
-      priority: z
-        .number()
-        .min(1, { message: "Priority must be at least 1" })
-        .default(1),
+      priority: z.number().min(1).default(1),
       isActive: z.boolean().default(true),
     })
     .refine(
-      (data) =>
-        (data.productId === undefined || data.targetType === "PRODUCT") &&
-        (data.targetType !== "PRODUCT" || data.productId !== undefined),
+      (data) => {
+        if (data.productId !== undefined) {
+          return (
+            data.targetType === "PRODUCT" || data.targetType === "PREORDER"
+          );
+        }
+        if (data.targetType === "PRODUCT" || data.targetType === "PREORDER") {
+          return data.productId !== undefined;
+        }
+        return true;
+      },
       {
-        message: "productId requires targetType 'PRODUCT', and vice versa.",
+        message:
+          "productId requires targetType to be 'PRODUCT' or 'PREORDER', and vice versa.",
         path: ["productId"],
       }
     )
@@ -105,18 +103,8 @@ export const zUpdatePromotionDto = {
   }),
   body: z
     .object({
-      title: z
-        .string()
-        .min(3, { message: "Title must be at least 3 characters long" })
-        .max(60, { message: "Title must be at most 60 characters long" })
-        .optional(),
-
-      description: z
-        .string()
-        .min(3, { message: "Description must be at least 3 characters long" })
-        .max(80, { message: "Description must be at most 80 characters long" })
-        .optional(),
-
+      title: z.string().min(3).max(60).optional(),
+      description: z.string().min(3).max(80).optional(),
       targetType: z
         .nativeEnum(PromoTargetType, {
           errorMap: () => ({ message: "Invalid target type" }),
@@ -132,21 +120,25 @@ export const zUpdatePromotionDto = {
         })
         .optional(),
 
-      priority: z
-        .number()
-        .min(1, { message: "Priority must be at least 1" })
-        .optional(),
+      priority: z.number().min(1).optional(),
 
       isActive: z.boolean().optional(),
     })
     .refine(
-      (data) =>
-        data.productId === undefined ||
-        data.targetType === undefined ||
-        (data.productId !== undefined && data.targetType === "PRODUCT") ||
-        (data.targetType !== "PRODUCT" && data.productId === undefined),
+      (data) => {
+        if (data.productId !== undefined) {
+          return (
+            data.targetType === "PRODUCT" || data.targetType === "PREORDER"
+          );
+        }
+        if (data.targetType === "PRODUCT" || data.targetType === "PREORDER") {
+          return data.productId !== undefined;
+        }
+        return true;
+      },
       {
-        message: "productId requires targetType 'PRODUCT', and vice versa.",
+        message:
+          "productId requires targetType to be 'PRODUCT' or 'PREORDER', and vice versa.",
         path: ["productId"],
       }
     )

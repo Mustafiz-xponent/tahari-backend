@@ -30,26 +30,34 @@ export async function createPromotion(
 ): Promise<Promotion> {
   if (!file) throw new Error("Image is required");
   // Upload image to S3
-  let s3Res;
-  if (file) {
-    const fileObject = multerFileToFileObject(file);
-    s3Res = await uploadFileToS3(fileObject, "promotions", undefined, true);
-  }
+  const fileObject = multerFileToFileObject(file);
+  const s3Res = await uploadFileToS3(fileObject, "promotions", undefined, true);
 
-  const promotion = await prisma.promotion.create({
-    data: {
-      title: data.title ?? null,
-      description: data.description ?? null,
-      targetType: data.targetType,
-      imageUrl: s3Res?.url!,
-      productId: data.productId ?? null,
-      dealId: data.dealId ?? null,
-      placement: data.placement,
-      priority: data.priority,
-      isActive: data.isActive,
-    },
-  });
-  return promotion;
+  try {
+    const promotion = await prisma.$transaction(async (tx) => {
+      return await tx.promotion.create({
+        data: {
+          title: data.title ?? null,
+          description: data.description ?? null,
+          targetType: data.targetType,
+          imageUrl: s3Res.url,
+          productId: data.productId ?? null,
+          dealId: data.dealId ?? null,
+          placement: data.placement,
+          priority: data.priority,
+          isActive: data.isActive,
+        },
+      });
+    });
+
+    return promotion;
+  } catch (error) {
+    // Rollback S3 file if DB insert fails
+    if (s3Res?.key) {
+      await deleteFileFromS3(s3Res.key, true);
+    }
+    throw error;
+  }
 }
 /**
  * Retrieves all promotions with optional filters and pagination
@@ -146,28 +154,38 @@ export async function updatePromotion(
     throw new AppError("Promotion not found", httpStatus.NOT_FOUND);
   }
   // Upload image to S3
-  let s3Res;
+  let s3Res: any;
   if (file) {
     await deleteFileFromS3(promotion.imageUrl!, true);
     const fileObject = multerFileToFileObject(file);
     s3Res = await uploadFileToS3(fileObject, "promotions", undefined, true);
   }
   // update promotion
-  const updatedPromotion = await prisma.promotion.update({
-    where: { promotionId },
-    data: {
-      title: data.title,
-      description: data.description,
-      targetType: data.targetType,
-      productId: data.productId,
-      dealId: data.dealId,
-      imageUrl: s3Res?.url ? s3Res.url : promotion.imageUrl,
-      placement: data.placement,
-      priority: data.priority,
-      isActive: data.isActive,
-    },
-  });
-  return updatedPromotion;
+  try {
+    const updatedPromotion = await prisma.$transaction(async (tx) => {
+      return await prisma.promotion.update({
+        where: { promotionId },
+        data: {
+          title: data.title,
+          description: data.description,
+          targetType: data.targetType,
+          productId: data.productId,
+          dealId: data.dealId,
+          imageUrl: s3Res?.url ? s3Res.url : promotion.imageUrl,
+          placement: data.placement,
+          priority: data.priority,
+          isActive: data.isActive,
+        },
+      });
+    });
+    return updatedPromotion;
+  } catch (error) {
+    // Rollback S3 file if DB insert fails
+    if (s3Res?.key) {
+      await deleteFileFromS3(s3Res.key, true);
+    }
+    throw error;
+  }
 }
 
 /**

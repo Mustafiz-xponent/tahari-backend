@@ -126,10 +126,9 @@ enum NotificationType {
 
 enum PromoTargetType {
   PRODUCT
-  SUBSCRIPTION_PLAN
-  PREORDER
   DEAL
-  OFFER
+  PREORDER
+  SUBSCRIPTION_PLAN
 }
 
 enum PromoPlacement {
@@ -548,12 +547,12 @@ model Promotion {
   title       String?
   description String?
   imageUrl    String
-  targetType  PromoTargetType // PRODUCT or ROUTE
+  targetType  PromoTargetType // PRODUCT, DEAL or ROUTE
   priority    Int             @unique @default(1)
   placement   PromoPlacement
   isActive    Boolean         @default(true)
   productId   BigInt?
-  dealId      BigInt?         @unique
+  dealId      BigInt?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -576,7 +575,7 @@ model Deal {
   updatedAt DateTime @updatedAt
 
   products  Product[]
-  promotion Promotion?
+  promotion Promotion[]
 
   @@index([dealId])
 }

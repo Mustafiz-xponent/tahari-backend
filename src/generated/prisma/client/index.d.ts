@@ -299,10 +299,9 @@ export type NotificationType = (typeof NotificationType)[keyof typeof Notificati
 
 export const PromoTargetType: {
   PRODUCT: 'PRODUCT',
-  SUBSCRIPTION_PLAN: 'SUBSCRIPTION_PLAN',
-  PREORDER: 'PREORDER',
   DEAL: 'DEAL',
-  OFFER: 'OFFER'
+  PREORDER: 'PREORDER',
+  SUBSCRIPTION_PLAN: 'SUBSCRIPTION_PLAN'
 };
 
 export type PromoTargetType = (typeof PromoTargetType)[keyof typeof PromoTargetType]
@@ -3744,10 +3743,12 @@ export namespace Prisma {
 
   export type DealCountOutputType = {
     products: number
+    promotion: number
   }
 
   export type DealCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     products?: boolean | DealCountOutputTypeCountProductsArgs
+    promotion?: boolean | DealCountOutputTypeCountPromotionArgs
   }
 
   // Custom InputTypes
@@ -3766,6 +3767,13 @@ export namespace Prisma {
    */
   export type DealCountOutputTypeCountProductsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ProductWhereInput
+  }
+
+  /**
+   * DealCountOutputType without action
+   */
+  export type DealCountOutputTypeCountPromotionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PromotionWhereInput
   }
 
 
@@ -31540,7 +31548,7 @@ export namespace Prisma {
     name: "Deal"
     objects: {
       products: Prisma.$ProductPayload<ExtArgs>[]
-      promotion: Prisma.$PromotionPayload<ExtArgs> | null
+      promotion: Prisma.$PromotionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       dealId: bigint
@@ -31948,7 +31956,7 @@ export namespace Prisma {
   export interface Prisma__DealClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     products<T extends Deal$productsArgs<ExtArgs> = {}>(args?: Subset<T, Deal$productsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    promotion<T extends Deal$promotionArgs<ExtArgs> = {}>(args?: Subset<T, Deal$promotionArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    promotion<T extends Deal$promotionArgs<ExtArgs> = {}>(args?: Subset<T, Deal$promotionArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -32416,6 +32424,11 @@ export namespace Prisma {
      */
     include?: PromotionInclude<ExtArgs> | null
     where?: PromotionWhereInput
+    orderBy?: PromotionOrderByWithRelationInput | PromotionOrderByWithRelationInput[]
+    cursor?: PromotionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PromotionScalarFieldEnum | PromotionScalarFieldEnum[]
   }
 
   /**
@@ -34902,7 +34915,6 @@ export namespace Prisma {
   export type PromotionWhereUniqueInput = Prisma.AtLeast<{
     promotionId?: bigint | number
     priority?: number
-    dealId?: bigint | number
     AND?: PromotionWhereInput | PromotionWhereInput[]
     OR?: PromotionWhereInput[]
     NOT?: PromotionWhereInput | PromotionWhereInput[]
@@ -34913,11 +34925,12 @@ export namespace Prisma {
     placement?: EnumPromoPlacementFilter<"Promotion"> | $Enums.PromoPlacement
     isActive?: BoolFilter<"Promotion"> | boolean
     productId?: BigIntNullableFilter<"Promotion"> | bigint | number | null
+    dealId?: BigIntNullableFilter<"Promotion"> | bigint | number | null
     createdAt?: DateTimeFilter<"Promotion"> | Date | string
     updatedAt?: DateTimeFilter<"Promotion"> | Date | string
     product?: XOR<ProductNullableScalarRelationFilter, ProductWhereInput> | null
     deal?: XOR<DealNullableScalarRelationFilter, DealWhereInput> | null
-  }, "promotionId" | "priority" | "dealId">
+  }, "promotionId" | "priority">
 
   export type PromotionOrderByWithAggregationInput = {
     promotionId?: SortOrder
@@ -34972,7 +34985,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Deal"> | Date | string
     updatedAt?: DateTimeFilter<"Deal"> | Date | string
     products?: ProductListRelationFilter
-    promotion?: XOR<PromotionNullableScalarRelationFilter, PromotionWhereInput> | null
+    promotion?: PromotionListRelationFilter
   }
 
   export type DealOrderByWithRelationInput = {
@@ -34987,7 +35000,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     products?: ProductOrderByRelationAggregateInput
-    promotion?: PromotionOrderByWithRelationInput
+    promotion?: PromotionOrderByRelationAggregateInput
   }
 
   export type DealWhereUniqueInput = Prisma.AtLeast<{
@@ -35005,7 +35018,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Deal"> | Date | string
     updatedAt?: DateTimeFilter<"Deal"> | Date | string
     products?: ProductListRelationFilter
-    promotion?: XOR<PromotionNullableScalarRelationFilter, PromotionWhereInput> | null
+    promotion?: PromotionListRelationFilter
   }, "dealId">
 
   export type DealOrderByWithAggregationInput = {
@@ -36961,7 +36974,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     products?: ProductCreateNestedManyWithoutDealInput
-    promotion?: PromotionCreateNestedOneWithoutDealInput
+    promotion?: PromotionCreateNestedManyWithoutDealInput
   }
 
   export type DealUncheckedCreateInput = {
@@ -36976,7 +36989,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     products?: ProductUncheckedCreateNestedManyWithoutDealInput
-    promotion?: PromotionUncheckedCreateNestedOneWithoutDealInput
+    promotion?: PromotionUncheckedCreateNestedManyWithoutDealInput
   }
 
   export type DealUpdateInput = {
@@ -36991,7 +37004,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUpdateManyWithoutDealNestedInput
-    promotion?: PromotionUpdateOneWithoutDealNestedInput
+    promotion?: PromotionUpdateManyWithoutDealNestedInput
   }
 
   export type DealUncheckedUpdateInput = {
@@ -37006,7 +37019,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUncheckedUpdateManyWithoutDealNestedInput
-    promotion?: PromotionUncheckedUpdateOneWithoutDealNestedInput
+    promotion?: PromotionUncheckedUpdateManyWithoutDealNestedInput
   }
 
   export type DealCreateManyInput = {
@@ -38933,11 +38946,6 @@ export namespace Prisma {
     in?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
     notIn?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
     not?: NestedEnumDiscountTypeFilter<$PrismaModel> | $Enums.DiscountType
-  }
-
-  export type PromotionNullableScalarRelationFilter = {
-    is?: PromotionWhereInput | null
-    isNot?: PromotionWhereInput | null
   }
 
   export type DealCountOrderByAggregateInput = {
@@ -40954,10 +40962,11 @@ export namespace Prisma {
     connect?: ProductWhereUniqueInput | ProductWhereUniqueInput[]
   }
 
-  export type PromotionCreateNestedOneWithoutDealInput = {
-    create?: XOR<PromotionCreateWithoutDealInput, PromotionUncheckedCreateWithoutDealInput>
-    connectOrCreate?: PromotionCreateOrConnectWithoutDealInput
-    connect?: PromotionWhereUniqueInput
+  export type PromotionCreateNestedManyWithoutDealInput = {
+    create?: XOR<PromotionCreateWithoutDealInput, PromotionUncheckedCreateWithoutDealInput> | PromotionCreateWithoutDealInput[] | PromotionUncheckedCreateWithoutDealInput[]
+    connectOrCreate?: PromotionCreateOrConnectWithoutDealInput | PromotionCreateOrConnectWithoutDealInput[]
+    createMany?: PromotionCreateManyDealInputEnvelope
+    connect?: PromotionWhereUniqueInput | PromotionWhereUniqueInput[]
   }
 
   export type ProductUncheckedCreateNestedManyWithoutDealInput = {
@@ -40967,10 +40976,11 @@ export namespace Prisma {
     connect?: ProductWhereUniqueInput | ProductWhereUniqueInput[]
   }
 
-  export type PromotionUncheckedCreateNestedOneWithoutDealInput = {
-    create?: XOR<PromotionCreateWithoutDealInput, PromotionUncheckedCreateWithoutDealInput>
-    connectOrCreate?: PromotionCreateOrConnectWithoutDealInput
-    connect?: PromotionWhereUniqueInput
+  export type PromotionUncheckedCreateNestedManyWithoutDealInput = {
+    create?: XOR<PromotionCreateWithoutDealInput, PromotionUncheckedCreateWithoutDealInput> | PromotionCreateWithoutDealInput[] | PromotionUncheckedCreateWithoutDealInput[]
+    connectOrCreate?: PromotionCreateOrConnectWithoutDealInput | PromotionCreateOrConnectWithoutDealInput[]
+    createMany?: PromotionCreateManyDealInputEnvelope
+    connect?: PromotionWhereUniqueInput | PromotionWhereUniqueInput[]
   }
 
   export type EnumDiscountTypeFieldUpdateOperationsInput = {
@@ -40991,14 +41001,18 @@ export namespace Prisma {
     deleteMany?: ProductScalarWhereInput | ProductScalarWhereInput[]
   }
 
-  export type PromotionUpdateOneWithoutDealNestedInput = {
-    create?: XOR<PromotionCreateWithoutDealInput, PromotionUncheckedCreateWithoutDealInput>
-    connectOrCreate?: PromotionCreateOrConnectWithoutDealInput
-    upsert?: PromotionUpsertWithoutDealInput
-    disconnect?: PromotionWhereInput | boolean
-    delete?: PromotionWhereInput | boolean
-    connect?: PromotionWhereUniqueInput
-    update?: XOR<XOR<PromotionUpdateToOneWithWhereWithoutDealInput, PromotionUpdateWithoutDealInput>, PromotionUncheckedUpdateWithoutDealInput>
+  export type PromotionUpdateManyWithoutDealNestedInput = {
+    create?: XOR<PromotionCreateWithoutDealInput, PromotionUncheckedCreateWithoutDealInput> | PromotionCreateWithoutDealInput[] | PromotionUncheckedCreateWithoutDealInput[]
+    connectOrCreate?: PromotionCreateOrConnectWithoutDealInput | PromotionCreateOrConnectWithoutDealInput[]
+    upsert?: PromotionUpsertWithWhereUniqueWithoutDealInput | PromotionUpsertWithWhereUniqueWithoutDealInput[]
+    createMany?: PromotionCreateManyDealInputEnvelope
+    set?: PromotionWhereUniqueInput | PromotionWhereUniqueInput[]
+    disconnect?: PromotionWhereUniqueInput | PromotionWhereUniqueInput[]
+    delete?: PromotionWhereUniqueInput | PromotionWhereUniqueInput[]
+    connect?: PromotionWhereUniqueInput | PromotionWhereUniqueInput[]
+    update?: PromotionUpdateWithWhereUniqueWithoutDealInput | PromotionUpdateWithWhereUniqueWithoutDealInput[]
+    updateMany?: PromotionUpdateManyWithWhereWithoutDealInput | PromotionUpdateManyWithWhereWithoutDealInput[]
+    deleteMany?: PromotionScalarWhereInput | PromotionScalarWhereInput[]
   }
 
   export type ProductUncheckedUpdateManyWithoutDealNestedInput = {
@@ -41015,14 +41029,18 @@ export namespace Prisma {
     deleteMany?: ProductScalarWhereInput | ProductScalarWhereInput[]
   }
 
-  export type PromotionUncheckedUpdateOneWithoutDealNestedInput = {
-    create?: XOR<PromotionCreateWithoutDealInput, PromotionUncheckedCreateWithoutDealInput>
-    connectOrCreate?: PromotionCreateOrConnectWithoutDealInput
-    upsert?: PromotionUpsertWithoutDealInput
-    disconnect?: PromotionWhereInput | boolean
-    delete?: PromotionWhereInput | boolean
-    connect?: PromotionWhereUniqueInput
-    update?: XOR<XOR<PromotionUpdateToOneWithWhereWithoutDealInput, PromotionUpdateWithoutDealInput>, PromotionUncheckedUpdateWithoutDealInput>
+  export type PromotionUncheckedUpdateManyWithoutDealNestedInput = {
+    create?: XOR<PromotionCreateWithoutDealInput, PromotionUncheckedCreateWithoutDealInput> | PromotionCreateWithoutDealInput[] | PromotionUncheckedCreateWithoutDealInput[]
+    connectOrCreate?: PromotionCreateOrConnectWithoutDealInput | PromotionCreateOrConnectWithoutDealInput[]
+    upsert?: PromotionUpsertWithWhereUniqueWithoutDealInput | PromotionUpsertWithWhereUniqueWithoutDealInput[]
+    createMany?: PromotionCreateManyDealInputEnvelope
+    set?: PromotionWhereUniqueInput | PromotionWhereUniqueInput[]
+    disconnect?: PromotionWhereUniqueInput | PromotionWhereUniqueInput[]
+    delete?: PromotionWhereUniqueInput | PromotionWhereUniqueInput[]
+    connect?: PromotionWhereUniqueInput | PromotionWhereUniqueInput[]
+    update?: PromotionUpdateWithWhereUniqueWithoutDealInput | PromotionUpdateWithWhereUniqueWithoutDealInput[]
+    updateMany?: PromotionUpdateManyWithWhereWithoutDealInput | PromotionUpdateManyWithWhereWithoutDealInput[]
+    deleteMany?: PromotionScalarWhereInput | PromotionScalarWhereInput[]
   }
 
   export type NestedBigIntFilter<$PrismaModel = never> = {
@@ -42786,7 +42804,7 @@ export namespace Prisma {
     isGlobal?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    promotion?: PromotionCreateNestedOneWithoutDealInput
+    promotion?: PromotionCreateNestedManyWithoutDealInput
   }
 
   export type DealUncheckedCreateWithoutProductsInput = {
@@ -42800,7 +42818,7 @@ export namespace Prisma {
     isGlobal?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    promotion?: PromotionUncheckedCreateNestedOneWithoutDealInput
+    promotion?: PromotionUncheckedCreateNestedManyWithoutDealInput
   }
 
   export type DealCreateOrConnectWithoutProductsInput = {
@@ -43066,7 +43084,7 @@ export namespace Prisma {
     isGlobal?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    promotion?: PromotionUpdateOneWithoutDealNestedInput
+    promotion?: PromotionUpdateManyWithoutDealNestedInput
   }
 
   export type DealUncheckedUpdateWithoutProductsInput = {
@@ -43080,7 +43098,7 @@ export namespace Prisma {
     isGlobal?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    promotion?: PromotionUncheckedUpdateOneWithoutDealNestedInput
+    promotion?: PromotionUncheckedUpdateManyWithoutDealNestedInput
   }
 
   export type InventoryPurchaseUpsertWithWhereUniqueWithoutProductInput = {
@@ -46309,6 +46327,11 @@ export namespace Prisma {
     create: XOR<PromotionCreateWithoutDealInput, PromotionUncheckedCreateWithoutDealInput>
   }
 
+  export type PromotionCreateManyDealInputEnvelope = {
+    data: PromotionCreateManyDealInput | PromotionCreateManyDealInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ProductUpsertWithWhereUniqueWithoutDealInput = {
     where: ProductWhereUniqueInput
     update: XOR<ProductUpdateWithoutDealInput, ProductUncheckedUpdateWithoutDealInput>
@@ -46325,43 +46348,20 @@ export namespace Prisma {
     data: XOR<ProductUpdateManyMutationInput, ProductUncheckedUpdateManyWithoutDealInput>
   }
 
-  export type PromotionUpsertWithoutDealInput = {
+  export type PromotionUpsertWithWhereUniqueWithoutDealInput = {
+    where: PromotionWhereUniqueInput
     update: XOR<PromotionUpdateWithoutDealInput, PromotionUncheckedUpdateWithoutDealInput>
     create: XOR<PromotionCreateWithoutDealInput, PromotionUncheckedCreateWithoutDealInput>
-    where?: PromotionWhereInput
   }
 
-  export type PromotionUpdateToOneWithWhereWithoutDealInput = {
-    where?: PromotionWhereInput
+  export type PromotionUpdateWithWhereUniqueWithoutDealInput = {
+    where: PromotionWhereUniqueInput
     data: XOR<PromotionUpdateWithoutDealInput, PromotionUncheckedUpdateWithoutDealInput>
   }
 
-  export type PromotionUpdateWithoutDealInput = {
-    promotionId?: BigIntFieldUpdateOperationsInput | bigint | number
-    title?: NullableStringFieldUpdateOperationsInput | string | null
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: StringFieldUpdateOperationsInput | string
-    targetType?: EnumPromoTargetTypeFieldUpdateOperationsInput | $Enums.PromoTargetType
-    priority?: IntFieldUpdateOperationsInput | number
-    placement?: EnumPromoPlacementFieldUpdateOperationsInput | $Enums.PromoPlacement
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    product?: ProductUpdateOneWithoutPromotionsNestedInput
-  }
-
-  export type PromotionUncheckedUpdateWithoutDealInput = {
-    promotionId?: BigIntFieldUpdateOperationsInput | bigint | number
-    title?: NullableStringFieldUpdateOperationsInput | string | null
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: StringFieldUpdateOperationsInput | string
-    targetType?: EnumPromoTargetTypeFieldUpdateOperationsInput | $Enums.PromoTargetType
-    priority?: IntFieldUpdateOperationsInput | number
-    placement?: EnumPromoPlacementFieldUpdateOperationsInput | $Enums.PromoPlacement
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    productId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  export type PromotionUpdateManyWithWhereWithoutDealInput = {
+    where: PromotionScalarWhereInput
+    data: XOR<PromotionUpdateManyMutationInput, PromotionUncheckedUpdateManyWithoutDealInput>
   }
 
   export type OtpCreateManyUserInput = {
@@ -47766,6 +47766,20 @@ export namespace Prisma {
     farmerId: bigint | number
   }
 
+  export type PromotionCreateManyDealInput = {
+    promotionId?: bigint | number
+    title?: string | null
+    description?: string | null
+    imageUrl: string
+    targetType: $Enums.PromoTargetType
+    priority?: number
+    placement: $Enums.PromoPlacement
+    isActive?: boolean
+    productId?: bigint | number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type ProductUpdateWithoutDealInput = {
     productId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
@@ -47834,6 +47848,48 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     farmerId?: BigIntFieldUpdateOperationsInput | bigint | number
+  }
+
+  export type PromotionUpdateWithoutDealInput = {
+    promotionId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: StringFieldUpdateOperationsInput | string
+    targetType?: EnumPromoTargetTypeFieldUpdateOperationsInput | $Enums.PromoTargetType
+    priority?: IntFieldUpdateOperationsInput | number
+    placement?: EnumPromoPlacementFieldUpdateOperationsInput | $Enums.PromoPlacement
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    product?: ProductUpdateOneWithoutPromotionsNestedInput
+  }
+
+  export type PromotionUncheckedUpdateWithoutDealInput = {
+    promotionId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: StringFieldUpdateOperationsInput | string
+    targetType?: EnumPromoTargetTypeFieldUpdateOperationsInput | $Enums.PromoTargetType
+    priority?: IntFieldUpdateOperationsInput | number
+    placement?: EnumPromoPlacementFieldUpdateOperationsInput | $Enums.PromoPlacement
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    productId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PromotionUncheckedUpdateManyWithoutDealInput = {
+    promotionId?: BigIntFieldUpdateOperationsInput | bigint | number
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: StringFieldUpdateOperationsInput | string
+    targetType?: EnumPromoTargetTypeFieldUpdateOperationsInput | $Enums.PromoTargetType
+    priority?: IntFieldUpdateOperationsInput | number
+    placement?: EnumPromoPlacementFieldUpdateOperationsInput | $Enums.PromoPlacement
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    productId?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

@@ -5,8 +5,7 @@ import {
   PrismaClientRustPanicError,
   PrismaClientInitializationError,
   PrismaClientValidationError,
-} from "@prisma/client/runtime/library";
-
+} from "@/generated/prisma/client/runtime/library";
 import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import { AppError } from "@/utils/appError";
 import logger from "@/utils/logger";
@@ -108,28 +107,27 @@ export const globalErrorHandler: ErrorRequestHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  let error = err as AppError;
+  let error = err;
   error.statusCode = error.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+  if (
+    err instanceof PrismaClientKnownRequestError ||
+    err instanceof PrismaClientUnknownRequestError ||
+    err instanceof PrismaClientRustPanicError ||
+    err instanceof PrismaClientInitializationError ||
+    err instanceof PrismaClientValidationError
+  ) {
+    error = handlePrismaError(err);
+  } else if (err.name === "JsonWebTokenError") {
+    error = handleJWTError();
+  } else if (err.name === "TokenExpiredError") {
+    error = handleJWTExpiredError();
+  } else if (err.name === "ValidationError") {
+    error = handleValidationError(err);
+  }
 
   if (process.env.NODE_ENV === "development") {
     sendErrorDev(error, res);
   } else {
-    if (
-      err instanceof PrismaClientKnownRequestError ||
-      err instanceof PrismaClientUnknownRequestError ||
-      err instanceof PrismaClientRustPanicError ||
-      err instanceof PrismaClientInitializationError ||
-      err instanceof PrismaClientValidationError
-    ) {
-      error = handlePrismaError(err);
-    } else if (err.name === "JsonWebTokenError") {
-      error = handleJWTError();
-    } else if (err.name === "TokenExpiredError") {
-      error = handleJWTExpiredError();
-    } else if (err.name === "ValidationError") {
-      error = handleValidationError(err);
-    }
-
     sendErrorProd(error, res);
   }
 };
