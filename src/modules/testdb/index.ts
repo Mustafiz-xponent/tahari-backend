@@ -6,6 +6,8 @@ async function main() {
   const user = await prisma.category.create({
     data: {
       name: "abul dir",
+      imageUrl:
+        "https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg?auto=compress&cs=tinysrgb&w=600",
     },
   });
   console.log(user);
