@@ -212,7 +212,7 @@ model Farmer {
 model Category {
   categoryId     BigInt    @id @default(autoincrement())
   name           String    @unique
-  imageUrl       String?
+  imageUrl       String
   isPrivateImage Boolean   @default(true)
   description    String?
   products       Product[]

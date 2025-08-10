@@ -1,7 +1,3 @@
-/**
- * Service layer for Category entity operations.
- * Contains business logic and database interactions for categories.
- */
 import { getErrorMessage } from "@/utils/errorHandler";
 import prisma from "@/prisma-client/prismaClient";
 import { Category, Product } from "@/generated/prisma/client";
@@ -10,13 +6,14 @@ import {
   CreateCategoryDto,
 } from "@/modules/categories/category.dto";
 import {
+  deleteFileFromS3,
   getBatchAccessibleImageUrls,
-  processProductsWithAccessibleUrls,
 } from "@/utils/fileUpload/s3Aws";
 import {
   uploadFileToS3,
   getAccessibleImageUrl,
 } from "@/utils/fileUpload/s3Aws";
+import { IMulterFile } from "@/utils/fileUpload/configMulterUpload";
 import { multerFileToFileObject } from "@/utils/fileUpload/configMulterUpload";
 
 export interface ProductWithAccessibleImages extends Product {
@@ -29,14 +26,6 @@ export interface CategoryWithAccessibleImages
   products: ProductWithAccessibleImages[];
 }
 
-interface IMulterFile {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  buffer: Buffer;
-  size: number;
-}
 // Create a new category
 export const createCategory = async ({
   data,
@@ -46,36 +35,38 @@ export const createCategory = async ({
   file?: IMulterFile;
 }): Promise<Category> => {
   try {
-    // Upload image to S3
-    let result;
-    if (file) {
-      const fileObject = multerFileToFileObject(file);
-      result = await uploadFileToS3(fileObject, "categories", undefined, true);
+    if (!file) {
+      throw new Error("No image file provided");
     }
-
-    return await prisma.category.create({
-      data: {
-        ...data,
-        imageUrl: result ? result.url : null,
-      },
-    });
+    // Upload image to S3
+    const fileObject = multerFileToFileObject(file);
+    const s3Res = await uploadFileToS3(
+      fileObject,
+      "categories",
+      undefined,
+      true
+    );
+    try {
+      const category = await prisma.$transaction(async (tx) => {
+        return await tx.category.create({
+          data: {
+            ...data,
+            imageUrl: s3Res.url,
+          },
+        });
+      });
+      return category;
+    } catch (error) {
+      // Rollback S3 file if DB insert fails
+      if (s3Res?.key) {
+        await deleteFileFromS3(s3Res.key, true);
+      }
+      throw error;
+    }
   } catch (error) {
     throw new Error(`Error creating category: ${getErrorMessage(error)}`);
   }
 };
-
-// // Get all categories
-// export const getAllCategories = async (): Promise<Category[]> => {
-//   try {
-//     return await prisma.category.findMany({
-//       include: {
-//         products: true,
-//       },
-//     });
-//   } catch (error) {
-//     throw new Error(`Error fetching categories: ${getErrorMessage(error)}`);
-//   }
-// };
 
 /**
  * Get all categories with products that have accessible image URLs
@@ -143,22 +134,6 @@ export const getAllCategories = async (
   }
 };
 
-// // Get a category by ID
-// export const getCategoryById = async (
-//   categoryId: BigInt
-// ): Promise<Category | null> => {
-//   try {
-//     return await prisma.category.findUnique({
-//       where: { categoryId: Number(categoryId) },
-//       include: {
-//         products: true, // Include related products if needed
-//       },
-//     });
-//   } catch (error) {
-//     throw new Error(`Error fetching category by ID: ${getErrorMessage(error)}`);
-//   }
-// };
-
 /**
  * Get a category by ID with products that have accessible image URLs
  */
@@ -214,13 +189,40 @@ export const getCategoryById = async (
 // Update a category's details
 export const updateCategory = async (
   categoryId: bigint,
-  data: UpdateCategoryDto
+  data: UpdateCategoryDto,
+  file?: IMulterFile
 ): Promise<Category> => {
   try {
-    return await prisma.category.update({
+    const category = await prisma.category.findUnique({
       where: { categoryId: Number(categoryId) },
-      data,
     });
+    if (!category) throw new Error("Category not found");
+
+    // Upload image to S3
+    let s3Res: any;
+    if (file) {
+      await deleteFileFromS3(category?.imageUrl!, true);
+      const fileObject = multerFileToFileObject(file);
+      s3Res = await uploadFileToS3(fileObject, "categories", undefined, true);
+    }
+    try {
+      const updatedCategory = await prisma.$transaction(async (tx) => {
+        return await tx.category.update({
+          where: { categoryId: Number(categoryId) },
+          data: {
+            ...data,
+            imageUrl: s3Res.url ? s3Res.url : category?.imageUrl,
+          },
+        });
+      });
+      return updatedCategory;
+    } catch (error) {
+      // Rollback S3 file if DB update fails
+      if (s3Res?.key) {
+        await deleteFileFromS3(s3Res.key, true);
+      }
+      throw error;
+    }
   } catch (error) {
     throw new Error(`Error updating category: ${getErrorMessage(error)}`);
   }
@@ -229,6 +231,13 @@ export const updateCategory = async (
 // Delete a category
 export const deleteCategory = async (categoryId: BigInt): Promise<Category> => {
   try {
+    const category = await prisma.category.findUnique({
+      where: { categoryId: Number(categoryId) },
+    });
+    if (!category) throw new Error("Category not found");
+    // Delete image from S3
+    await deleteFileFromS3(category.imageUrl!, true);
+    // Delete category
     return await prisma.category.delete({
       where: { categoryId: Number(categoryId) },
     });

@@ -7,6 +7,7 @@ import { Router } from "express";
 import * as CategoryController from "@/modules/categories/category.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 import { UserRole } from "@/generated/prisma/client";
+import { upload } from "@/utils/fileUpload/configMulterUpload";
 
 const router = Router();
 
@@ -29,6 +30,7 @@ router.put(
   "/:id",
   authMiddleware,
   authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  upload.single("image"),
   CategoryController.updateCategory
 );
 

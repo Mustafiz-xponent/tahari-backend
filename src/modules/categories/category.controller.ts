@@ -114,7 +114,12 @@ export const updateCategory = async (
   try {
     const categoryId = categoryIdSchema.parse(req.params.id);
     const data = zUpdateCategoryDto.parse(req.body);
-    const updated = await categoryService.updateCategory(categoryId, data);
+    const file = req.file;
+    const updated = await categoryService.updateCategory(
+      BigInt(categoryId),
+      data,
+      file
+    );
     res.json({
       success: true,
       message: "Category updated successfully",

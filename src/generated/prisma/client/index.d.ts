@@ -9745,7 +9745,7 @@ export namespace Prisma {
   export type CategoryGroupByOutputType = {
     categoryId: bigint
     name: string
-    imageUrl: string | null
+    imageUrl: string
     isPrivateImage: boolean
     description: string | null
     _count: CategoryCountAggregateOutputType | null
@@ -9819,7 +9819,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       categoryId: bigint
       name: string
-      imageUrl: string | null
+      imageUrl: string
       isPrivateImage: boolean
       description: string | null
     }, ExtArgs["result"]["category"]>
@@ -33484,7 +33484,7 @@ export namespace Prisma {
     NOT?: CategoryWhereInput | CategoryWhereInput[]
     categoryId?: BigIntFilter<"Category"> | bigint | number
     name?: StringFilter<"Category"> | string
-    imageUrl?: StringNullableFilter<"Category"> | string | null
+    imageUrl?: StringFilter<"Category"> | string
     isPrivateImage?: BoolFilter<"Category"> | boolean
     description?: StringNullableFilter<"Category"> | string | null
     products?: ProductListRelationFilter
@@ -33493,7 +33493,7 @@ export namespace Prisma {
   export type CategoryOrderByWithRelationInput = {
     categoryId?: SortOrder
     name?: SortOrder
-    imageUrl?: SortOrderInput | SortOrder
+    imageUrl?: SortOrder
     isPrivateImage?: SortOrder
     description?: SortOrderInput | SortOrder
     products?: ProductOrderByRelationAggregateInput
@@ -33505,7 +33505,7 @@ export namespace Prisma {
     AND?: CategoryWhereInput | CategoryWhereInput[]
     OR?: CategoryWhereInput[]
     NOT?: CategoryWhereInput | CategoryWhereInput[]
-    imageUrl?: StringNullableFilter<"Category"> | string | null
+    imageUrl?: StringFilter<"Category"> | string
     isPrivateImage?: BoolFilter<"Category"> | boolean
     description?: StringNullableFilter<"Category"> | string | null
     products?: ProductListRelationFilter
@@ -33514,7 +33514,7 @@ export namespace Prisma {
   export type CategoryOrderByWithAggregationInput = {
     categoryId?: SortOrder
     name?: SortOrder
-    imageUrl?: SortOrderInput | SortOrder
+    imageUrl?: SortOrder
     isPrivateImage?: SortOrder
     description?: SortOrderInput | SortOrder
     _count?: CategoryCountOrderByAggregateInput
@@ -33530,7 +33530,7 @@ export namespace Prisma {
     NOT?: CategoryScalarWhereWithAggregatesInput | CategoryScalarWhereWithAggregatesInput[]
     categoryId?: BigIntWithAggregatesFilter<"Category"> | bigint | number
     name?: StringWithAggregatesFilter<"Category"> | string
-    imageUrl?: StringNullableWithAggregatesFilter<"Category"> | string | null
+    imageUrl?: StringWithAggregatesFilter<"Category"> | string
     isPrivateImage?: BoolWithAggregatesFilter<"Category"> | boolean
     description?: StringNullableWithAggregatesFilter<"Category"> | string | null
   }
@@ -35394,7 +35394,7 @@ export namespace Prisma {
   export type CategoryCreateInput = {
     categoryId?: bigint | number
     name: string
-    imageUrl?: string | null
+    imageUrl: string
     isPrivateImage?: boolean
     description?: string | null
     products?: ProductCreateNestedManyWithoutCategoryInput
@@ -35403,7 +35403,7 @@ export namespace Prisma {
   export type CategoryUncheckedCreateInput = {
     categoryId?: bigint | number
     name: string
-    imageUrl?: string | null
+    imageUrl: string
     isPrivateImage?: boolean
     description?: string | null
     products?: ProductUncheckedCreateNestedManyWithoutCategoryInput
@@ -35412,7 +35412,7 @@ export namespace Prisma {
   export type CategoryUpdateInput = {
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: StringFieldUpdateOperationsInput | string
     isPrivateImage?: BoolFieldUpdateOperationsInput | boolean
     description?: NullableStringFieldUpdateOperationsInput | string | null
     products?: ProductUpdateManyWithoutCategoryNestedInput
@@ -35421,7 +35421,7 @@ export namespace Prisma {
   export type CategoryUncheckedUpdateInput = {
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: StringFieldUpdateOperationsInput | string
     isPrivateImage?: BoolFieldUpdateOperationsInput | boolean
     description?: NullableStringFieldUpdateOperationsInput | string | null
     products?: ProductUncheckedUpdateManyWithoutCategoryNestedInput
@@ -35430,7 +35430,7 @@ export namespace Prisma {
   export type CategoryCreateManyInput = {
     categoryId?: bigint | number
     name: string
-    imageUrl?: string | null
+    imageUrl: string
     isPrivateImage?: boolean
     description?: string | null
   }
@@ -35438,7 +35438,7 @@ export namespace Prisma {
   export type CategoryUpdateManyMutationInput = {
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: StringFieldUpdateOperationsInput | string
     isPrivateImage?: BoolFieldUpdateOperationsInput | boolean
     description?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -35446,7 +35446,7 @@ export namespace Prisma {
   export type CategoryUncheckedUpdateManyInput = {
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: StringFieldUpdateOperationsInput | string
     isPrivateImage?: BoolFieldUpdateOperationsInput | boolean
     description?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -42744,7 +42744,7 @@ export namespace Prisma {
   export type CategoryCreateWithoutProductsInput = {
     categoryId?: bigint | number
     name: string
-    imageUrl?: string | null
+    imageUrl: string
     isPrivateImage?: boolean
     description?: string | null
   }
@@ -42752,7 +42752,7 @@ export namespace Prisma {
   export type CategoryUncheckedCreateWithoutProductsInput = {
     categoryId?: bigint | number
     name: string
-    imageUrl?: string | null
+    imageUrl: string
     isPrivateImage?: boolean
     description?: string | null
   }
@@ -43012,7 +43012,7 @@ export namespace Prisma {
   export type CategoryUpdateWithoutProductsInput = {
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: StringFieldUpdateOperationsInput | string
     isPrivateImage?: BoolFieldUpdateOperationsInput | boolean
     description?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -43020,7 +43020,7 @@ export namespace Prisma {
   export type CategoryUncheckedUpdateWithoutProductsInput = {
     categoryId?: BigIntFieldUpdateOperationsInput | bigint | number
     name?: StringFieldUpdateOperationsInput | string
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: StringFieldUpdateOperationsInput | string
     isPrivateImage?: BoolFieldUpdateOperationsInput | boolean
     description?: NullableStringFieldUpdateOperationsInput | string | null
   }
