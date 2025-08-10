@@ -5,10 +5,7 @@
 
 import { Request, Response } from "express";
 import * as subscriptionService from "@/modules/subscriptions/subscription.service";
-import {
-  zCreateSubscriptionDto,
-  zUpdateSubscriptionDto,
-} from "@/modules/subscriptions/subscription.dto";
+import { zUpdateSubscriptionDto } from "@/modules/subscriptions/subscription.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { bigint, z } from "zod";
 import httpStatus from "http-status";
@@ -17,7 +14,7 @@ import { SubscriptionStatus } from "@/generated/prisma/client";
 const subscriptionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Subscription ID must be a positive integer",
 });
-interface IQueryParams {
+interface ISubscriptionQueryParams {
   page?: string;
   limit?: string;
   sort?: "asc" | "desc";
@@ -92,7 +89,7 @@ export const getSubscriptionById = async (
  * Get users subscription
  */
 export const getCustomerSubscriptions = async (
-  req: Request<{}, {}, {}, IQueryParams>,
+  req: Request<{}, {}, {}, ISubscriptionQueryParams>,
   res: Response
 ): Promise<void> => {
   try {

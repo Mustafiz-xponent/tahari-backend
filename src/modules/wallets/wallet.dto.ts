@@ -5,7 +5,6 @@
  */
 
 import { z } from "zod";
-
 /**
  * Zod schema for creating a new wallet.
  * Validates all required fields necessary for creation.

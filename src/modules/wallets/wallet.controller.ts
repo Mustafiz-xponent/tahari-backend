@@ -79,7 +79,6 @@ export const handleSslCommerzSuccess = async (
   res: Response
 ): Promise<void> => {
   try {
-    // Optional: Check payment status for user feedback
     const tranId = req.body.tran_id;
     const paymentStatus = await walletService.getPaymentStatus(tranId);
 

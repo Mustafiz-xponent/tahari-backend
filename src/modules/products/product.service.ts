@@ -19,7 +19,10 @@ import {
 } from "@/modules/products/product.dto";
 import logger from "@/utils/logger";
 import { Decimal } from "@/generated/prisma/client/runtime/library";
-import { calculateDealPricing } from "@/utils/calculateDealPricing";
+import {
+  calculateDealPricing,
+  DealPricingResult,
+} from "@/utils/calculateDealPricing";
 
 // Add interface for product with accessible URLs
 interface ProductWithAccessibleImages extends Omit<Product, "imageUrls"> {
@@ -180,13 +183,20 @@ export async function getAllProducts(
     // Apply pricing calculation
     processedProducts = await Promise.all(
       processedProducts.map(async (product) => {
-        const { isUnderDeal, dealUnitPrice } = await calculateDealPricing(
-          product
-        );
+        const {
+          hasActiveDeal,
+          hasActiveGlobalDeal,
+          discountUnitPrice,
+          discountType,
+          discountValue,
+        } = await calculateDealPricing(product);
         return {
           ...product,
-          isUnderDeal,
-          dealUnitPrice,
+          hasActiveDeal,
+          hasActiveGlobalDeal,
+          discountType,
+          discountValue,
+          discountUnitPrice,
         };
       })
     );
@@ -271,13 +281,7 @@ export async function getProductById(
   includeRelations = false,
   generateAccessibleUrls = true,
   urlExpiresIn = 300
-): Promise<
-  | (ProductWithAccessibleImages & {
-      isUnderDeal: boolean;
-      dealUnitPrice: Decimal | null;
-    })
-  | null
-> {
+): Promise<(ProductWithAccessibleImages & DealPricingResult) | null> {
   try {
     const product = await prisma.product.findUnique({
       where: { productId: Number(productId) },
@@ -295,7 +299,13 @@ export async function getProductById(
     }
 
     // Calculate deal pricing
-    const { isUnderDeal, dealUnitPrice } = await calculateDealPricing(product);
+    const {
+      hasActiveDeal,
+      hasActiveGlobalDeal,
+      discountUnitPrice,
+      discountType,
+      discountValue,
+    } = await calculateDealPricing(product);
 
     // Generate accessible URLs if requested
     let accessibleImageUrls: string[] = [];
@@ -310,8 +320,11 @@ export async function getProductById(
     return {
       ...product,
       accessibleImageUrls,
-      isUnderDeal,
-      dealUnitPrice,
+      hasActiveDeal,
+      hasActiveGlobalDeal,
+      discountUnitPrice,
+      discountType,
+      discountValue,
     };
   } catch (error) {
     throw new Error(`Failed to fetch product: ${getErrorMessage(error)}`);

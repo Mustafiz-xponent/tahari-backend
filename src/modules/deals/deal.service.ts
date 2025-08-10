@@ -52,15 +52,17 @@ export async function createDeal(data: CreateDealDto): Promise<Deal> {
     );
   }
 
-  // Check if any product already has an active deal
+  // Check for existing *individual* deals on these products
   const productsWithDeal = await prisma.product.findMany({
     where: {
       productId: { in: data.productIds },
       deal: {
+        isGlobal: false,
         startDate: { lte: new Date() },
-        endDate: { gt: new Date() }, // the deal is still ongoing
+        endDate: { gt: new Date() },
       },
     },
+    select: { productId: true },
   });
 
   if (productsWithDeal.length > 0) {

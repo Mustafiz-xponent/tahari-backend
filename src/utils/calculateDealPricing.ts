@@ -6,12 +6,20 @@ interface ProductWithDeal {
   unitPrice: Product["unitPrice"];
   deal?: Deal | null;
 }
-
+export interface DealPricingResult {
+  hasActiveDeal: boolean;
+  hasActiveGlobalDeal: boolean;
+  discountType: Deal["discountType"] | null;
+  discountValue: Deal["discountValue"] | null;
+  discountUnitPrice: Decimal | null;
+}
 /**
  * Calculates the pricing for a product considering both global and product-specific deals.
  * Product-specific deals override global deals if both are active.
  */
-export async function calculateDealPricing(product: ProductWithDeal) {
+export async function calculateDealPricing(
+  product: ProductWithDeal
+): Promise<DealPricingResult> {
   const now = new Date();
   let activeDeal: Deal | null = null;
 
@@ -40,27 +48,33 @@ export async function calculateDealPricing(product: ProductWithDeal) {
   //  If no deal found, return defaults
   if (!activeDeal) {
     return {
-      isUnderDeal: false,
-      dealUnitPrice: null,
+      hasActiveDeal: false,
+      hasActiveGlobalDeal: false,
+      discountType: null,
+      discountValue: null,
+      discountUnitPrice: null,
     };
   }
 
   // Calculate price with the active deal
-  let dealUnitPrice: Decimal;
+  let discountUnitPrice: Decimal;
   const discountValue = activeDeal.discountValue;
 
   if (activeDeal.discountType === "PERCENTAGE") {
     const percentage = discountValue / 100;
-    dealUnitPrice = product.unitPrice.mul(new Decimal(1 - percentage));
+    discountUnitPrice = product.unitPrice.mul(new Decimal(1 - percentage));
   } else {
-    dealUnitPrice = product.unitPrice.sub(discountValue);
-    if (dealUnitPrice.lessThan(0)) {
-      dealUnitPrice = new Decimal(0);
+    discountUnitPrice = product.unitPrice.sub(discountValue);
+    if (discountUnitPrice.lessThan(0)) {
+      discountUnitPrice = new Decimal(0);
     }
   }
 
   return {
-    isUnderDeal: true,
-    dealUnitPrice,
+    hasActiveDeal: activeDeal.isGlobal ? false : true,
+    hasActiveGlobalDeal: activeDeal.isGlobal,
+    discountType: activeDeal.discountType,
+    discountValue: activeDeal.discountValue,
+    discountUnitPrice,
   };
 }
