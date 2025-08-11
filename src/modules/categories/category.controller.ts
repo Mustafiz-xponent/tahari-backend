@@ -13,6 +13,8 @@ import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import { upload } from "@/utils/fileUpload/configMulterUpload";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { Category } from "@/generated/prisma/client";
 const categoryIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Category ID must be a positive integer",
 });
@@ -31,8 +33,9 @@ export const createCategory = [
         data,
         file,
       });
-      res.status(httpStatus.CREATED).json({
+      sendResponse<Category>(res, {
         success: true,
+        statusCode: httpStatus.CREATED,
         message: "Category created successfully",
         data: category,
       });
@@ -57,9 +60,9 @@ export const getAllCategories = async (
       generateAccessibleUrls,
       urlExpiresIn
     );
-
-    res.json({
+    sendResponse<Category[]>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Categories retrieved successfully",
       data: categories,
     });
@@ -87,15 +90,17 @@ export const getCategoryById = async (
     );
 
     if (!category) {
-      res.status(httpStatus.NOT_FOUND).json({
+      sendResponse<null>(res, {
         success: false,
+        statusCode: httpStatus.NOT_FOUND,
         message: "Category not found",
+        data: null,
       });
       return;
     }
-
-    res.json({
+    sendResponse<Category>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Category retrieved successfully",
       data: category,
     });
@@ -120,8 +125,9 @@ export const updateCategory = async (
       data,
       file
     );
-    res.json({
+    sendResponse<Category>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Category updated successfully",
       data: updated,
     });
@@ -140,7 +146,12 @@ export const deleteCategory = async (
   try {
     const categoryId = categoryIdSchema.parse(req.params.id);
     await categoryService.deleteCategory(categoryId);
-    res.json({ success: true, message: "Category deleted successfully" });
+    sendResponse<null>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Category deleted successfully",
+      data: null,
+    });
   } catch (error) {
     handleErrorResponse(error, res, "delete category");
   }

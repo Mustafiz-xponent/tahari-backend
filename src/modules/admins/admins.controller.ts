@@ -4,31 +4,8 @@ import * as adminService from "@/modules/admins/admins.service";
 import { CreateAdminDto, UpdateAdminDto } from "@/modules/admins/admins.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import httpStatus from "http-status";
-
-// export const createAdmin = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const data: CreateAdminDto = req.body;
-//     console.log("✅ Received admin data:", data);
-
-//     const admin = await adminService.createAdmin(data);
-//     // Convert BigInt fields (like adminId) to string
-//     const adminSafe = {
-//       ...admin,
-//       adminId: admin.adminId.toString(), // convert BigInt to string
-//     };
-
-//     res.status(201).json({
-//       message: "Admin created successfully",
-//       data: adminSafe,
-//     });
-//   } catch (error) {
-//     console.error("Create admin error:", error);
-//     res.status(500).json({ error: getErrorMessage(error) });
-//   }
-// };
+import sendResponse from "@/utils/sendResponse";
+import { Admin } from "@/generated/prisma/client";
 
 export const getAllAdmins = async (
   _req: Request,
@@ -36,11 +13,19 @@ export const getAllAdmins = async (
 ): Promise<void> => {
   try {
     const admins = await adminService.getAllAdmins();
-    res.status(httpStatus.OK).json(admins);
+    sendResponse<Admin[]>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Admins retrieved successfully",
+      data: admins,
+    });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: getErrorMessage(error) });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to fetch admins",
+      data: null,
+    });
   }
 };
 
@@ -52,13 +37,27 @@ export const getAdminById = async (
     const id = BigInt(req.params.id);
     const admin = await adminService.getAdminById(id);
     if (!admin) {
-      res.status(httpStatus.NOT_FOUND).json({ message: "Admin not found" });
+      sendResponse<null>(res, {
+        success: false,
+        statusCode: httpStatus.NOT_FOUND,
+        message: "Admin not found",
+        data: null,
+      });
+      return;
     }
-    res.status(httpStatus.OK).json(admin);
+    sendResponse<Admin>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Admin retrieved successfully",
+      data: admin,
+    });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: getErrorMessage(error) });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to fetch admin",
+      data: null,
+    });
   }
 };
 
@@ -70,11 +69,19 @@ export const updateAdmin = async (
     const id = BigInt(req.params.id);
     const data: UpdateAdminDto = req.body;
     const updated = await adminService.updateAdmin(id, data);
-    res.status(httpStatus.OK).json(updated);
+    sendResponse<Admin>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Admin updated successfully",
+      data: updated,
+    });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: getErrorMessage(error) });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to update admin",
+      data: null,
+    });
   }
 };
 
@@ -85,10 +92,18 @@ export const deleteAdmin = async (
   try {
     const id = BigInt(req.params.id);
     const deleted = await adminService.deleteAdmin(id);
-    res.status(httpStatus.OK).json(deleted);
+    sendResponse<Admin>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Admin deleted successfully",
+      data: deleted,
+    });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: getErrorMessage(error) });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to delete admin",
+      data: null,
+    });
   }
 };

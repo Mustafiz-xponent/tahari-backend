@@ -14,6 +14,8 @@ import {
 } from "@/modules/auth/customer/customer.dto";
 import * as customerService from "@/modules/auth/customer/customer.service";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { Customer, User } from "@/generated/prisma/client";
 
 /**
  * Register a customer
@@ -22,9 +24,11 @@ export const registerCustomer = async (req: Request, res: Response) => {
   try {
     const data = zCustomerRegisterDto.parse(req.body);
     await customerService.registerCustomer(data);
-    res.status(httpStatus.CREATED).json({
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Registration successful. OTP sent to your phone.",
+      data: null,
     });
   } catch (error) {
     handleErrorResponse(error, res, "register customer");
@@ -38,8 +42,9 @@ export const loginCustomer = async (req: Request, res: Response) => {
   try {
     const data = zCustomerLoginDto.parse(req.body);
     const { token, user } = await customerService.loginCustomer(data);
-    res.json({
+    sendResponse<{ token: string; user: Omit<User, "passwordHash"> }>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Login successful",
       data: { token, user },
     });
@@ -55,10 +60,11 @@ export const otpLoginCustomer = async (req: Request, res: Response) => {
   try {
     const data = zCustomerOtpLoginDto.parse(req.body);
     const otp = await customerService.otpLoginCustomer(data);
-    res.json({
+    sendResponse<{ otp: string }>(res, {
       success: true,
-      data: { otp },
+      statusCode: httpStatus.OK,
       message: "OTP sent successfully",
+      data: { otp },
     });
   } catch (error) {
     handleErrorResponse(error, res, "OTP login");
@@ -75,9 +81,9 @@ export const verifyCustomerOtp = async (req: Request, res: Response) => {
 
     // Exclude passwordHash from the user object manually
     const { passwordHash, ...sanitizedUser } = user;
-
-    res.json({
+    sendResponse<{ token: string; user: Omit<User, "passwordHash"> }>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "OTP verified successfully",
       data: { token, user: sanitizedUser },
     });
@@ -109,11 +115,11 @@ export const updateCustomerProfile = async (req: Request, res: Response) => {
 
     // Exclude sensitive fields from the response
     const { passwordHash, ...sanitizedUser } = updatedUser;
-
-    res.json({
+    sendResponse<{ user: Omit<User, "passwordHash"> }>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Profile updated successfully",
-      data: sanitizedUser,
+      data: { user: sanitizedUser },
     });
   } catch (error) {
     handleErrorResponse(error, res, "update profile");
@@ -134,11 +140,11 @@ export const getCustomerById = async (req: Request, res: Response) => {
     if (BigInt(requestingUserId) !== customerId) {
       throw new Error("Can only access your own profile");
     }
-
     const customer = await customerService.getCustomerById(customerId);
 
-    res.json({
+    sendResponse<Omit<User, "passwordHash">>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Customer retrieved successfully",
       data: customer,
     });

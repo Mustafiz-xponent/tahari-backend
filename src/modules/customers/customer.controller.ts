@@ -8,6 +8,8 @@ import * as customerService from "@/modules/customers/customer.service";
 import { zUpdateCustomerDto } from "@/modules/customers/customer.dto";
 import { ZodError, z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { Customer } from "@/generated/prisma/client";
 
 const customerIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Customer ID must be a positive integer",
@@ -21,9 +23,10 @@ export const getAllCustomers = async (
   res: Response
 ): Promise<void> => {
   const customers = await customerService.getAllCustomers();
-  res.status(httpStatus.OK).json({
+  sendResponse<Customer[]>(res, {
     success: true,
-    message: "Customers fetched successfully",
+    statusCode: httpStatus.OK,
+    message: "Customers retrieved successfully",
     data: customers,
   });
 };
@@ -39,19 +42,31 @@ export const getCustomerById = async (
     const customerId = customerIdSchema.parse(req.params.id);
     const customer = await customerService.getCustomerById(customerId);
     if (!customer) {
-      res.status(httpStatus.NOT_FOUND).json({ message: "Customer not found" });
+      sendResponse<null>(res, {
+        success: false,
+        statusCode: httpStatus.NOT_FOUND,
+        message: "Customer not found",
+        data: null,
+      });
       return;
     }
-    res.json(customer);
+    sendResponse<Customer>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Customer retrieved successfully",
+      data: customer,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
-    console.error("Error fetching customer:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to fetch customer" });
+    sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to fetch customer",
+      data: null,
+    });
   }
 };
 
@@ -66,16 +81,23 @@ export const updateCustomer = async (
     const customerId = customerIdSchema.parse(req.params.id);
     const data = zUpdateCustomerDto.parse(req.body);
     const updated = await customerService.updateCustomer(customerId, data);
-    res.json({ message: "Customer updated successfully", customer: updated });
+    sendResponse<Customer>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Customer updated successfully",
+      data: updated,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
-    console.error("Error updating customer:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to update customer" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to update customer",
+      data: null,
+    });
   }
 };
 
@@ -89,15 +111,22 @@ export const deleteCustomer = async (
   try {
     const customerId = customerIdSchema.parse(req.params.id);
     await customerService.deleteCustomer(customerId);
-    res.json({ message: "Customer deleted successfully" });
+    sendResponse<null>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Customer deleted successfully",
+      data: null,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
-    console.error("Error deleting customer:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to delete customer" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to delete customer",
+      data: null,
+    });
   }
 };

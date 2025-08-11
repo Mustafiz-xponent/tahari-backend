@@ -11,6 +11,8 @@ import {
 import * as adminService from "@/modules/auth/admin/admin.service";
 import { z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { User } from "@/generated/prisma/client";
 
 const adminIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Admin ID must be a positive integer",
@@ -23,8 +25,9 @@ export const createAdmin = async (req: Request, res: Response) => {
   try {
     const data = zCreateAdminDto.parse(req.body);
     const { user } = await adminService.createAdmin(data);
-    res.status(httpStatus.CREATED).json({
+    sendResponse<{ user: Omit<User, "passwordHash"> }>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Admin created successfully",
       data: { user },
     });
@@ -40,8 +43,9 @@ export const loginAdmin = async (req: Request, res: Response) => {
   try {
     const data = zAdminLoginDto.parse(req.body);
     const { token, user } = await adminService.loginAdmin(data);
-    res.json({
+    sendResponse<{ token: string; user: Omit<User, "passwordHash"> }>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Admin logged in successfully",
       data: { token, user },
     });
@@ -60,10 +64,11 @@ export const deleteAdmin = async (
   try {
     const adminId = adminIdSchema.parse(req.params.id);
     await adminService.deleteAdmin(adminId, req.user?.userId);
-
-    res.status(httpStatus.OK).json({
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Admin deleted successfully",
+      data: null,
     });
   } catch (error) {
     handleErrorResponse(error, res, "delete admin");

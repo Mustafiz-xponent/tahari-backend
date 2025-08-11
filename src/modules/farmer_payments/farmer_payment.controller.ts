@@ -14,6 +14,8 @@ import {
 import { z } from "zod";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { FarmerPayment } from "@/generated/prisma/client";
 
 const paymentIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Payment ID must be a positive integer",
@@ -29,8 +31,9 @@ export const createFarmerPayment = async (
   try {
     const data = zCreateFarmerPaymentDto.parse(req.body);
     const payment = await farmerPaymentService.createFarmerPayment(data);
-    res.status(httpStatus.CREATED).json({
+    sendResponse<FarmerPayment>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Farmer payment created successfully",
       data: payment,
     });
@@ -48,9 +51,10 @@ export const getAllFarmerPayments = async (
 ): Promise<void> => {
   try {
     const payments = await farmerPaymentService.getAllFarmerPayments();
-    res.json({
+    sendResponse<FarmerPayment[]>(res, {
       success: true,
-      message: "Farmer payments fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Farmer payments retrieved successfully",
       data: payments,
     });
   } catch (error) {
@@ -71,9 +75,10 @@ export const getFarmerPaymentById = async (
     if (!payment) {
       throw new Error("Farmer payment not found");
     }
-    res.json({
+    sendResponse<FarmerPayment>(res, {
       success: true,
-      message: "Farmer payment fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Farmer payment retrieved successfully",
       data: payment,
     });
   } catch (error) {
@@ -95,8 +100,9 @@ export const updateFarmerPayment = async (
       paymentId,
       data
     );
-    res.json({
+    sendResponse<FarmerPayment>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Farmer payment updated successfully",
       data: updated,
     });
@@ -115,8 +121,9 @@ export const deleteFarmerPayment = async (
   try {
     const paymentId = paymentIdSchema.parse(req.params.id);
     await farmerPaymentService.deleteFarmerPayment(paymentId);
-    res.json({
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Farmer payment deleted successfully",
       data: null,
     });

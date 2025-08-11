@@ -83,14 +83,17 @@ export const getFarmerTransactionById = async (
       transactionId
     );
     if (!transaction) {
-      res.status(httpStatus.NOT_FOUND).json({
+      sendResponse<null>(res, {
         success: false,
+        statusCode: httpStatus.NOT_FOUND,
         message: "Farmer transaction not found",
+        data: null,
       });
       return;
     }
-    res.json({
+    sendResponse<FarmerTransaction>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Farmer transaction retrieved successfully",
       data: transaction,
     });
@@ -113,8 +116,9 @@ export const updateFarmerTransaction = async (
       transactionId,
       data
     );
-    res.json({
+    sendResponse<FarmerTransaction>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Farmer transaction updated successfully",
       data: updated,
     });
@@ -133,9 +137,11 @@ export const deleteFarmerTransaction = async (
   try {
     const transactionId = transactionIdSchema.parse(req.params.id);
     await farmerTransactionService.deleteFarmerTransaction(transactionId);
-    res.json({
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Farmer transaction deleted successfully",
+      data: null,
     });
   } catch (error) {
     handleErrorResponse(error, res, "delete farmer transaction");
