@@ -2,10 +2,13 @@
  * Service layer for Wallet entity operations.
  * Contains business logic and database interactions for wallets.
  */
-
 import prisma from "@/prisma-client/prismaClient";
-import { Wallet, WalletTransaction } from "@/generated/prisma/client";
-import { CreateWalletDto, UpdateWalletDto } from "@/modules/wallets/wallet.dto";
+import { Wallet } from "@/generated/prisma/client";
+import {
+  CreateWalletDto,
+  DepositeWalletDto,
+  UpdateWalletDto,
+} from "@/modules/wallets/wallet.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { processSSLCommerzWalletDeposite } from "@/utils/processWalletDeposite";
 import {
@@ -20,7 +23,9 @@ import { WalletDepositeResult } from "@/modules/wallets/wallet.interface";
  * @returns The created wallet
  * @throws Error if the wallet cannot be created (e.g., duplicate customerId or invalid foreign key)
  */
-export async function createWallet(data: CreateWalletDto): Promise<Wallet> {
+export async function createWallet(
+  data: CreateWalletDto["body"]
+): Promise<Wallet> {
   try {
     // Check if a wallet already exists for the customer
     const existingWallet = await prisma.wallet.findUnique({
@@ -47,7 +52,7 @@ export async function initiateDeposit({
   amount,
 }: {
   userId: number;
-  amount: number;
+  amount: DepositeWalletDto["body"]["amount"];
 }): Promise<WalletDepositeResult> {
   try {
     // Get customer details
@@ -242,11 +247,11 @@ export async function getAllWallets(): Promise<Wallet[]> {
  * @throws Error if the query fails
  */
 export async function getCustomerWalletBalanace(
-  userId: BigInt
+  userId: bigint
 ): Promise<Wallet | null> {
   try {
     const customer = await prisma.customer.findUnique({
-      where: { userId: Number(userId) },
+      where: { userId },
       include: { wallet: true },
     });
     if (!customer) {
@@ -301,7 +306,7 @@ export async function getWalletById(walletId: BigInt): Promise<Wallet | null> {
  */
 export async function updateWallet(
   walletId: BigInt,
-  data: UpdateWalletDto
+  data: UpdateWalletDto["body"]
 ): Promise<Wallet> {
   try {
     // If updating customerId, check for existing wallet with that customerId

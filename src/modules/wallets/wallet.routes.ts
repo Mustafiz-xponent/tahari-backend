@@ -6,17 +6,32 @@ import { Router } from "express";
 import * as WalletController from "@/modules/wallets/wallet.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 import { UserRole } from "@/generated/prisma/client";
+import validator from "@/middlewares/validator";
+import {
+  zCreateWalletDto,
+  zDepositeWalletDto,
+  zGetWalletDto,
+  zDeleteWalletDto,
+  zUpdateWalletDto,
+} from "@/modules/wallets/wallet.dto";
 
 const router = Router();
 
 // Route to create a new wallet
-router.post("/", WalletController.createWallet);
+router.post(
+  "/",
+  authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validator(zCreateWalletDto),
+  WalletController.createWallet
+);
 
 // Route to deposite wallet
 router.post(
   "/deposit",
   authMiddleware,
   authorizeRoles(UserRole.CUSTOMER),
+  validator(zDepositeWalletDto),
   WalletController.initiateWalletDeposit
 );
 
@@ -40,6 +55,7 @@ router.get(
   "/:id",
   authMiddleware,
   authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validator(zGetWalletDto),
   WalletController.getWalletById
 );
 
@@ -48,6 +64,7 @@ router.get(
 //   "/:id",
 //   authMiddleware,
 //   authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+//   validator(zUpdateWalletDto),
 //   WalletController.updateWallet
 // );
 
@@ -56,6 +73,7 @@ router.get(
 //   "/:id",
 //   authMiddleware,
 //   authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+//   validator(zDeleteWalletDto),
 //   WalletController.deleteWallet
 // );
 

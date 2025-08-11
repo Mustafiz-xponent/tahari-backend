@@ -1,19 +1,15 @@
 import { Request, Response } from "express";
 import * as walletService from "@/modules/wallets/wallet.service";
 import {
-  zCreateWalletDto,
-  zUpdateWalletDto,
+  DeleteWalletDto,
+  GetWalletDto,
+  UpdateWalletDto,
 } from "@/modules/wallets/wallet.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
-import { z } from "zod";
 import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
 import { Wallet } from "@/generated/prisma/client";
 import { WalletDepositeResult } from "@/modules/wallets/wallet.interface";
-
-const walletIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
-  message: "Wallet ID must be a positive integer",
-});
 
 /**
  * Create a new wallet
@@ -23,8 +19,7 @@ export const createWallet = async (
   res: Response
 ): Promise<void> => {
   try {
-    const data = zCreateWalletDto.parse(req.body);
-    const wallet = await walletService.createWallet(data);
+    const wallet = await walletService.createWallet(req.body);
 
     sendResponse<Wallet>(res, {
       success: true,
@@ -47,17 +42,6 @@ export const initiateWalletDeposit = async (
   try {
     const { amount } = req.body;
     const userId = req.user?.userId;
-
-    // Validation
-    if (!amount || amount <= 0) {
-      sendResponse<null>(res, {
-        success: false,
-        statusCode: httpStatus.BAD_REQUEST,
-        message: "Valid amount are required",
-        data: null,
-      });
-      return;
-    }
 
     const depositData = await walletService.initiateDeposit({
       userId: Number(userId!),
@@ -203,7 +187,7 @@ export const getWalletById = async (
   res: Response
 ): Promise<void> => {
   try {
-    const walletId = walletIdSchema.parse(req.params.id);
+    const walletId = req.params.id as unknown as GetWalletDto["params"]["id"];
     const wallet = await walletService.getWalletById(walletId);
     if (!wallet) {
       throw new Error("Wallet not found");
@@ -228,8 +212,9 @@ export const updateWallet = async (
   res: Response
 ): Promise<void> => {
   try {
-    const walletId = walletIdSchema.parse(req.params.id);
-    const data = zUpdateWalletDto.parse(req.body);
+    const walletId = req.params
+      .id as unknown as UpdateWalletDto["params"]["id"];
+    const data = req.body;
     const updatedWallet = await walletService.updateWallet(walletId, data);
 
     sendResponse<Wallet>(res, {
@@ -251,7 +236,8 @@ export const deleteWallet = async (
   res: Response
 ): Promise<void> => {
   try {
-    const walletId = walletIdSchema.parse(req.params.id);
+    const walletId = req.params
+      .id as unknown as DeleteWalletDto["params"]["id"];
     await walletService.deleteWallet(walletId);
     sendResponse<null>(res, {
       success: true,
