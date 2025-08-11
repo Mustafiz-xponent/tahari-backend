@@ -91,7 +91,7 @@ export async function getAllSubscriptionPlans(): Promise<SubscriptionPlan[]> {
  */
 export async function getSubscriptionPlanById(
   planId: BigInt
-): Promise<SubscriptionPlan | null> {
+): Promise<SubscriptionPlan> {
   try {
     const subscriptionPlan = await prisma.subscriptionPlan.findUnique({
       where: { planId: Number(planId) },

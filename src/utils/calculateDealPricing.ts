@@ -15,7 +15,7 @@ export interface DealPricingResult {
 }
 /**
  * Calculates the pricing for a product considering both global and product-specific deals.
- * Product-specific deals override global deals if both are active.
+ * Product-specific deals take precedence over global deals if both are active.
  */
 export async function calculateDealPricing(
   product: ProductWithDeal

@@ -12,6 +12,8 @@ import {
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { Payment } from "@/generated/prisma/client";
 
 const paymentIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Payment ID must be a positive integer",
@@ -27,8 +29,10 @@ export const createPayment = async (
   try {
     const data = zCreatePaymentDto.parse(req.body);
     const payment = await paymentService.createPayment(data);
-    res.status(httpStatus.CREATED).json({
+
+    sendResponse<paymentService.PaymentResult>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Payment created successfully",
       data: payment,
     });
@@ -95,13 +99,20 @@ export const handleSSLCommerzIPN = async (
 ): Promise<void> => {
   try {
     await paymentService.handleSSLCommerzSuccess(req.body);
-    res
-      .status(httpStatus.OK)
-      .json({ success: true, message: "IPN received successfully" });
+
+    sendResponse<null>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "IPN received successfully",
+      data: null,
+    });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ success: false, message: "IPN failed" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "IPN failed",
+      data: null,
+    });
   }
 };
 
@@ -114,8 +125,10 @@ export const getAllPayments = async (
 ): Promise<void> => {
   try {
     const payments = await paymentService.getAllPayments();
-    res.json({
+
+    sendResponse<Payment[]>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Payments fetched successfully",
       data: payments,
     });
@@ -137,9 +150,10 @@ export const getPaymentById = async (
     if (!payment) {
       throw new Error("Payment not found");
     }
-    res.json({
+    sendResponse<Payment>(res, {
       success: true,
-      message: "Payment fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Payment retrived successfully",
       data: payment,
     });
   } catch (error) {
@@ -157,11 +171,12 @@ export const updatePayment = async (
   try {
     const paymentId = paymentIdSchema.parse(req.params.id);
     const data = zUpdatePaymentDto.parse(req.body);
-    const updated = await paymentService.updatePayment(paymentId, data);
-    res.json({
+    const updatedPayment = await paymentService.updatePayment(paymentId, data);
+    sendResponse<Payment>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Payment updated successfully",
-      data: updated,
+      data: updatedPayment,
     });
   } catch (error) {
     handleErrorResponse(error, res, "update payment");
@@ -178,8 +193,10 @@ export const deletePayment = async (
   try {
     const paymentId = paymentIdSchema.parse(req.params.id);
     await paymentService.deletePayment(paymentId);
-    res.json({
+
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Payment deleted successfully",
       data: null,
     });

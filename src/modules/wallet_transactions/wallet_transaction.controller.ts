@@ -12,6 +12,8 @@ import {
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { WalletTransaction } from "@/generated/prisma/client";
 
 const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Transaction ID must be a positive integer",
@@ -35,8 +37,10 @@ export const createWalletTransaction = async (
     const transaction = await walletTransactionService.createWalletTransaction(
       data
     );
-    res.status(httpStatus.CREATED).json({
+
+    sendResponse<WalletTransaction>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Wallet transaction created successfully",
       data: transaction,
     });
@@ -55,9 +59,11 @@ export const getAllWalletTransactions = async (
   try {
     const transactions =
       await walletTransactionService.getAllWalletTransactions();
-    res.json({
+
+    sendResponse<WalletTransaction[]>(res, {
       success: true,
-      message: "Wallet transactions fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Wallet transactions retrived successfully",
       data: transactions,
     });
   } catch (error) {
@@ -80,9 +86,10 @@ export const getWalletTransactionById = async (
     if (!transaction) {
       throw new Error("Wallet transaction not found");
     }
-    res.json({
+    sendResponse<WalletTransaction>(res, {
       success: true,
-      message: "Wallet transaction fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Wallet transaction retrived successfully",
       data: transaction,
     });
   } catch (error) {
@@ -115,9 +122,10 @@ export const getCustomerWalletTransactions = async (
       { userId, paginationParams, filterParams }
     );
 
-    res.json({
+    sendResponse<WalletTransaction[]>(res, {
       success: true,
-      message: "Wallet transactions fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Wallet transactions retrived successfully",
       data: result.transactions,
       pagination: {
         currentPage: result.currentPage,
@@ -146,8 +154,10 @@ export const updateWalletTransaction = async (
       transactionId,
       data
     );
-    res.json({
+
+    sendResponse<WalletTransaction>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Wallet transaction updated successfully",
       data: updated,
     });
@@ -166,8 +176,9 @@ export const deleteWalletTransaction = async (
   try {
     const transactionId = transactionIdSchema.parse(req.params.id);
     await walletTransactionService.deleteWalletTransaction(transactionId);
-    res.json({
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Wallet transaction deleted successfully",
       data: null,
     });

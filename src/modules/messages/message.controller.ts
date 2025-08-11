@@ -8,6 +8,8 @@ import * as messageService from "@/modules/messages/message.service";
 import { zCreateMessageDto } from "@/modules/messages/message.dto";
 import { ZodError, z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { Message } from "@/generated/prisma/client";
 
 const messageIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Message ID must be a positive integer",
@@ -22,19 +24,25 @@ export const createMessage = async (
 ): Promise<void> => {
   try {
     const data = zCreateMessageDto.parse(req.body);
-    const _message = await messageService.createMessage(data);
-    res
-      .status(httpStatus.CREATED)
-      .json({ message: "Message created successfully", _message });
+    const message = await messageService.createMessage(data);
+
+    sendResponse<Message>(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "Message created successfully",
+      data: message,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
-    console.error("Error creating message:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to create message" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to create message",
+      data: null,
+    });
   }
 };
 
@@ -64,8 +72,9 @@ export const getAllMessages = async (
       paginationParams,
       receiverId
     );
-    res.status(httpStatus.OK).json({
+    sendResponse<Message[]>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Messages retrieved successfully",
       data: results.messages,
       pagination: {
@@ -81,10 +90,12 @@ export const getAllMessages = async (
       },
     });
   } catch (error) {
-    console.error("Error fetching messages:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to fetch messages" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to fetch messages",
+      data: null,
+    });
   }
 };
 
@@ -102,16 +113,23 @@ export const getMessageById = async (
       res.status(httpStatus.NOT_FOUND).json({ message: "Message not found" });
       return;
     }
-    res.json(message);
+    sendResponse<Message>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Message retrieved successfully",
+      data: message,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
-    console.error("Error fetching message:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to fetch message" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to fetch message",
+      data: null,
+    });
   }
 };
 
@@ -134,15 +152,18 @@ export const updateMessage = async (
       userId,
       userRole
     );
-
-    res.status(httpStatus.OK).json({
+    sendResponse<Message>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Message updated successfully",
       data: updatedMessage,
     });
   } catch (error) {
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
       message: "Failed to update message",
+      data: null,
     });
   }
 };
@@ -160,13 +181,19 @@ export const deleteMessage = async (
     const userRole = req.user?.role;
 
     await messageService.deleteMessage(BigInt(messageId), userId, userRole);
-    res
-      .status(httpStatus.OK)
-      .json({ success: true, message: "Message deleted successfully" });
+    sendResponse<null>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Message deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to delete message" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to delete message",
+      data: null,
+    });
   }
 };
 
@@ -185,15 +212,19 @@ export const sendMessage = async (
       senderId,
       senderRole,
     });
-
-    res.status(httpStatus.CREATED).json({
+    sendResponse<Message>(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
       message: "Message sent successfully",
-      data: result.data,
+      data: result,
     });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to send message" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to send message",
+      data: null,
+    });
   }
 };
 /**
@@ -213,14 +244,18 @@ export const markMessageAsRead = async (
       userRole,
       senderId,
     });
-
-    res.status(httpStatus.OK).json({
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Message marked as read successfully",
+      data: null,
     });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to mark message as read" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to mark message as read",
+      data: null,
+    });
   }
 };

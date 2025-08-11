@@ -7,6 +7,8 @@ import {
 } from "@/modules/farmers/farmer.dto";
 import { ZodError, z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { Farmer } from "@/generated/prisma/client";
 
 const farmerIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Farmer ID must be a positive integer",
@@ -22,18 +24,23 @@ export const createFarmer = async (
   try {
     const data = zCreateFarmerDto.parse(req.body);
     const farmer = await farmerService.createFarmer(data);
-    res
-      .status(httpStatus.CREATED)
-      .json({ message: "Farmer created successfully", farmer });
+    sendResponse<Farmer>(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "Farmer created successfully",
+      data: farmer,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
-    console.error("Error creating farmer:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to create farmer" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to create farmer",
+      data: null,
+    });
   }
 };
 
@@ -46,12 +53,19 @@ export const getAllFarmers = async (
 ): Promise<void> => {
   try {
     const farmers = await farmerService.getAllFarmers();
-    res.json(farmers);
+    sendResponse<Farmer[]>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Farmers retrieved successfully",
+      data: farmers,
+    });
   } catch (error) {
-    console.error("Error fetching farmers:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to fetch farmers" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to fetch farmers",
+      data: null,
+    });
   }
 };
 
@@ -69,12 +83,19 @@ export const getFarmerById = async (
       res.status(httpStatus.NOT_FOUND).json({ message: "Farmer not found" });
       return;
     }
-    res.json(farmer);
+    sendResponse<Farmer>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Farmer retrieved successfully",
+      data: farmer,
+    });
   } catch (error) {
-    console.error("Error fetching farmer:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to fetch farmer" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to fetch farmer",
+      data: null,
+    });
   }
 };
 
@@ -89,16 +110,23 @@ export const updateFarmer = async (
     const farmerId = farmerIdSchema.parse(req.params.id);
     const data = zUpdateFarmerDto.parse(req.body);
     const updated = await farmerService.updateFarmer(farmerId, data);
-    res.json({ message: "Farmer updated successfully", farmer: updated });
+    sendResponse<Farmer>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Farmer updated successfully",
+      data: updated,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
-    console.error("Error updating farmer:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to update farmer" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to update farmer",
+      data: null,
+    });
   }
 };
 
@@ -112,11 +140,18 @@ export const deleteFarmer = async (
   try {
     const farmerId = farmerIdSchema.parse(req.params.id);
     await farmerService.deleteFarmer(farmerId);
-    res.json({ message: "Farmer deleted successfully" });
+    sendResponse<null>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Farmer deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    console.error("Error deleting farmer:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to delete farmer" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to delete farmer",
+      data: null,
+    });
   }
 };

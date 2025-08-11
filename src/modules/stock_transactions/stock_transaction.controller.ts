@@ -10,36 +10,15 @@ import { z } from "zod";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import {
   zCreateStockTransactionArrayDto,
-  zCreateStockTransactionDto,
   zUpdateStockTransactionDto,
 } from "@/modules/stock_transactions/stock_transaction.dto";
 import * as stockTransactionService from "@/modules/stock_transactions/stock_transaction.service";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { StockTransaction } from "@/generated/prisma/client";
 const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Transaction ID must be a positive integer",
 });
-
-// /**
-//  * Create a new stock transaction
-//  */
-// export const createStockTransaction = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const data = zCreateStockTransactionDto.parse(req.body);
-//     const transaction = await stockTransactionService.createStockTransaction(
-//       data
-//     );
-//     res.status(201).json({
-//       success: true,
-//       message: "Stock transaction created successfully",
-//       data: transaction,
-//     });
-//   } catch (error) {
-//     handleErrorResponse(error, res, "create stock transaction");
-//   }
-// };
 
 /**
  * Create stock transaction(s) - always processes array of transactions
@@ -54,13 +33,14 @@ export const createStockTransaction = async (
       data
     );
 
-    res.status(httpStatus.CREATED).json({
+    sendResponse<StockTransaction[]>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: `${transactions.length} stock transaction${
         transactions.length > 1 ? "s" : ""
       } created successfully`,
       data: transactions,
-      count: transactions.length,
+      meta: { count: transactions.length },
     });
   } catch (error) {
     handleErrorResponse(error, res, "create stock transaction");
@@ -77,9 +57,11 @@ export const getAllStockTransactions = async (
   try {
     const transactions =
       await stockTransactionService.getAllStockTransactions();
-    res.json({
+
+    sendResponse<StockTransaction[]>(res, {
       success: true,
-      message: "Stock transactions fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Stock transactions retrieved successfully",
       data: transactions,
     });
   } catch (error) {
@@ -102,9 +84,11 @@ export const getStockTransactionById = async (
     if (!transaction) {
       throw new Error("Stock transaction not found");
     }
-    res.json({
+
+    sendResponse<StockTransaction>(res, {
       success: true,
-      message: "Stock transaction fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Stock transaction retrieved successfully",
       data: transaction,
     });
   } catch (error) {
@@ -126,8 +110,9 @@ export const updateStockTransaction = async (
       transactionId,
       data
     );
-    res.json({
+    sendResponse<StockTransaction>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Stock transaction updated successfully",
       data: updated,
     });
@@ -146,8 +131,10 @@ export const deleteStockTransaction = async (
   try {
     const transactionId = transactionIdSchema.parse(req.params.id);
     await stockTransactionService.deleteStockTransaction(transactionId);
-    res.json({
+
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Stock transaction deleted successfully",
       data: null,
     });

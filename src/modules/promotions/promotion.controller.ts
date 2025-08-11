@@ -69,6 +69,7 @@ export const getPromotionById = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const promotionId = BigInt(req.params.id);
     const promotion = await promotionService.getPromotionById(promotionId);
+
     sendResponse<Promotion>(res, {
       success: true,
       statusCode: httpStatus.OK,
@@ -111,6 +112,7 @@ export const deletePromotion = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const promotionId = BigInt(req.params.id);
     await promotionService.deletePromotion(promotionId);
+
     sendResponse<null>(res, {
       success: true,
       statusCode: httpStatus.OK,

@@ -12,6 +12,8 @@ import {
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { SubscriptionDelivery } from "@/generated/prisma/client";
 
 const deliveryIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Delivery ID must be a positive integer",
@@ -28,8 +30,10 @@ export const createSubscriptionDelivery = async (
     const data = zCreateSubscriptionDeliveryDto.parse(req.body);
     const subscriptionDelivery =
       await subscriptionDeliveryService.createSubscriptionDelivery(data);
-    res.status(httpStatus.CREATED).json({
+
+    sendResponse<SubscriptionDelivery>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Subscription delivery created successfully",
       data: subscriptionDelivery,
     });
@@ -48,9 +52,11 @@ export const getAllSubscriptionDeliveries = async (
   try {
     const subscriptionDeliveries =
       await subscriptionDeliveryService.getAllSubscriptionDeliveries();
-    res.json({
+
+    sendResponse<SubscriptionDelivery[]>(res, {
       success: true,
-      message: "Subscription deliveries fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Subscription deliveries retrieved successfully",
       data: subscriptionDeliveries,
     });
   } catch (error) {
@@ -72,9 +78,10 @@ export const getSubscriptionDeliveryById = async (
     if (!subscriptionDelivery) {
       throw new Error("Subscription delivery not found");
     }
-    res.json({
+    sendResponse<SubscriptionDelivery>(res, {
       success: true,
-      message: "Subscription delivery fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Subscription delivery retrieved successfully",
       data: subscriptionDelivery,
     });
   } catch (error) {
@@ -97,8 +104,9 @@ export const updateSubscriptionDelivery = async (
         deliveryId,
         data
       );
-    res.json({
+    sendResponse<SubscriptionDelivery>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Subscription delivery updated successfully",
       data: updated,
     });
@@ -117,8 +125,10 @@ export const deleteSubscriptionDelivery = async (
   try {
     const deliveryId = deliveryIdSchema.parse(req.params.id);
     await subscriptionDeliveryService.deleteSubscriptionDelivery(deliveryId);
-    res.json({
+
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Subscription delivery deleted successfully",
       data: null,
     });

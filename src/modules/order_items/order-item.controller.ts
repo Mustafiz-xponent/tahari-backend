@@ -13,30 +13,12 @@ import {
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { OrderItem } from "@/generated/prisma/client";
 
 const orderItemIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Order Item ID must be a positive integer",
 });
-
-/**
- * Create a new order item
- */
-// export const createOrderItem = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const data = zCreateOrderItemDto.parse(req.body);
-//     const orderItem = await orderItemService.createOrderItem(data);
-//     res.status(201).json({
-//       success: true,
-//       message: "Order item created successfully",
-//       data: orderItem,
-//     });
-//   } catch (error) {
-//     handleErrorResponse(error, res, "create order item");
-//   }
-// };
 
 export const createOrderItem = async (req: Request, res: Response) => {
   try {
@@ -44,8 +26,9 @@ export const createOrderItem = async (req: Request, res: Response) => {
     if (req.body.items && Array.isArray(req.body.items)) {
       const data = zCreateOrderItemsDto.parse(req.body);
       const items = await orderItemService.createOrderItems(data);
-      res.status(httpStatus.CREATED).json({
+      sendResponse<OrderItem[]>(res, {
         success: true,
+        statusCode: httpStatus.CREATED,
         message: `Created ${items.length} order items`,
         data: items,
       });
@@ -54,8 +37,9 @@ export const createOrderItem = async (req: Request, res: Response) => {
     else {
       const data = zCreateOrderItemDto.parse(req.body);
       const item = await orderItemService.createOrderItem(data);
-      res.status(httpStatus.CREATED).json({
+      sendResponse<OrderItem>(res, {
         success: true,
+        statusCode: httpStatus.CREATED,
         message: "Order item created successfully",
         data: item,
       });
@@ -74,9 +58,10 @@ export const getAllOrderItems = async (
 ): Promise<void> => {
   try {
     const orderItems = await orderItemService.getAllOrderItems();
-    res.json({
+    sendResponse<OrderItem[]>(res, {
       success: true,
-      message: "Order items fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Order items retrieved successfully",
       data: orderItems,
     });
   } catch (error) {
@@ -97,9 +82,10 @@ export const getOrderItemById = async (
     if (!orderItem) {
       throw new Error("Order item not found");
     }
-    res.json({
+    sendResponse<OrderItem>(res, {
       success: true,
-      message: "Order item fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Order item retrieved successfully",
       data: orderItem,
     });
   } catch (error) {
@@ -118,8 +104,9 @@ export const updateOrderItem = async (
     const orderItemId = orderItemIdSchema.parse(req.params.id);
     const data = zUpdateOrderItemDto.parse(req.body);
     const updated = await orderItemService.updateOrderItem(orderItemId, data);
-    res.json({
+    sendResponse<OrderItem>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Order item updated successfully",
       data: updated,
     });
@@ -138,8 +125,9 @@ export const deleteOrderItem = async (
   try {
     const orderItemId = orderItemIdSchema.parse(req.params.id);
     await orderItemService.deleteOrderItem(orderItemId);
-    res.json({
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Order item deleted successfully",
       data: null,
     });

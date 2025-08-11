@@ -65,7 +65,9 @@ export async function createOrderItem(
  * @returns {Promise<Prisma.OrderItem[]>} Created order items
  * @throws {Error} If order or products don't exist
  */
-export async function createOrderItems(data: CreateOrderItemsDto) {
+export async function createOrderItems(
+  data: CreateOrderItemsDto
+): Promise<OrderItem[]> {
   try {
     // Convert all IDs to BigInt for consistent comparison
     const orderId = data.orderId;

@@ -12,6 +12,8 @@ import {
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { OrderTracking } from "@/generated/prisma/client";
 
 const idSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "ID must be a positive integer",
@@ -27,8 +29,9 @@ export const createOrderTracking = async (
   try {
     const data = zCreateOrderTrackingDto.parse(req.body);
     const orderTracking = await orderTrackingService.createOrderTracking(data);
-    res.status(httpStatus.CREATED).json({
+    sendResponse<OrderTracking>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Order tracking created successfully",
       data: orderTracking,
     });
@@ -46,9 +49,10 @@ export const getAllOrderTrackings = async (
 ): Promise<void> => {
   try {
     const orderTrackings = await orderTrackingService.getAllOrderTrackings();
-    res.json({
+    sendResponse<OrderTracking[]>(res, {
       success: true,
-      message: "Order trackings fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Order trackings retrieved successfully",
       data: orderTrackings,
     });
   } catch (error) {
@@ -71,9 +75,10 @@ export const getOrderTrackingsByOrderId = async (
     if (!orderTracking) {
       throw new Error("Order tracking not found");
     }
-    res.json({
+    sendResponse<OrderTracking[]>(res, {
       success: true,
-      message: "Order trackings fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Order trackings retrieved successfully",
       data: orderTracking,
     });
   } catch (error) {
@@ -95,8 +100,9 @@ export const updateOrderTracking = async (
       trackingId,
       data
     );
-    res.json({
+    sendResponse<OrderTracking>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Order tracking updated successfully",
       data: updated,
     });
@@ -115,8 +121,9 @@ export const deleteOrderTracking = async (
   try {
     const trackingId = idSchema.parse(req.params.id);
     await orderTrackingService.deleteOrderTracking(trackingId);
-    res.json({
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Order tracking deleted successfully",
       data: null,
     });

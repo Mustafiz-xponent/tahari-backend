@@ -7,6 +7,8 @@ import { Request, Response } from "express";
 import * as notificationService from "@/modules/notifications/notification.service";
 import { ZodError, z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { Notification } from "@/generated/prisma/client";
 
 const notificationIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Notification ID must be a positive integer",
@@ -27,15 +29,19 @@ export const createNotification = async (
       receiverId,
       type,
     });
-    res.status(httpStatus.CREATED).json({
+    sendResponse<Notification>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Notification created successfully",
       data: notification,
     });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to create notification" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to create notification",
+      data: null,
+    });
   }
 };
 
@@ -48,12 +54,19 @@ export const getAllNotifications = async (
 ): Promise<void> => {
   try {
     const notifications = await notificationService.getAllNotifications();
-    res.json(notifications);
+    sendResponse<Notification[]>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Notifications retrieved successfully",
+      data: notifications,
+    });
   } catch (error) {
-    console.error("Error fetching notifications:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to fetch notifications" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to fetch notifications",
+      data: null,
+    });
   }
 };
 /**
@@ -78,9 +91,9 @@ export const getUserNotifications = async (
       BigInt(userId),
       paginationParams
     );
-
-    res.status(httpStatus.OK).json({
+    sendResponse<Notification[]>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Notifications retrieved successfully",
       data: result.notifications,
       pagination: {
@@ -97,10 +110,12 @@ export const getUserNotifications = async (
       },
     });
   } catch (error) {
-    console.error("Error fetching notifications:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to fetch notifications" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to fetch notifications",
+      data: null,
+    });
   }
 };
 /**
@@ -121,16 +136,23 @@ export const getNotificationById = async (
         .json({ message: "Notification not found" });
       return;
     }
-    res.json(notification);
+    sendResponse<Notification>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Notification retrieved successfully",
+      data: notification,
+    });
   } catch (error) {
     if (error instanceof ZodError) {
       res.status(httpStatus.BAD_REQUEST).json({ errors: error.flatten() });
       return;
     }
-    console.error("Error fetching notification:", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to fetch notification" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to fetch notification",
+      data: null,
+    });
   }
 };
 
@@ -149,16 +171,19 @@ export const updateNotification = async (
       BigInt(notificationId),
       data
     );
-
-    res.status(httpStatus.OK).json({
+    sendResponse<Notification>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Notification updated successfully",
       data: updatedNotification,
     });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to update notification" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to update notification",
+      data: null,
+    });
   }
 };
 
@@ -172,11 +197,19 @@ export const deleteNotification = async (
   try {
     const notificationId = req.params.id;
     await notificationService.deleteNotification(BigInt(notificationId));
-    res.json({ message: "Notification deleted successfully" });
+    sendResponse<null>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Notification deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ success: false, message: "Failed to delete notification" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to delete notification",
+      data: null,
+    });
   }
 };
 /**
@@ -192,9 +225,12 @@ export const markNotificationAsReadById = async (
     userId,
     BigInt(notificationId)
   );
-  res
-    .status(httpStatus.OK)
-    .json({ success: true, message: "Notification marked as read" });
+  sendResponse<null>(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Notification marked as read",
+    data: null,
+  });
 };
 
 /**
@@ -207,13 +243,19 @@ export const markAllNotificationsAsRead = async (
   try {
     const userId = req.user?.userId;
     await notificationService.markAllNotificationsAsRead(userId);
-    res
-      .status(httpStatus.OK)
-      .json({ success: true, message: "All notifications marked as read" });
+    sendResponse<null>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "All notifications marked as read",
+      data: null,
+    });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to mark notifications as read" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to mark notifications as read",
+      data: null,
+    });
   }
 };
 
@@ -227,12 +269,18 @@ export const markAllNotificationsAsSeen = async (
   try {
     const userId = req.user?.userId;
     await notificationService.markAllNotificationsAsSeen(userId);
-    res
-      .status(httpStatus.OK)
-      .json({ success: true, message: "All notifications marked as seen" });
+    sendResponse<null>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "All notifications marked as seen",
+      data: null,
+    });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to mark notifications as seen" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to mark notifications as seen",
+      data: null,
+    });
   }
 };

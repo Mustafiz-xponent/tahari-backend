@@ -12,6 +12,9 @@ import {
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { Wallet } from "@/generated/prisma/client";
+import { IDepositData } from "@/modules/wallets/wallet.interface";
 
 const walletIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Wallet ID must be a positive integer",
@@ -27,8 +30,10 @@ export const createWallet = async (
   try {
     const data = zCreateWalletDto.parse(req.body);
     const wallet = await walletService.createWallet(data);
-    res.status(httpStatus.CREATED).json({
+
+    sendResponse<Wallet>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Wallet created successfully",
       data: wallet,
     });
@@ -62,8 +67,9 @@ export const initiateWalletDeposit = async (
       amount: parseFloat(amount),
     });
 
-    res.status(httpStatus.OK).json({
+    sendResponse<IDepositData>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Deposit initiated successfully",
       data: depositData,
     });
@@ -149,9 +155,11 @@ export const getAllWallets = async (
 ): Promise<void> => {
   try {
     const wallets = await walletService.getAllWallets();
-    res.json({
+
+    sendResponse<Wallet[]>(res, {
       success: true,
-      message: "Wallets fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Wallets retrived successfully",
       data: wallets,
     });
   } catch (error) {
@@ -173,9 +181,11 @@ export const getCustomerWalletBalanace = async (
     if (!wallet) {
       throw new Error("Wallet not found");
     }
-    res.json({
+
+    sendResponse<Wallet>(res, {
       success: true,
-      message: "Wallet fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Wallet retrived successfully",
       data: wallet,
     });
   } catch (error) {
@@ -195,9 +205,11 @@ export const getWalletById = async (
     if (!wallet) {
       throw new Error("Wallet not found");
     }
-    res.json({
+
+    sendResponse<Wallet>(res, {
       success: true,
-      message: "Wallet fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Wallet retrived successfully",
       data: wallet,
     });
   } catch (error) {
@@ -215,11 +227,13 @@ export const updateWallet = async (
   try {
     const walletId = walletIdSchema.parse(req.params.id);
     const data = zUpdateWalletDto.parse(req.body);
-    const updated = await walletService.updateWallet(walletId, data);
-    res.json({
+    const updatedWallet = await walletService.updateWallet(walletId, data);
+
+    sendResponse<Wallet>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Wallet updated successfully",
-      data: updated,
+      data: updatedWallet,
     });
   } catch (error) {
     handleErrorResponse(error, res, "update wallet");
@@ -236,8 +250,9 @@ export const deleteWallet = async (
   try {
     const walletId = walletIdSchema.parse(req.params.id);
     await walletService.deleteWallet(walletId);
-    res.json({
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Wallet deleted successfully",
       data: null,
     });

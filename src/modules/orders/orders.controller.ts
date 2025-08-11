@@ -8,8 +8,9 @@ import * as orderService from "@/modules/orders/orders.service";
 import { zCreateOrderDto, zUpdateOrderDto } from "@/modules/orders/orders.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
-import { OrderStatus } from "@/generated/prisma/client";
+import { Order, OrderStatus } from "@/generated/prisma/client";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
 
 const orderIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Order ID must be a positive integer",
@@ -25,8 +26,10 @@ export const createOrder = async (
   try {
     const data = zCreateOrderDto.parse(req.body);
     const order = await orderService.createOrder(data);
-    res.status(httpStatus.CREATED).json({
+
+    sendResponse<Order>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Order created successfully",
       data: order,
     });
@@ -65,9 +68,9 @@ export const getAllOrders = async (
     // TODO: add pagination & filter functionality
 
     const orders = await orderService.getAllOrders();
-
-    res.json({
+    sendResponse<Order[]>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Orders fetched successfully",
       data: orders,
     });
@@ -89,9 +92,10 @@ export const getOrderById = async (
     if (!order) {
       throw new Error("Order not found");
     }
-    res.json({
+    sendResponse<Order>(res, {
       success: true,
-      message: "Order fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Order retrived successfully",
       data: order,
     });
   } catch (error) {
@@ -110,8 +114,10 @@ export const updateOrder = async (
     const orderId = orderIdSchema.parse(req.params.id);
     const data = zUpdateOrderDto.parse(req.body);
     const updated = await orderService.updateOrder(orderId, data);
-    res.json({
+
+    sendResponse<Order>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Order updated successfully",
       data: updated,
     });
@@ -130,8 +136,10 @@ export const deleteOrder = async (
   try {
     const orderId = orderIdSchema.parse(req.params.id);
     await orderService.deleteOrder(orderId);
-    res.json({
+
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Order deleted successfully",
       data: null,
     });
@@ -174,9 +182,10 @@ export const getCustomerOrders = async (
       skip,
     });
 
-    res.status(httpStatus.OK).json({
+    sendResponse<Order[]>(res, {
       success: true,
-      message: "Customer orders fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Customer orders retrived successfully",
       data: result.orders,
       pagination: {
         currentPage: result.currentPage,

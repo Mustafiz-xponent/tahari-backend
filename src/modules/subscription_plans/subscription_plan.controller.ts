@@ -12,6 +12,8 @@ import {
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { SubscriptionPlan } from "@/generated/prisma/client";
 const planIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Plan ID must be a positive integer",
 });
@@ -26,8 +28,10 @@ export const createSubscriptionPlan = async (
   try {
     const data = zCreateSubscriptionPlanDto.parse(req.body);
     const plan = await subscriptionPlanService.createSubscriptionPlan(data);
-    res.status(httpStatus.CREATED).json({
+
+    sendResponse<SubscriptionPlan>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Subscription plan created successfully",
       data: plan,
     });
@@ -45,9 +49,11 @@ export const getAllSubscriptionPlans = async (
 ): Promise<void> => {
   try {
     const plans = await subscriptionPlanService.getAllSubscriptionPlans();
-    res.json({
+
+    sendResponse<SubscriptionPlan[]>(res, {
       success: true,
-      message: "Subscription plans fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Subscription plans retrived successfully",
       data: plans,
     });
   } catch (error) {
@@ -66,9 +72,10 @@ export const getSubscriptionPlanById = async (
     const planId = planIdSchema.parse(req.params.id);
     const plan = await subscriptionPlanService.getSubscriptionPlanById(planId);
 
-    res.json({
+    sendResponse<SubscriptionPlan>(res, {
       success: true,
-      message: "Subscription plan fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Subscription plan retrived successfully",
       data: plan,
     });
   } catch (error) {
@@ -90,8 +97,10 @@ export const updateSubscriptionPlan = async (
       planId,
       data
     );
-    res.json({
+
+    sendResponse<SubscriptionPlan>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Subscription plan updated successfully",
       data: updated,
     });
@@ -110,9 +119,12 @@ export const deleteSubscriptionPlan = async (
   try {
     const planId = planIdSchema.parse(req.params.id);
     await subscriptionPlanService.deleteSubscriptionPlan(planId);
-    res.json({
+
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Subscription plan deleted successfully",
+      data: null,
     });
   } catch (error) {
     handleErrorResponse(error, res, "delete subscription plan");

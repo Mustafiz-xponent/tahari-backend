@@ -12,6 +12,7 @@ import {
   createNotification,
   validateSSLCommerzPayment,
 } from "@/utils/processPayment";
+import { IDepositData } from "@/modules/wallets/wallet.interface";
 
 /**
  * Create a new wallet
@@ -47,7 +48,7 @@ export async function initiateDeposit({
 }: {
   userId: number;
   amount: number;
-}): Promise<{ walletTransaction: WalletTransaction; redirectUrl: string }> {
+}): Promise<IDepositData> {
   try {
     // Get customer details
     const customer = await prisma.customer.findUnique({

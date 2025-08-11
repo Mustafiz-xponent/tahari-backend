@@ -329,7 +329,7 @@ export const sendMessage = async ({
   receiverId,
   senderId,
   senderRole,
-}: SendMessagePayload) => {
+}: SendMessagePayload): Promise<Message> => {
   try {
     // Customer ➜ Support broadcast
     if (senderRole === UserRole.CUSTOMER && !receiverId) {
@@ -359,7 +359,7 @@ export const sendMessage = async ({
         io.to(customerSocket).emit("newMessage", msg);
       }
 
-      return { data: msg };
+      return msg;
     }
 
     //  Support/Admin/SuperAdmin --> Customer direct message
@@ -414,9 +414,9 @@ export const sendMessage = async ({
         io.to(socketId).emit("newMessage", msg);
       });
 
-      return { data: msg };
+      return msg;
     }
-    return { data: null };
+    throw new Error("Invalid sender or receiver");
   } catch (error) {
     throw new Error(`Failed to send message: ${getErrorMessage(error)}`);
   }

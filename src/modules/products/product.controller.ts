@@ -16,6 +16,7 @@ import {
 import * as productService from "@/modules/products/product.service";
 import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
+import { Product } from "@/generated/prisma/client";
 
 const productIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Product ID must be a positive integer",
@@ -45,8 +46,10 @@ export const createProduct = [
         imageFiles,
         true
       );
-      res.status(httpStatus.CREATED).json({
+
+      sendResponse<Product>(res, {
         success: true,
+        statusCode: httpStatus.CREATED,
         message: "Product created successfully",
         data: product,
       });
@@ -79,8 +82,9 @@ export const getAllProducts = async (
       filters
     );
 
-    res.json({
+    sendResponse<Product[]>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Products retrieved successfully",
       data: result.products,
       pagination: {
@@ -120,9 +124,9 @@ export const getProductByName = async (
       });
       return;
     }
-
-    res.json({
+    sendResponse<productService.ProductWithAccessibleImages[]>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Product retrieved successfully",
       data: product,
     });
@@ -152,8 +156,9 @@ export const getProductById = async (
       });
       return;
     }
-    res.json({
+    sendResponse<Product>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Product retrieved successfully",
       data: product,
     });
@@ -191,8 +196,9 @@ export const updateProduct = [
         imageFiles,
         replaceImages
       );
-      res.json({
+      sendResponse<Product>(res, {
         success: true,
+        statusCode: httpStatus.OK,
         message: "Product updated successfully",
         data: updated,
       });
@@ -212,9 +218,12 @@ export const deleteProduct = async (
   try {
     const productId = productIdSchema.parse(req.params.id);
     await productService.deleteProduct(productId);
-    res.json({
+
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Product deleted successfully",
+      data: null,
     });
   } catch (error) {
     handleErrorResponse(error, res, "delete product");

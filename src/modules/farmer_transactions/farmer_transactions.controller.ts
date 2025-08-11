@@ -12,6 +12,8 @@ import {
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { FarmerTransaction } from "@/generated/prisma/client";
 
 const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Transaction ID must be a positive integer",
@@ -35,8 +37,9 @@ export const createFarmerTransaction = async (
     const transaction = await farmerTransactionService.createFarmerTransaction(
       data
     );
-    res.status(httpStatus.CREATED).json({
+    sendResponse<FarmerTransaction>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Farmer transaction created successfully",
       data: transaction,
     });
@@ -55,8 +58,10 @@ export const getAllFarmerTransactions = async (
   try {
     const transactions =
       await farmerTransactionService.getAllFarmerTransactions();
-    res.json({
+
+    sendResponse<FarmerTransaction[]>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Farmer transactions retrieved successfully",
       data: transactions,
     });

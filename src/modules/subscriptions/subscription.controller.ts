@@ -7,9 +7,10 @@ import { Request, Response } from "express";
 import * as subscriptionService from "@/modules/subscriptions/subscription.service";
 import { zUpdateSubscriptionDto } from "@/modules/subscriptions/subscription.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
-import { bigint, z } from "zod";
+import { z } from "zod";
 import httpStatus from "http-status";
-import { SubscriptionStatus } from "@/generated/prisma/client";
+import { Subscription, SubscriptionStatus } from "@/generated/prisma/client";
+import sendResponse from "@/utils/sendResponse";
 
 const subscriptionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Subscription ID must be a positive integer",
@@ -34,8 +35,10 @@ export const createSubscription = async (
       userId,
       data
     );
-    res.status(httpStatus.CREATED).json({
+
+    sendResponse<Subscription>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Subscription created successfully",
       data: subscription,
     });
@@ -53,9 +56,11 @@ export const getAllSubscriptions = async (
 ): Promise<void> => {
   try {
     const subscriptions = await subscriptionService.getAllSubscriptions();
-    res.json({
+
+    sendResponse<Subscription[]>(res, {
       success: true,
-      message: "Subscriptions fetched successfully",
+      statusCode: httpStatus.OK,
+      message: "Subscriptions retrived successfully",
       data: subscriptions,
     });
   } catch (error) {
@@ -76,8 +81,9 @@ export const getSubscriptionById = async (
       subscriptionId
     );
 
-    res.json({
+    sendResponse<Subscription>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Subscription retrived successfully",
       data: subscription,
     });
@@ -109,8 +115,9 @@ export const getCustomerSubscriptions = async (
       status
     );
 
-    res.json({
+    sendResponse<Subscription[]>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Subscription retrived successfully",
       data: result.subscriptions,
       pagination: {
@@ -140,8 +147,9 @@ export const updateSubscription = async (
       subscriptionId,
       data
     );
-    res.json({
+    sendResponse<Subscription>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Subscription updated successfully",
       data: updated,
     });
@@ -163,8 +171,9 @@ export const pauseSubscription = async (
       BigInt(subscriptionId),
       userId
     );
-    res.json({
+    sendResponse<Subscription>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Subscription paused successfully",
       data: subscription,
     });
@@ -186,8 +195,9 @@ export const cancelSubscription = async (
       BigInt(subscriptionId),
       userId
     );
-    res.json({
+    sendResponse<Subscription>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Subscription cancelled successfully",
       data: subscription,
     });
@@ -209,8 +219,9 @@ export const resumeSubscription = async (
       BigInt(subscriptionId),
       userId
     );
-    res.json({
+    sendResponse<Subscription>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Subscription resumed successfully",
       data: subscription,
     });
@@ -228,8 +239,9 @@ export const deleteSubscription = async (
   try {
     const subscriptionId = subscriptionIdSchema.parse(req.params.id);
     await subscriptionService.deleteSubscription(subscriptionId);
-    res.json({
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Subscription deleted successfully",
       data: null,
     });

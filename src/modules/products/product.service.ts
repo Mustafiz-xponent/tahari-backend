@@ -18,14 +18,14 @@ import {
   UpdateProductDto,
 } from "@/modules/products/product.dto";
 import logger from "@/utils/logger";
-import { Decimal } from "@/generated/prisma/client/runtime/library";
 import {
   calculateDealPricing,
   DealPricingResult,
 } from "@/utils/calculateDealPricing";
 
 // Add interface for product with accessible URLs
-interface ProductWithAccessibleImages extends Omit<Product, "imageUrls"> {
+export interface ProductWithAccessibleImages
+  extends Omit<Product, "imageUrls"> {
   imageUrls: string[];
   accessibleImageUrls?: string[];
 }

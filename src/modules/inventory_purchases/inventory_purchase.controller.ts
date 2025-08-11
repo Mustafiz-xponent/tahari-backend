@@ -12,6 +12,8 @@ import {
 import { z } from "zod";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import httpStatus from "http-status";
+import sendResponse from "@/utils/sendResponse";
+import { InventoryPurchase } from "@/generated/prisma/client";
 
 const purchaseIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Purchase ID must be a positive integer",
@@ -29,8 +31,9 @@ export const createInventoryPurchase = async (
     const purchase = await inventoryPurchaseService.createInventoryPurchase(
       data
     );
-    res.status(httpStatus.CREATED).json({
+    sendResponse<InventoryPurchase>(res, {
       success: true,
+      statusCode: httpStatus.CREATED,
       message: "Inventory purchase created successfully",
       data: purchase,
     });
@@ -48,8 +51,9 @@ export const getAllInventoryPurchases = async (
 ): Promise<void> => {
   try {
     const purchases = await inventoryPurchaseService.getAllInventoryPurchases();
-    res.json({
+    sendResponse<InventoryPurchase[]>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Inventory purchases retrieved successfully",
       data: purchases,
     });
@@ -73,8 +77,9 @@ export const getInventoryPurchaseById = async (
     if (!purchase) {
       throw new Error("Inventory purchase not found");
     }
-    res.json({
+    sendResponse<InventoryPurchase>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Inventory purchase retrieved successfully",
       data: purchase,
     });
@@ -93,14 +98,13 @@ export const updateInventoryPurchase = async (
   try {
     const purchaseId = purchaseIdSchema.parse(req.params.id);
     const data = zUpdateInventoryPurchaseDto.parse(req.body);
-    const updated = await inventoryPurchaseService.updateInventoryPurchase(
-      purchaseId,
-      data
-    );
-    res.json({
+    const updatedInventoryPurchase =
+      await inventoryPurchaseService.updateInventoryPurchase(purchaseId, data);
+    sendResponse<InventoryPurchase>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Inventory purchase updated successfully",
-      data: updated,
+      data: updatedInventoryPurchase,
     });
   } catch (error) {
     handleErrorResponse(error, res, "update inventory purchase");
@@ -117,9 +121,11 @@ export const deleteInventoryPurchase = async (
   try {
     const purchaseId = purchaseIdSchema.parse(req.params.id);
     await inventoryPurchaseService.deleteInventoryPurchase(purchaseId);
-    res.json({
+    sendResponse<null>(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: "Inventory purchase deleted successfully",
+      data: null,
     });
   } catch (error) {
     handleErrorResponse(error, res, "delete inventory purchase");
