@@ -5,20 +5,17 @@ import {
   GetWalletDto,
   UpdateWalletDto,
 } from "@/modules/wallets/wallet.dto";
-import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
 import { Wallet } from "@/generated/prisma/client";
 import { WalletDepositeResult } from "@/modules/wallets/wallet.interface";
+import asyncHandler from "@/utils/asyncHandler";
 
 /**
  * Create a new wallet
  */
-export const createWallet = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const createWallet = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const wallet = await walletService.createWallet(req.body);
 
     sendResponse<Wallet>(res, {
@@ -27,19 +24,14 @@ export const createWallet = async (
       message: "Wallet created successfully",
       data: wallet,
     });
-  } catch (error) {
-    handleErrorResponse(error, res, "create wallet");
   }
-};
+);
 
 /**
  * Initiate wallet deposit
  */
-export const initiateWalletDeposit = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const initiateWalletDeposit = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const { amount } = req.body;
     const userId = req.user?.userId;
 
@@ -54,10 +46,8 @@ export const initiateWalletDeposit = async (
       message: "Deposit initiated successfully",
       data: depositData,
     });
-  } catch (error) {
-    handleErrorResponse(error, res, "initiate wallet deposit");
   }
-};
+);
 /**
  * Handle SSLCommerz success callback
  */
@@ -136,11 +126,8 @@ export const handleSslCommerzIPN = async (
 /**
  * Get all wallets
  */
-export const getAllWallets = async (
-  _req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const getAllWallets = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const wallets = await walletService.getAllWallets();
 
     sendResponse<Wallet[]>(res, {
@@ -149,19 +136,14 @@ export const getAllWallets = async (
       message: "Wallets retrived successfully",
       data: wallets,
     });
-  } catch (error) {
-    handleErrorResponse(error, res, "fetch wallets");
   }
-};
+);
 
 /**
  * Get a customer wallet balance
  */
-export const getCustomerWalletBalanace = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const getCustomerWalletBalanace = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const wallet = await walletService.getCustomerWalletBalanace(
       BigInt(req?.user?.userId!)
     );
@@ -175,23 +157,15 @@ export const getCustomerWalletBalanace = async (
       message: "Wallet retrived successfully",
       data: wallet,
     });
-  } catch (error) {
-    handleErrorResponse(error, res, "fetch wallet");
   }
-};
+);
 /**
  * Get a single wallet by ID
  */
-export const getWalletById = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const getWalletById = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const walletId = req.params.id as unknown as GetWalletDto["params"]["id"];
     const wallet = await walletService.getWalletById(walletId);
-    if (!wallet) {
-      throw new Error("Wallet not found");
-    }
 
     sendResponse<Wallet>(res, {
       success: true,
@@ -199,19 +173,14 @@ export const getWalletById = async (
       message: "Wallet retrived successfully",
       data: wallet,
     });
-  } catch (error) {
-    handleErrorResponse(error, res, "fetch wallet");
   }
-};
+);
 
 /**
  * Update a wallet by ID
  */
-export const updateWallet = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const updateWallet = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const walletId = req.params
       .id as unknown as UpdateWalletDto["params"]["id"];
     const data = req.body;
@@ -223,29 +192,23 @@ export const updateWallet = async (
       message: "Wallet updated successfully",
       data: updatedWallet,
     });
-  } catch (error) {
-    handleErrorResponse(error, res, "update wallet");
   }
-};
+);
 
 /**
  * Delete a wallet by ID
  */
-export const deleteWallet = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deleteWallet = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const walletId = req.params
       .id as unknown as DeleteWalletDto["params"]["id"];
     await walletService.deleteWallet(walletId);
+
     sendResponse<null>(res, {
       success: true,
       statusCode: httpStatus.OK,
       message: "Wallet deleted successfully",
       data: null,
     });
-  } catch (error) {
-    handleErrorResponse(error, res, "delete wallet");
   }
-};
+);

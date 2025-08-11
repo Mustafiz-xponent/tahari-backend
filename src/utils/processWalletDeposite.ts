@@ -2,6 +2,8 @@ import axios from "axios";
 import prisma from "@/prisma-client/prismaClient";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { WalletDepositeResult } from "@/modules/wallets/wallet.interface";
+import { AppError } from "@/utils/appError";
+import httpStatus from "http-status";
 
 /**
  * Process payment through SSLCommerz
@@ -22,10 +24,11 @@ export async function processSSLCommerzWalletDeposite(
 
     // Validate SSLCommerz response
     if (!sslcommerzResponse || sslcommerzResponse.status !== "SUCCESS") {
-      throw new Error(
+      throw new AppError(
         `SSLCommerz initialization failed: ${
           sslcommerzResponse?.failedreason || "Unknown error"
-        }`
+        }`,
+        httpStatus.INTERNAL_SERVER_ERROR
       );
     }
     // Create pending wallet transaction
@@ -43,7 +46,7 @@ export async function processSSLCommerzWalletDeposite(
       redirectUrl: sslcommerzResponse.redirectGatewayURL,
     };
   } catch (error) {
-    throw new Error(`SSLCommerz payment failed: ${getErrorMessage(error)}`);
+    throw error;
   }
 }
 
@@ -63,7 +66,10 @@ async function initializeSSLCommerzPayment(data: {
       !process.env.SSLCOMMERZ_STORE_ID ||
       !process.env.SSLCOMMERZ_STORE_PASSWD
     ) {
-      throw new Error("SSLCommerz credentials not configured");
+      throw new AppError(
+        "SSLCommerz credentials not configured",
+        httpStatus.INTERNAL_SERVER_ERROR
+      );
     }
 
     // Determine the base URL based on environment
@@ -140,27 +146,41 @@ async function initializeSSLCommerzPayment(data: {
     if (axios.isAxiosError(error)) {
       // Handle specific HTTP errors
       if (error.response?.status === 400) {
-        throw new Error(
+        throw new AppError(
           `SSLCommerz API Bad Request: ${
             error.response.data?.failedreason || "Invalid request parameters"
-          }`
+          }`,
+          httpStatus.BAD_REQUEST
         );
       } else if (error.response?.status === 401) {
-        throw new Error(
-          "SSLCommerz API Authentication failed: Invalid store credentials"
+        throw new AppError(
+          "SSLCommerz API Authentication failed: Invalid store credentials",
+          httpStatus.UNAUTHORIZED
         );
       } else if (error.response?.status! >= 500) {
-        throw new Error("SSLCommerz API server error: Please try again later");
+        throw new AppError(
+          "SSLCommerz API server error: Please try again later",
+          httpStatus.INTERNAL_SERVER_ERROR
+        );
       } else {
-        throw new Error(`SSLCommerz API request failed: ${error.message}`);
+        throw new AppError(
+          `SSLCommerz API request failed: ${error.message}`,
+          httpStatus.INTERNAL_SERVER_ERROR
+        );
       }
     }
     const code = (error as any).code;
     // Handle network errors
     if (code === "ECONNABORTED") {
-      throw new Error("SSLCommerz API timeout: Request took too long");
+      throw new AppError(
+        "SSLCommerz API timeout: Request took too long",
+        httpStatus.INTERNAL_SERVER_ERROR
+      );
     } else if (code === "ENOTFOUND" || code === "ECONNREFUSED") {
-      throw new Error("SSLCommerz API connection failed: Network error");
+      throw new AppError(
+        "SSLCommerz API connection failed: Network error",
+        httpStatus.INTERNAL_SERVER_ERROR
+      );
     }
     throw error;
   }
