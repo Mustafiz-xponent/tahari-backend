@@ -1,6 +1,6 @@
 import { WalletTransaction } from "@/generated/prisma/client";
 
-export interface IDepositData {
+export interface WalletDepositeResult {
   walletTransaction: WalletTransaction;
   redirectUrl: string;
 }

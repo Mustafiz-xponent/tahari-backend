@@ -1,7 +1,7 @@
-import prisma from "@/prisma-client/prismaClient";
 import axios from "axios";
+import prisma from "@/prisma-client/prismaClient";
 import { getErrorMessage } from "@/utils/errorHandler";
-import { IDepositData } from "@/modules/wallets/wallet.interface";
+import { WalletDepositeResult } from "@/modules/wallets/wallet.interface";
 
 /**
  * Process payment through SSLCommerz
@@ -9,7 +9,7 @@ import { IDepositData } from "@/modules/wallets/wallet.interface";
 export async function processSSLCommerzWalletDeposite(
   customer: any,
   amount: number
-): Promise<IDepositData> {
+): Promise<WalletDepositeResult> {
   try {
     // Initialize SSLCommerz payment
     const sslcommerzResponse = await initializeSSLCommerzPayment({

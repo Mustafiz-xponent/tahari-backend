@@ -6,6 +6,7 @@ import { status } from "http-status";
 import { User } from "@/generated/prisma/client";
 import { Socket } from "socket.io";
 import logger from "@/utils/logger";
+import sendResponse from "@/utils/sendResponse";
 
 // Auth middleware check if user is authenticated
 export const authMiddleware: RequestHandler = async (
@@ -15,9 +16,12 @@ export const authMiddleware: RequestHandler = async (
 ) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) {
-    res
-      .status(status.UNAUTHORIZED)
-      .json({ success: false, message: "No token provided" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: status.UNAUTHORIZED,
+      message: "No token provided",
+      data: null,
+    });
     return;
   }
   const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
@@ -29,9 +33,11 @@ export const authMiddleware: RequestHandler = async (
   });
 
   if (!user) {
-    res.status(status.UNAUTHORIZED).json({
-      succes: false,
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: status.UNAUTHORIZED,
       message: "User no longer exists. Please login again.",
+      data: null,
     });
     return;
   }
@@ -47,9 +53,11 @@ export const authMiddleware: RequestHandler = async (
 export const authorizeRoles = (...roles: UserRole[]): RequestHandler => {
   return (req, res, next) => {
     if (!roles.includes(req.user?.role as UserRole)) {
-      res.status(status.FORBIDDEN).json({
+      sendResponse<null>(res, {
         success: false,
+        statusCode: status.FORBIDDEN,
         message: "You are not permitted to access this resource",
+        data: null,
       });
       return;
     }

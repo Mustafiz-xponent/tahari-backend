@@ -77,8 +77,12 @@ export const zCreateDealDto = {
       }
     ),
 };
-export type CreateDealDto = z.infer<typeof zCreateDealDto.body>;
-
+// Inferred types
+type CreateDealBodyDto = z.infer<typeof zCreateDealDto.body>;
+// Combined type for usage
+export type CreateDealDto = {
+  body: CreateDealBodyDto;
+};
 /*
  ** Schema: Get All Deals (Query Parameters)
  ** Includes pagination, sorting
@@ -91,7 +95,10 @@ export const zGetAllDealsDto = {
     isActive: z.coerce.boolean().optional(),
   }),
 };
-export type GetAllDealsQueryDto = z.infer<typeof zGetAllDealsDto.query>;
+type GetAllDealsQueryDto = z.infer<typeof zGetAllDealsDto.query>;
+export type GetAllDealsDto = {
+  query: GetAllDealsQueryDto;
+};
 
 /*
  **   Schema: Get Single Deal by ID (Route Param)
@@ -101,10 +108,15 @@ export const zGetDealDto = {
     id: zBigIntId("Deal ID"),
   }),
 };
-/*
- ** Schema: Update Deal
- ** All fields optional, but validated similarly to creation
- */
+
+type GetDealParamsDto = z.infer<typeof zGetDealDto.params>;
+export type GetDealDto = {
+  params: GetDealParamsDto;
+};
+/**
+ * Schema: Update Deal
+ * @description All fields optional, but validated similarly to creation
+ **/
 export const zUpdateDealDto = {
   params: z.object({
     id: zBigIntId("Deal ID"),
@@ -171,8 +183,12 @@ export const zUpdateDealDto = {
       }
     ),
 };
-
-export type UpdateDealDto = z.infer<typeof zUpdateDealDto.body>;
+type updateDealParamsDto = z.infer<typeof zUpdateDealDto.params>;
+type UpdateDealBodyDto = z.infer<typeof zUpdateDealDto.body>;
+export type UpdateDealDto = {
+  params: updateDealParamsDto;
+  body: UpdateDealBodyDto;
+};
 /*
  ** Schema: Delete Deal by ID (Route Param)
  */
@@ -180,4 +196,9 @@ export const zDeleteDealDto = {
   params: z.object({
     id: zBigIntId("Deal ID"),
   }),
+};
+
+type DeleteDealParamsDto = z.infer<typeof zDeleteDealDto.params>;
+export type DeleteDealDto = {
+  params: DeleteDealParamsDto;
 };

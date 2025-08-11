@@ -118,9 +118,11 @@ export const getProductByName = async (
     );
 
     if (!product) {
-      res.status(httpStatus.NOT_FOUND).json({
+      sendResponse<null>(res, {
         success: false,
+        statusCode: httpStatus.NOT_FOUND,
         message: "Product not found",
+        data: null,
       });
       return;
     }
@@ -150,9 +152,11 @@ export const getProductById = async (
       includeRelations
     );
     if (!product) {
-      res.status(httpStatus.NOT_FOUND).json({
+      sendResponse<null>(res, {
         success: false,
+        statusCode: httpStatus.NOT_FOUND,
         message: "Product not found",
+        data: null,
       });
       return;
     }

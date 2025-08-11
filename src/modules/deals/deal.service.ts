@@ -14,7 +14,7 @@ import { processProductsWithAccessibleUrls } from "@/utils/fileUpload/s3Aws";
  * - Accepts deal data in `CreateDealDto`
  * - Returns the created deal
  */
-export async function createDeal(data: CreateDealDto): Promise<Deal> {
+export async function createDeal(data: CreateDealDto["body"]): Promise<Deal> {
   if (data.isGlobal) {
     const existingGlobalDeal = await prisma.deal.findFirst({
       where: {
@@ -175,7 +175,7 @@ export async function getDealById(dealId: bigint): Promise<DealWithProducts> {
  */
 export async function updateDeal(
   dealId: bigint,
-  data: UpdateDealDto
+  data: UpdateDealDto["body"]
 ): Promise<Deal> {
   const existingDeal = await prisma.deal.findUnique({ where: { dealId } });
 

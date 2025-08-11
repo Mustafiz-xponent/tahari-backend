@@ -35,6 +35,7 @@ import { rateLimiter } from "@/middlewares/rateLimiter";
 import { globalErrorHandler } from "@/middlewares/errorHandler";
 import cors from "cors";
 import { initJobs } from "@/jobs";
+import sendResponse from "@/utils/sendResponse";
 
 dotenv.config();
 
@@ -87,17 +88,20 @@ app.use("/api/deals", dealRoutes);
 
 // Health check route
 app.get("/health", (_req: Request, res: Response) => {
-  res.status(httpStatus.OK).json({
+  sendResponse<null>(res, {
     success: true,
+    statusCode: httpStatus.OK,
     message: "Server is running",
-    timestamp: new Date().toISOString(),
+    data: null,
   });
 });
 // API route not found
 app.use((_req: Request, res: Response) => {
-  res.status(httpStatus.NOT_FOUND).json({
+  sendResponse<null>(res, {
     success: false,
+    statusCode: httpStatus.NOT_FOUND,
     message: "API route not found",
+    data: null,
   });
 });
 // Global error handler

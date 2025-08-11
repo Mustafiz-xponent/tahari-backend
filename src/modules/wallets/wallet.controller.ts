@@ -1,8 +1,3 @@
-/**
- * Controller layer for Wallet entity operations.
- * Handles HTTP requests and responses for wallet-related endpoints.
- */
-
 import { Request, Response } from "express";
 import * as walletService from "@/modules/wallets/wallet.service";
 import {
@@ -14,7 +9,7 @@ import { z } from "zod";
 import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
 import { Wallet } from "@/generated/prisma/client";
-import { IDepositData } from "@/modules/wallets/wallet.interface";
+import { WalletDepositeResult } from "@/modules/wallets/wallet.interface";
 
 const walletIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Wallet ID must be a positive integer",
@@ -51,13 +46,15 @@ export const initiateWalletDeposit = async (
 ): Promise<void> => {
   try {
     const { amount } = req.body;
-    const userId = req?.user?.userId;
+    const userId = req.user?.userId;
 
     // Validation
     if (!amount || amount <= 0) {
-      res.status(httpStatus.BAD_REQUEST).json({
+      sendResponse<null>(res, {
         success: false,
+        statusCode: httpStatus.BAD_REQUEST,
         message: "Valid amount are required",
+        data: null,
       });
       return;
     }
@@ -67,7 +64,7 @@ export const initiateWalletDeposit = async (
       amount: parseFloat(amount),
     });
 
-    sendResponse<IDepositData>(res, {
+    sendResponse<WalletDepositeResult>(res, {
       success: true,
       statusCode: httpStatus.OK,
       message: "Deposit initiated successfully",

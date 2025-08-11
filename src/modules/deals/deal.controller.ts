@@ -4,12 +4,12 @@ import * as dealService from "@/modules/deals/deal.service";
 import asyncHandler from "@/utils/asyncHandler";
 import sendResponse from "@/utils/sendResponse";
 import { Deal } from "@/generated/prisma/client";
-import { GetAllDealsQueryDto } from "@/modules/deals/deal.dto";
+import { GetAllDealsDto } from "@/modules/deals/deal.dto";
 
 /**
  * Create a new deal
  * - Expects deal data in `req.body`
- * - Calls service to create deal and returns response
+ * @description Calls service to create deal and returns response
  */
 export const createDeal = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
@@ -27,12 +27,12 @@ export const createDeal = asyncHandler(
 /**
  * Get all deals with pagination and filtering
  * - Accepts query params: page, limit, sort
- * - Calls service to fetch paginated + filtered promotions
+ * @description Calls service to fetch paginated + filtered promotions
  */
 export const getAllDeals = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const { page, limit, sort, isActive } =
-      req.query as unknown as GetAllDealsQueryDto;
+      req.query as unknown as GetAllDealsDto["query"];
     const skip = (page - 1) * limit;
     const paginationParams = { page, limit, skip, sort };
     const filterParams = { isActive };
@@ -62,7 +62,7 @@ export const getAllDeals = asyncHandler(
 /**
  * Get a single deal by its ID
  * - Converts the string ID from URL param into BigInt
- * - Calls service to get promotion by ID
+ * @description Calls service to get promotion by ID
  */
 export const getDealById = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
@@ -80,7 +80,7 @@ export const getDealById = asyncHandler(
 /**
  * Update a deal by ID
  * - Converts the ID to BigInt
- * - Calls service to update deal and returns response
+ * @description Calls service to update deal and returns response
  */
 export const updateDeal = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
@@ -99,7 +99,7 @@ export const updateDeal = asyncHandler(
 /**
  * Delete a delete by ID
  * - Converts ID to BigInt
- * - Calls service to delete deal
+ * @description Calls service to delete deal
  */
 export const deleteDeal = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
