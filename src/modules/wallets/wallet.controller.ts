@@ -134,13 +134,19 @@ export const handleSslCommerzIPN = async (
 ): Promise<void> => {
   try {
     await walletService.handleDepositeSuccess(req.body);
-    res
-      .status(httpStatus.OK)
-      .json({ success: true, message: "IPN received successfully" });
+    sendResponse<null>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "IPN received successfully",
+      data: null,
+    });
   } catch (error) {
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ success: false, message: "IPN failed" });
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "IPN failed",
+      data: null,
+    });
   }
 };
 /**

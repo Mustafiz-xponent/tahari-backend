@@ -2,7 +2,6 @@
  * Controller layer for SubscriptionDelivery entity operations.
  * Handles HTTP requests and responses for subscription delivery-related endpoints.
  */
-
 import { Request, Response } from "express";
 import * as subscriptionDeliveryService from "@/modules/subscription_deliveries/subscription-delivery.service";
 import {

@@ -2,7 +2,6 @@
  * Routes for Wallet entity operations.
  * Defines API endpoints for wallet-related CRUD operations.
  */
-
 import { Router } from "express";
 import * as WalletController from "@/modules/wallets/wallet.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
@@ -45,10 +44,20 @@ router.get(
 );
 
 // Route to update a wallet's details
-router.put("/:id", WalletController.updateWallet);
+// router.put(
+//   "/:id",
+//   authMiddleware,
+//   authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+//   WalletController.updateWallet
+// );
 
 // Route to delete a wallet
-router.delete("/:id", WalletController.deleteWallet);
+// router.delete(
+//   "/:id",
+//   authMiddleware,
+//   authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+//   WalletController.deleteWallet
+// );
 
 // SSLCommerz callback routes
 router.post("/deposite/success", WalletController.handleSslCommerzSuccess);
