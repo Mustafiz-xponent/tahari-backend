@@ -9,7 +9,6 @@ import {
   DepositeWalletDto,
   UpdateWalletDto,
 } from "@/modules/wallets/wallet.dto";
-import { getErrorMessage } from "@/utils/errorHandler";
 import { processSSLCommerzWalletDeposite } from "@/utils/processWalletDeposite";
 import {
   createNotification,
@@ -42,7 +41,7 @@ export async function createWallet(
   const wallet = await prisma.wallet.create({
     data: {
       customerId: data.customerId,
-      balance: 0.0, // Default balance as per model
+      balance: 0.0,
     },
   });
   return wallet;
@@ -104,7 +103,10 @@ export async function handleDepositeSuccess(
       });
 
       if (!walletTransaction) {
-        throw new Error("Wallet transaction not found");
+        throw new AppError(
+          "Wallet transaction not found",
+          httpStatus.NOT_FOUND
+        );
       }
 
       // Update wallet and wallet trasaction
@@ -145,17 +147,15 @@ export async function handleDepositeSuccess(
         };
       });
     } else {
-      throw new Error(
+      throw new AppError(
         `Payment validation failed: ${
           validation.failedreason || "Unknown validation error"
-        }`
+        }`,
+        httpStatus.BAD_REQUEST
       );
     }
   } catch (error) {
-    console.error(error);
-    throw new Error(
-      `SSLCommerz success handling failed: ${getErrorMessage(error)}`
-    );
+    throw error;
   }
 }
 export async function getPaymentStatus(tranId: string): Promise<string> {
@@ -167,8 +167,7 @@ export async function getPaymentStatus(tranId: string): Promise<string> {
 
     return transaction?.transactionStatus || "NOT_FOUND";
   } catch (error) {
-    console.error("Error getting payment status:", error);
-    return "ERROR";
+    throw error;
   }
 }
 /**
@@ -214,15 +213,12 @@ export async function handleDepositeFailure(failureData: any): Promise<void> {
     }
   } catch (error) {
     console.error("handleSSLCommerzFailure error:", error);
-    throw new Error(
-      `Failed to handle SSLCommerz payment: ${getErrorMessage(error)}`
-    );
+    throw error;
   }
 }
 /**
  * Retrieve all wallets
  * @returns An array of all wallets
- * @throws Error if the query fails
  */
 export async function getAllWallets(): Promise<Wallet[]> {
   const wallets = await prisma.wallet.findMany();

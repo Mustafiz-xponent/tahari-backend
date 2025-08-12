@@ -51,11 +51,8 @@ export const initiateWalletDeposit = asyncHandler(
 /**
  * Handle SSLCommerz success callback
  */
-export const handleSslCommerzSuccess = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const handleSslCommerzSuccess = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     const tranId = req.body.tran_id;
     const paymentStatus = await walletService.getPaymentStatus(tranId);
 
@@ -64,40 +61,28 @@ export const handleSslCommerzSuccess = async (
     } else {
       res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
     }
-  } catch (error) {
-    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
   }
-};
+);
 
 /**
  * Handle SSLCommerz failure callback
  */
-export const handleSslCommerzFailure = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const handleSslCommerzFailure = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     await walletService.handleDepositeFailure(req.body);
     res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
-  } catch (error) {
-    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
   }
-};
+);
 /**
 /**
  * Handle SSLCommerz cancel callback
  */
-export const handleSslCommerzCancel = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const handleSslCommerzCancel = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
     await walletService.handleDepositeFailure(req.body);
     res.redirect(`${process.env.PAYMENT_CANCEL_DEEP_LINK}`);
-  } catch (error) {
-    res.redirect(`${process.env.PAYMENT_FAIL_DEEP_LINK}`);
   }
-};
+);
 
 /**
  * Handle SSLCommerz IPN (Instant Payment Notification)
