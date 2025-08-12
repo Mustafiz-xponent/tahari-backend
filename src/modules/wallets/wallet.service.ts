@@ -159,16 +159,12 @@ export async function handleDepositeSuccess(
   }
 }
 export async function getPaymentStatus(tranId: string): Promise<string> {
-  try {
-    const transaction = await prisma.walletTransaction.findFirst({
-      where: { description: { contains: tranId } },
-      select: { transactionStatus: true },
-    });
+  const transaction = await prisma.walletTransaction.findFirst({
+    where: { description: { contains: tranId } },
+    select: { transactionStatus: true },
+  });
 
-    return transaction?.transactionStatus || "NOT_FOUND";
-  } catch (error) {
-    throw error;
-  }
+  return transaction?.transactionStatus || "NOT_FOUND";
 }
 /**
  * Handle SSLCommerz payment failure
@@ -232,7 +228,7 @@ export async function getAllWallets(): Promise<Wallet[]> {
  */
 export async function getCustomerWalletBalanace(
   userId: bigint
-): Promise<Wallet | null> {
+): Promise<Wallet> {
   const customer = await prisma.customer.findUnique({
     where: { userId },
     include: { wallet: true },

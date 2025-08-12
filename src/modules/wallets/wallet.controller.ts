@@ -132,9 +132,6 @@ export const getCustomerWalletBalanace = asyncHandler(
     const wallet = await walletService.getCustomerWalletBalanace(
       BigInt(req?.user?.userId!)
     );
-    if (!wallet) {
-      throw new Error("Wallet not found");
-    }
 
     sendResponse<Wallet>(res, {
       success: true,
