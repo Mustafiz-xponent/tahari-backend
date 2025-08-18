@@ -3,7 +3,7 @@
  * Contains business logic and database interactions for payments.
  */
 import prisma from "@/prisma-client/prismaClient";
-import { Payment } from "@/generated/prisma/client";
+import { Payment, PaymentStatus } from "@/generated/prisma/client";
 import {
   CreatePaymentDto,
   UpdatePaymentDto,
@@ -310,9 +310,30 @@ export async function handleSSLCommerzFailure(failureData: any): Promise<void> {
 /**
  * Retrieve all payments
  */
-export async function getAllPayments(): Promise<Payment[]> {
+// export async function getAllPayments(): Promise<Payment[]> {
+//   try {
+//     const payments = await prisma.payment.findMany();
+//     return payments;
+//   } catch (error) {
+//     throw new Error(`Failed to fetch payments: ${getErrorMessage(error)}`);
+//   }
+// }
+
+// Refactor must be done-------------------------------------------------------------------------->
+
+export async function getAllPayments(paymentStatus?: string): Promise<Payment[]> {
   try {
-    const payments = await prisma.payment.findMany();
+    // Only include paymentStatus if it's a valid enum value
+    const validStatuses = Object.values(PaymentStatus);
+
+    const whereClause = paymentStatus && validStatuses.includes(paymentStatus as PaymentStatus)
+      ? { paymentStatus: paymentStatus as PaymentStatus }
+      : {};
+
+    const payments = await prisma.payment.findMany({
+      where: whereClause,
+    });
+
     return payments;
   } catch (error) {
     throw new Error(`Failed to fetch payments: ${getErrorMessage(error)}`);

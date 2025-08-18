@@ -124,7 +124,9 @@ export const getAllPayments = async (
   res: Response
 ): Promise<void> => {
   try {
-    const payments = await paymentService.getAllPayments();
+    // Read optional query param
+    const { paymentStatus } = _req.query;
+    const payments = await paymentService.getAllPayments(paymentStatus as string | undefined);
 
     sendResponse<Payment[]>(res, {
       success: true,

@@ -539,7 +539,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\farmer-app-server\\src\\generated\\prisma\\client",
+      "value": "C:\\Users\\Xponent Info System\\farmerAppApi\\src\\generated\\prisma\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -553,7 +553,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\farmer-app-server\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\Xponent Info System\\farmerAppApi\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -567,11 +567,12 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://postgres.drnvilpnesqtdtvvkfju:UGXUzGVwxKO21BKc@aws-0-ap-south-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=5&pool_timeout=10"
+        "value": null
       }
     }
   },
