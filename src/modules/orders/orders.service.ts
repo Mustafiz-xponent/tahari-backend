@@ -78,9 +78,22 @@ export async function createOrder(data: CreateOrderDto): Promise<Order> {
  * @throws Error if the query fails
  */
 
-export async function getAllOrders(): Promise<Order[]> {
+interface OrderFilters {
+  status?: OrderStatus;
+  customerId?: bigint;
+  skip?: number;
+  take?: number;
+  sort?: "asc" | "desc";
+}
+
+export async function getAllOrders(filters: OrderFilters): Promise<Order[]> {
   try {
+    const { status, customerId, skip, take, sort } = filters;
+    const whereClause: any = {};
+    if (status) whereClause.status = status;
+    if (customerId) whereClause.customerId = customerId;
     const orders = await prisma.order.findMany({
+      where: whereClause,
       include: {
         orderItems: {
           include: {
@@ -89,6 +102,8 @@ export async function getAllOrders(): Promise<Order[]> {
         },
         customer: true,
       },
+      skip,
+      take,
       orderBy: { createdAt: "desc" },
     });
     return orders;

@@ -61,13 +61,19 @@ export const getAllOrders = async (
     const skip = (page - 1) * limit;
     const sort = req.query.sort === "asc" ? "asc" : "desc";
 
-    const status = req.query.status as string | undefined;
+    const status = req.query.status as OrderStatus | undefined;
     const customerId = req.query.customerId
       ? BigInt(req.query.customerId as string)
       : undefined;
     // TODO: add pagination & filter functionality
 
-    const orders = await orderService.getAllOrders();
+    const orders = await orderService.getAllOrders({
+      status,
+      customerId,
+      skip,
+      take: limit,
+      sort,
+    });
     sendResponse<Order[]>(res, {
       success: true,
       statusCode: httpStatus.OK,
