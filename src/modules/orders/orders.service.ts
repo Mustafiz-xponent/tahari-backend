@@ -4,7 +4,7 @@
  */
 
 import prisma from "@/prisma-client/prismaClient";
-import { Order, OrderStatus } from "@/generated/prisma/client";
+import { Order, OrderStatus, Prisma } from "@/generated/prisma/client";
 import { CreateOrderDto, UpdateOrderDto } from "@/modules/orders/orders.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { getBatchAccessibleImageUrls } from "@/utils/fileUpload/s3Aws";
@@ -89,9 +89,17 @@ interface OrderFilters {
 export async function getAllOrders(filters: OrderFilters): Promise<Order[]> {
   try {
     const { status, customerId, skip, take, sort } = filters;
-    const whereClause: any = {};
-    if (status) whereClause.status = status;
-    if (customerId) whereClause.customerId = customerId;
+
+    const whereClause: Prisma.OrderWhereInput = {};
+
+    if (status && Object.values(OrderStatus).includes(status)) {
+      // Cast incoming string to Prisma enum
+      whereClause.status = status as OrderStatus;
+    }
+
+    if (customerId) {
+      whereClause.customerId = customerId;
+    }
     const orders = await prisma.order.findMany({
       where: whereClause,
       include: {
