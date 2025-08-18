@@ -5,6 +5,8 @@
 
 import { Router } from "express";
 import * as PaymentController from "@/modules/payments/payment.controller";
+import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
+import { UserRole } from "@/generated/prisma/client";
 
 const router = Router();
 
@@ -12,7 +14,12 @@ const router = Router();
 router.post("/", PaymentController.createPayment);
 
 // Route to get all payments
-router.get("/", PaymentController.getAllPayments);
+router.get(
+  "/",
+  authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  PaymentController.getAllPayments
+);
 
 // Route to get a payment by ID
 router.get("/:id", PaymentController.getPaymentById);

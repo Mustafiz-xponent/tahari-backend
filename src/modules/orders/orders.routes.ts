@@ -14,7 +14,12 @@ const router = Router();
 router.post("/", OrderController.createOrder);
 
 // Route to get all orders
-router.get("/", OrderController.getAllOrders);
+router.get(
+  "/",
+  authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  OrderController.getAllOrders
+);
 
 // Route to get orders for a specific customer
 router.get(
