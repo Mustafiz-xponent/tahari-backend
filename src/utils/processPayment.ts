@@ -117,6 +117,7 @@ export async function processWalletPayment(
 
       // Create stock transaction record
       await tx.stockTransaction.create({
+        
         data: {
           quantity: item.quantity * item.packageSize,
           transactionType: "OUT",
