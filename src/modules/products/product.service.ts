@@ -74,6 +74,7 @@ export async function createProduct(
         imageUrls: [], // Start with empty array
         isPrivateImages: usePrivateBucket, // Store whether images are private
         categoryId: data.categoryId,
+
         farmerId: data.farmerId,
       },
     });
@@ -158,13 +159,19 @@ export async function getAllProducts(
     // Get paginated products with optional relations
     const products = await prisma.product.findMany({
       where: whereClause,
-      include: includeRelations
-        ? {
-            category: true,
-            farmer: true,
-            deal: true,
-          }
-        : { deal: true }, // ensure we fetch deal for pricing calculation
+      include: {
+        deal: true,
+        category: {
+          select: {
+            categoryId: true,
+            name: true,
+          },
+        },
+        ...(includeRelations && {
+          farmer: true,
+          deal: true,
+        }),
+      }, // ensure we fetch deal for pricing calculation
       take: limit,
       skip: skip,
       orderBy: {
