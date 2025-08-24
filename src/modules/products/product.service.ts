@@ -167,6 +167,12 @@ export async function getAllProducts(
             name: true,
           },
         },
+
+        farmer: {
+          select: {
+            farmName: true,
+          },
+        },
         ...(includeRelations && {
           farmer: true,
           deal: true,
