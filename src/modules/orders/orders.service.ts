@@ -108,7 +108,12 @@ export async function getAllOrders(filters: OrderFilters): Promise<Order[]> {
             product: true,
           },
         },
-        customer: true,
+        customer: {
+          select: {
+            user: true,
+            customerId: true,
+          },
+        },
       },
       skip,
       take,
