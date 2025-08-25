@@ -81,6 +81,7 @@ export async function createOrder(data: CreateOrderDto): Promise<Order> {
 interface OrderFilters {
   status?: OrderStatus;
   customerId?: bigint;
+  orderId?: bigint;
   skip?: number;
   take?: number;
   sort?: "asc" | "desc";
@@ -95,7 +96,8 @@ export async function getAllOrders(
   totalCount: number;
 }> {
   try {
-    const { status, customerId, skip, take, sort, page, limit } = filters;
+    const { status, customerId, orderId, skip, take, sort, page, limit } =
+      filters;
 
     const whereClause: Prisma.OrderWhereInput = {};
 
@@ -106,6 +108,10 @@ export async function getAllOrders(
 
     if (customerId) {
       whereClause.customerId = customerId;
+    }
+
+    if (orderId) {
+      whereClause.orderId = BigInt(orderId);
     }
     const orders = await prisma.order.findMany({
       where: whereClause,

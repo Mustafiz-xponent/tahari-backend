@@ -46,6 +46,7 @@ interface OrdersQuery {
   limit?: string;
   status?: OrderStatus;
   customerId?: string;
+  orderId?: string;
   sort?: "asc" | "desc";
 }
 export const getAllOrders = async (
@@ -65,11 +66,15 @@ export const getAllOrders = async (
     const customerId = req.query.customerId
       ? BigInt(req.query.customerId as string)
       : undefined;
+    const orderId = req.query.orderId
+      ? BigInt(req.query.orderId as string)
+      : undefined;
     // TODO: add pagination & filter functionality
 
     const result = await orderService.getAllOrders({
       status,
       customerId,
+      orderId,
       skip,
       take: limit,
       sort,
