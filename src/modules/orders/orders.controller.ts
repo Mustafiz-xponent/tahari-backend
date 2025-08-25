@@ -67,18 +67,28 @@ export const getAllOrders = async (
       : undefined;
     // TODO: add pagination & filter functionality
 
-    const orders = await orderService.getAllOrders({
+    const result = await orderService.getAllOrders({
       status,
       customerId,
       skip,
       take: limit,
       sort,
+      page,
+      limit,
     });
     sendResponse<Order[]>(res, {
       success: true,
       statusCode: httpStatus.OK,
       message: "Orders fetched successfully",
-      data: orders,
+      data: result.orders,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalCount,
+        itemsPerPage: limit,
+        hasNextPage: result.currentPage < result.totalPages,
+        hasPreviousPage: result.currentPage > 1,
+      },
     });
   } catch (error) {
     handleErrorResponse(error, res, "fetch orders");

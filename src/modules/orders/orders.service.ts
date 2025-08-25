@@ -86,9 +86,16 @@ interface OrderFilters {
   sort?: "asc" | "desc";
 }
 
-export async function getAllOrders(filters: OrderFilters): Promise<Order[]> {
+export async function getAllOrders(
+  filters: OrderFilters & { page: number; limit: number }
+): Promise<{
+  orders: Order[];
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+}> {
   try {
-    const { status, customerId, skip, take, sort } = filters;
+    const { status, customerId, skip, take, sort, page, limit } = filters;
 
     const whereClause: Prisma.OrderWhereInput = {};
 
@@ -119,7 +126,46 @@ export async function getAllOrders(filters: OrderFilters): Promise<Order[]> {
       take,
       orderBy: { createdAt: "desc" },
     });
-    return orders;
+
+    const processedOrdersWithImageUrls = await Promise.all(
+      orders.map(async (order) => {
+        const updatedOrderItems = await Promise.all(
+          order.orderItems.map(async (item) => {
+            const accessibleUrls =
+              item.product.imageUrls.length > 0
+                ? await getBatchAccessibleImageUrls(
+                    item.product.imageUrls,
+                    item.product.isPrivateImages,
+                    300
+                  )
+                : [];
+
+            return {
+              ...item.product,
+              accessibleImageUrls: accessibleUrls,
+              quantity: item.quantity,
+            };
+          })
+        );
+        return {
+          ...order,
+          totalAmount: order.totalAmount,
+          orderItems: updatedOrderItems,
+        };
+      })
+    );
+
+    // Count total orders for pagination
+    const totalOrders = await prisma.order.count({
+      where: whereClause,
+    });
+
+    return {
+      orders: processedOrdersWithImageUrls,
+      currentPage: page,
+      totalPages: Math.ceil(totalOrders / limit),
+      totalCount: totalOrders,
+    };
   } catch (error) {
     throw new Error(`Failed to fetch orders: ${getErrorMessage(error)}`);
   }
