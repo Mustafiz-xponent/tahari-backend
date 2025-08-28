@@ -4,16 +4,16 @@ import { NotificationType, Payment } from "@/generated/prisma/client";
 import { getErrorMessage } from "@/utils/errorHandler";
 import axios from "axios";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
-import { getSocketId, io } from "@/utils/socket";
+import { getOnlineSupportSockets, getSocketId, io } from "@/utils/socket";
 import { Prisma } from "@prisma/client";
+import * as orderService from "@/modules/orders/orders.service";
 
 export interface PaymentResult {
   payment?: Payment;
   redirectUrl?: string; // For SSLCommerz redirect
 }
-/**
- * Process payment through customer wallet
- */
+
+// Notify the customer realtime
 export const createNotification = async (
   message: string,
   type: NotificationType,
@@ -32,11 +32,14 @@ export const createNotification = async (
     io.to(receiverId).emit("newNotification", notification);
   }
 };
+/**
+ * Process payment through customer wallet
+ */
 export async function processWalletPayment(
   data: CreatePaymentDto,
   order: any
 ): Promise<PaymentResult> {
-  return await prisma.$transaction(async (tx) => {
+  const paymentResult = await prisma.$transaction(async (tx) => {
     // Check if customer has wallet
     if (!order.customer.wallet) {
       throw new Error("Customer wallet not found");
@@ -117,7 +120,6 @@ export async function processWalletPayment(
 
       // Create stock transaction record
       await tx.stockTransaction.create({
-        
         data: {
           quantity: item.quantity * item.packageSize,
           transactionType: "OUT",
@@ -127,12 +129,30 @@ export async function processWalletPayment(
         },
       });
     }
-    const message = getOrderStatusMessage(updatedOrder.status, data.orderId);
-    await createNotification(message, "ORDER", order.customer.userId, tx);
-    return {
-      payment,
-    };
+    // Notify the customer
+    const customerMessage = getOrderStatusMessage(
+      updatedOrder.status,
+      data.orderId
+    );
+    await createNotification(
+      customerMessage,
+      "ORDER",
+      order.customer.userId,
+      tx
+    );
+    // TODO: Notify the admin a new order has been placed
+
+    return payment;
   });
+  // Emit to all connected support/admin sockets
+  if (paymentResult) {
+    const orderData = await orderService.getOrderById(order.orderId);
+    const sockets = getOnlineSupportSockets();
+    sockets.forEach((socketId) => {
+      io.to(socketId).emit("newOrder", orderData);
+    });
+  }
+  return { payment: paymentResult };
 }
 /**
  * Process COD payment
@@ -141,7 +161,7 @@ export async function processCodPayment(
   data: CreatePaymentDto,
   order: any
 ): Promise<PaymentResult> {
-  return await prisma.$transaction(async (tx) => {
+  const paymentResult = await prisma.$transaction(async (tx) => {
     const existingPayment = await tx.payment.findFirst({
       where: { orderId: Number(data.orderId) },
     });
@@ -180,13 +200,22 @@ export async function processCodPayment(
           "Order created and confirmed. payment pending for Cash on Delivery",
       },
     });
-
+    // Notify the customer
     const message = `ধন্যবাদ! আপনার অর্ডারটি নিশ্চিত হয়েছে। দয়া করে পণ্য গ্রহণের সময় পেমেন্ট করুন। (অর্ডার আইডিঃ #${data.orderId})`;
     await createNotification(message, "ORDER", order.customer.userId, tx);
-    return {
-      payment,
-    };
+    // TODO: Notify the admin
+    return payment;
   });
+
+  // Emit to all connected support/admin sockets
+  if (paymentResult) {
+    const orderData = await orderService.getOrderById(order.orderId);
+    const sockets = getOnlineSupportSockets();
+    sockets.forEach((socketId) => {
+      io.to(socketId).emit("newOrder", orderData);
+    });
+  }
+  return { payment: paymentResult };
 }
 /**
  * Process payment through SSLCommerz

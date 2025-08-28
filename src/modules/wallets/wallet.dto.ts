@@ -30,9 +30,11 @@ export type CreateWalletDto = {
  * Validates all required fields necessary for wallet deposite.
  */
 export const zDepositeWalletDto = {
-  body: z.object({
-    amount: z.number().nonnegative("Amount must be non-negative"),
-  }),
+  body: z
+    .object({
+      amount: z.number().nonnegative("Amount must be non-negative"),
+    })
+    .strict(),
 };
 type DepositeWalletBodyDto = z.infer<typeof zDepositeWalletDto.body>;
 export type DepositeWalletDto = {

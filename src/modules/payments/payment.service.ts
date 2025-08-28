@@ -17,6 +17,8 @@ import {
 } from "@/utils/processPayment";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
 import { createNotification } from "@/utils/processPayment";
+import { getOnlineSupportSockets, io } from "@/utils/socket";
+import * as orderService from "@/modules/orders/orders.service";
 
 /**
  * create order payment through wallet or SSLCommerz
@@ -89,7 +91,7 @@ export async function handleSSLCommerzSuccess(
       const orderId = BigInt(orderIdMatch[1]);
 
       // Update payment and order in transaction
-      return await prisma.$transaction(async (tx) => {
+      const paymentResult = await prisma.$transaction(async (tx) => {
         // Check payment status
         const payment = await tx.payment.findUnique({
           where: {
@@ -101,7 +103,7 @@ export async function handleSSLCommerzSuccess(
         if (!payment) throw new Error("Payment record not found");
         if (payment.paymentStatus === "COMPLETED") {
           return {
-            success: true,
+            success: false,
             message: "Payment was already completed successfully",
           };
         }
@@ -172,17 +174,28 @@ export async function handleSSLCommerzSuccess(
             },
           });
         }
+        // Notify the customer
         const message = getOrderStatusMessage(
           updatedOrder.status,
           updatedOrder.orderId
         );
-
         await createNotification(message, "ORDER", order.customer.userId, tx);
+        // TODO: Notify the admin
         return {
           success: true,
           message: "SSLCommerz payment completed successfully",
         };
       });
+      // Emit to all connected support/admin sockets
+      if (paymentResult.success) {
+        const orderData = await orderService.getOrderById(orderId);
+        const sockets = getOnlineSupportSockets();
+        sockets.forEach((socketId) => {
+          io.to(socketId).emit("newOrder", orderData);
+        });
+      }
+
+      return paymentResult;
     } else {
       throw new Error(
         `Payment validation failed: ${
@@ -321,14 +334,17 @@ export async function handleSSLCommerzFailure(failureData: any): Promise<void> {
 
 // Refactor must be done-------------------------------------------------------------------------->
 
-export async function getAllPayments(paymentStatus?: string): Promise<Payment[]> {
+export async function getAllPayments(
+  paymentStatus?: string
+): Promise<Payment[]> {
   try {
     // Only include paymentStatus if it's a valid enum value
     const validStatuses = Object.values(PaymentStatus);
 
-    const whereClause = paymentStatus && validStatuses.includes(paymentStatus as PaymentStatus)
-      ? { paymentStatus: paymentStatus as PaymentStatus }
-      : {};
+    const whereClause =
+      paymentStatus && validStatuses.includes(paymentStatus as PaymentStatus)
+        ? { paymentStatus: paymentStatus as PaymentStatus }
+        : {};
 
     const payments = await prisma.payment.findMany({
       where: whereClause,

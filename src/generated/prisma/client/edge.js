@@ -539,7 +539,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Xponent Info System\\farmerAppApi\\src\\generated\\prisma\\client",
+      "value": "D:\\farmer-app-server\\src\\generated\\prisma\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -553,7 +553,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Xponent Info System\\farmerAppApi\\prisma\\schema.prisma",
+    "sourceFilePath": "D:\\farmer-app-server\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

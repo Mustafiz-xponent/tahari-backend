@@ -2,8 +2,7 @@
  * Controller layer for Order entity operations.
  * Handles HTTP requests and responses for order-related endpoints.
  */
-
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import * as orderService from "@/modules/orders/orders.service";
 import { zCreateOrderDto, zUpdateOrderDto } from "@/modules/orders/orders.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";

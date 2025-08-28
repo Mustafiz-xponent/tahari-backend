@@ -74,7 +74,6 @@ export const handleSslCommerzFailure = asyncHandler(
   }
 );
 /**
-/**
  * Handle SSLCommerz cancel callback
  */
 export const handleSslCommerzCancel = asyncHandler(

@@ -20,7 +20,7 @@ export const canPauseOrCancelSubscription = async (
   const nextDelivery = await prisma.subscriptionDelivery.findFirst({
     where: { subscriptionId, deliveryDate: { gte: today } },
     orderBy: { deliveryDate: "asc" },
-  }); 
+  });
   if (!nextDelivery) return { canProceed: true, nextDelivery: null };
   const daysLeft = differenceInCalendarDays(nextDelivery.deliveryDate, today);
   return { canProceed: daysLeft > bufferDays, nextDelivery };
@@ -117,6 +117,7 @@ export async function pauseOrCancelSubscription(
         });
       }
     }
+    // Notify the customer realtime
     let message: string = "";
     if (action === "PAUSED") {
       message = `আপনার সাবস্ক্রিপশনটি সাময়িকভাবে স্থগিত করা হয়েছে।`;
@@ -225,6 +226,7 @@ export async function processResumeSubscription(
     } else {
       throw new Error("Invalid payment method");
     }
+    // Notify the customer realtime
     const message = `আপনার সাবস্ক্রিপশনটি পুনরায় চালু করা হয়েছে।`;
     await createNotification(message, "SUBSCRIPTION", userId, tx);
     return updatedSubscription;

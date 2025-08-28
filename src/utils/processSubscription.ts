@@ -145,7 +145,7 @@ const pauseAndNotifyInsufficientStock = async (
   tx: Prisma.TransactionClient
 ) => {
   await pauseSubscription(subscription.subscriptionId, tx);
-
+  // Notify customer
   await createNotification(
     `আপনার সাবস্ক্রিপশন সাময়িকভাবে বন্ধ হয়েছে কারণ পণ্যটি স্টকে নেই।`,
     "SUBSCRIPTION",
@@ -388,6 +388,7 @@ const handleRenewalWalletPayment = async (
     );
   } else {
     await pauseSubscription(subscription.subscriptionId, tx);
+    // Notify customer
     await createNotification(
       "পরবর্তী সাবস্ক্রিপশন পরিশোধের জন্য পর্যাপ্ত ব্যালেন্স নেই, অনুগ্রহ করে ওয়ালেট রিচার্জ করুন।",
       "SUBSCRIPTION",
