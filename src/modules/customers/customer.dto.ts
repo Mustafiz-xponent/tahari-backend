@@ -51,3 +51,19 @@ export const zUpdateCustomerDto = z.object({
  * TypeScript type inferred from update schema.
  */
 export type UpdateCustomerDto = z.infer<typeof zUpdateCustomerDto>;
+
+/*
+ ** Schema: Get All Customers (Query Parameters)
+ ** Includes pagination, sorting
+ */
+export const zGetAllCustomersDto = {
+  query: z.object({
+    page: z.coerce.number().int().positive().optional().default(1),
+    limit: z.coerce.number().int().positive().max(100).optional().default(10),
+    sort: z.enum(["asc", "desc"]).optional().default("desc"),
+  }),
+};
+type GetAllCustomersQueryDto = z.infer<typeof zGetAllCustomersDto.query>;
+export type GetAllCustomersDto = {
+  query: GetAllCustomersQueryDto;
+};

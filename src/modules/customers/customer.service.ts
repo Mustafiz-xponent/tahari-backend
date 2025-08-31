@@ -11,6 +11,10 @@ import {
 } from "@/modules/customers/customer.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import bcrypt from "bcrypt";
+import {
+  GetAllCusotmersResult,
+  GetAllCustomersQueryParams,
+} from "@/modules/customers/customer.interface";
 
 /**
  * Create a new customer
@@ -44,22 +48,56 @@ import bcrypt from "bcrypt";
  * @returns An array of all customers
  * @throws Error if the query fails
  */
-export async function getAllCustomers(): Promise<Customer[]> {
+export async function getAllCustomers(
+  paginationParams: GetAllCustomersQueryParams
+): Promise<GetAllCusotmersResult> {
   try {
+    const { page, limit, skip, sort } = paginationParams;
     const customers = await prisma.customer.findMany({
       include: {
         user: {
           select: {
             userId: true,
-            email: true,
             name: true,
+            email: true,
             phone: true,
-            role: true,
+            // Count unread messages per customer for admin/support.
+            _count: {
+              select: {
+                sentMessages: {
+                  where: {
+                    receiverId: null, // null when receiver is admin/support
+                    status: "UNREAD",
+                  },
+                },
+              },
+            },
           },
         },
       },
+      take: limit,
+      skip: skip,
     });
-    return customers;
+
+    const totalCount = await prisma.customer.count();
+    const totalPages = Math.ceil(totalCount / limit);
+    const customersWithUnreadMessageCount = customers.map((customer) => ({
+      customerId: customer.customerId,
+      userId: customer.userId,
+      user: {
+        userId: customer.user.userId,
+        name: customer.user.name,
+        email: customer.user.email,
+      },
+      unreadMessageCount: customer.user._count.sentMessages,
+    }));
+
+    return {
+      customers: customersWithUnreadMessageCount,
+      totalCount,
+      totalPages,
+      currentPage: page,
+    };
   } catch (error) {
     throw error;
   }

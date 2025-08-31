@@ -159,6 +159,7 @@ export async function getAllMessages(
         },
       });
     }
+
     return {
       messages,
       totalCount: totalMessageCount,

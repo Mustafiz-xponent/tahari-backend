@@ -1,6 +1,5 @@
 import axios from "axios";
 import prisma from "@/prisma-client/prismaClient";
-import { getErrorMessage } from "@/utils/errorHandler";
 import { WalletDepositeResult } from "@/modules/wallets/wallet.interface";
 import { AppError } from "@/utils/appError";
 import httpStatus from "http-status";

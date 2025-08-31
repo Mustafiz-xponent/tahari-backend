@@ -5,7 +5,10 @@
 
 import { Request, Response } from "express";
 import * as customerService from "@/modules/customers/customer.service";
-import { zUpdateCustomerDto } from "@/modules/customers/customer.dto";
+import {
+  GetAllCustomersDto,
+  zUpdateCustomerDto,
+} from "@/modules/customers/customer.dto";
 import { ZodError, z } from "zod";
 import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
@@ -19,15 +22,28 @@ const customerIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
  * Get all customers
  */
 export const getAllCustomers = async (
-  _req: Request,
+  req: Request,
   res: Response
 ): Promise<void> => {
-  const customers = await customerService.getAllCustomers();
+  const { page, limit, sort } =
+    req.query as unknown as GetAllCustomersDto["query"];
+  const skip = (page - 1) * limit;
+  const paginationParams = { page, limit, skip, sort };
+  const result = await customerService.getAllCustomers(paginationParams);
+
   sendResponse<Customer[]>(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: "Customers retrieved successfully",
-    data: customers,
+    data: result.customers,
+    pagination: {
+      currentPage: result.currentPage,
+      totalPages: result.totalPages,
+      totalItems: result.totalCount,
+      itemsPerPage: limit,
+      hasNextPage: page < result.totalPages,
+      hasPreviousPage: page > 1,
+    },
   });
 };
 
