@@ -18,7 +18,7 @@ import { getErrorMessage } from "@/utils/errorHandler";
  * @throws Error if the transaction cannot be created (e.g., invalid walletId or orderId)
  */
 export async function createWalletTransaction(
-  data: CreateWalletTransactionDto
+  data: CreateWalletTransactionDto["body"]
 ): Promise<WalletTransaction> {
   try {
     // Validate walletId existence
@@ -159,8 +159,8 @@ export async function getCustomerWalletTransactions({
  * @throws Error if the transaction is not found or update fails
  */
 export async function updateWalletTransaction(
-  transactionId: BigInt,
-  data: UpdateWalletTransactionDto
+  transactionId: UpdateWalletTransactionDto["params"]["id"],
+  data: UpdateWalletTransactionDto["body"]
 ): Promise<WalletTransaction> {
   try {
     // Validate walletId existence if provided

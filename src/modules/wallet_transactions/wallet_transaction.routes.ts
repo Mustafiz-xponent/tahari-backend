@@ -2,13 +2,17 @@
  * Routes for WalletTransaction entity operations.
  * Defines API endpoints for wallet transaction-related CRUD operations.
  */
-
 import { Router } from "express";
 import * as WalletTransactionController from "@/modules/wallet_transactions/wallet_transaction.controller";
 import { authMiddleware, authorizeRoles } from "@/middlewares/auth";
 import { UserRole } from "@/generated/prisma/client";
 import validator from "@/middlewares/validator";
-import { zCreateWalletTransactionDto } from "@/modules/wallet_transactions/wallet_transaction.dto";
+import {
+  zCreateWalletTransactionDto,
+  zDeleteWalletTransactionDto,
+  zGetWalletTransactionDto,
+  zUpdateWalletTransactionDto,
+} from "@/modules/wallet_transactions/wallet_transaction.dto";
 
 const router = Router();
 
@@ -22,7 +26,12 @@ router.post(
 );
 
 // Route to get all wallet transactions
-router.get("/", WalletTransactionController.getAllWalletTransactions);
+router.get(
+  "/",
+  authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  WalletTransactionController.getAllWalletTransactions
+);
 
 // Route to get customer wallet transactions
 router.get(
@@ -33,12 +42,30 @@ router.get(
 );
 
 // Route to get a wallet transaction by ID
-router.get("/:id", WalletTransactionController.getWalletTransactionById);
+router.get(
+  "/:id",
+  authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validator(zGetWalletTransactionDto),
+  WalletTransactionController.getWalletTransactionById
+);
 
 // Route to update a wallet transaction's details
-router.put("/:id", WalletTransactionController.updateWalletTransaction);
+router.put(
+  "/:id",
+  authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validator(zUpdateWalletTransactionDto),
+  WalletTransactionController.updateWalletTransaction
+);
 
 // Route to delete a wallet transaction
-router.delete("/:id", WalletTransactionController.deleteWalletTransaction);
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validator(zDeleteWalletTransactionDto),
+  WalletTransactionController.deleteWalletTransaction
+);
 
 export default router;

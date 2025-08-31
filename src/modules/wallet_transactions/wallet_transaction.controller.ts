@@ -5,8 +5,9 @@
 import { Request, Response } from "express";
 import * as walletTransactionService from "@/modules/wallet_transactions/wallet_transaction.service";
 import {
-  zCreateWalletTransactionDto,
-  zUpdateWalletTransactionDto,
+  DeleteWalletTransactionDto,
+  GetWalletTransactionDto,
+  UpdateWalletTransactionDto,
 } from "@/modules/wallet_transactions/wallet_transaction.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
 import { z } from "zod";
@@ -14,10 +15,6 @@ import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
 import { WalletTransaction } from "@/generated/prisma/client";
 import { CustomerTransactionQuery } from "@/modules/wallet_transactions/wallet_transactions.interface";
-
-const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
-  message: "Transaction ID must be a positive integer",
-});
 
 /**
  * Create a new wallet transaction
@@ -72,7 +69,8 @@ export const getWalletTransactionById = async (
   res: Response
 ): Promise<void> => {
   try {
-    const transactionId = transactionIdSchema.parse(req.params.id);
+    const transactionId = req.params
+      .id as unknown as GetWalletTransactionDto["params"]["id"];
     const transaction = await walletTransactionService.getWalletTransactionById(
       transactionId
     );
@@ -141,8 +139,10 @@ export const updateWalletTransaction = async (
   res: Response
 ): Promise<void> => {
   try {
-    const transactionId = transactionIdSchema.parse(req.params.id);
-    const data = zUpdateWalletTransactionDto.parse(req.body);
+    const data = req.body;
+    const transactionId = req.params
+      .id as unknown as UpdateWalletTransactionDto["params"]["id"];
+
     const updated = await walletTransactionService.updateWalletTransaction(
       transactionId,
       data
@@ -167,7 +167,8 @@ export const deleteWalletTransaction = async (
   res: Response
 ): Promise<void> => {
   try {
-    const transactionId = transactionIdSchema.parse(req.params.id);
+    const transactionId = req.params
+      .id as unknown as DeleteWalletTransactionDto["params"]["id"];
     await walletTransactionService.deleteWalletTransaction(transactionId);
     sendResponse<null>(res, {
       success: true,
