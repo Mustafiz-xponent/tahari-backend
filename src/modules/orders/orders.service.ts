@@ -78,17 +78,22 @@ export async function createOrder(data: CreateOrderDto): Promise<Order> {
  * @throws Error if the query fails
  */
 
-interface OrderFilters {
-  status?: OrderStatus;
-  customerId?: bigint;
-  orderId?: bigint;
-  skip?: number;
-  take?: number;
-  sort?: "asc" | "desc";
+interface GetAllOrdersQueryParams {
+  filters: {
+    status?: OrderStatus;
+    customerId?: bigint;
+    orderId?: bigint;
+  };
+  pagination: {
+    page: number;
+    limit: number;
+    skip: number;
+    sort: string;
+  };
 }
 
 export async function getAllOrders(
-  filters: OrderFilters & { page: number; limit: number }
+  queryParams: GetAllOrdersQueryParams
 ): Promise<{
   orders: Order[];
   currentPage: number;
@@ -96,8 +101,9 @@ export async function getAllOrders(
   totalCount: number;
 }> {
   try {
-    const { status, customerId, orderId, skip, take, sort, page, limit } =
-      filters;
+    const { filters, pagination } = queryParams;
+    const { status, customerId, orderId } = filters;
+    const { page, limit, skip, sort } = pagination;
 
     const whereClause: Prisma.OrderWhereInput = {};
 
@@ -106,13 +112,9 @@ export async function getAllOrders(
       whereClause.status = status as OrderStatus;
     }
 
-    if (customerId) {
-      whereClause.customerId = customerId;
-    }
+    if (customerId) whereClause.customerId = customerId;
+    if (orderId) whereClause.orderId = orderId;
 
-    if (orderId) {
-      whereClause.orderId = BigInt(orderId);
-    }
     const orders = await prisma.order.findMany({
       where: whereClause,
       include: {
@@ -129,8 +131,8 @@ export async function getAllOrders(
         },
       },
       skip,
-      take,
-      orderBy: { createdAt: "desc" },
+      take: limit,
+      orderBy: { createdAt: sort === "asc" ? "asc" : "desc" },
     });
 
     const processedOrdersWithImageUrls = await Promise.all(

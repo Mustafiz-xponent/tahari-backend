@@ -1,53 +1,43 @@
-/**
- * Data Transfer Objects (DTOs) for the WalletTransaction entity
- * These interfaces define the expected shape of data when creating or updating a wallet transaction.
- * You can also use these types with validation libraries like Zod or Joi if needed.
- */
-
-import { z } from "zod";
-
-// Enum-like validation for TransactionType
-const transactionTypeEnum = z.enum([
-  "DEPOSIT",
-  "WITHDRAWAL",
-  "PURCHASE",
-  "REFUND",
-]);
-
-// Enum-like validation for PaymentStatus
-const paymentStatusEnum = z.enum(["PENDING", "COMPLETED", "FAILED"]);
+import {
+  WalletTransactionType,
+  PaymentStatus,
+} from "@/generated/prisma/client";
+import { nativeEnum, z } from "zod";
 
 /**
  * Zod schema for creating a new wallet transaction.
  * Validates all required fields necessary for creation.
  */
-export const zCreateWalletTransactionDto = z.object({
-  amount: z.number({ required_error: "Amount is required" }),
-  transactionType: transactionTypeEnum,
-  transactionStatus: paymentStatusEnum,
-  walletId: z
-    .union([z.string(), z.number()])
-    .transform(BigInt)
-    .refine((val) => val > 0n, {
-      message: "Wallet ID must be a positive integer",
-    }),
-  orderId: z
-    .union([z.string(), z.number()])
-    .transform(BigInt)
-    .refine((val) => val > 0n, {
-      message: "Order ID must be a positive integer",
-    })
-    .optional(),
-  description: z.string().min(1, "Description must not be empty").optional(),
-});
+export const zCreateWalletTransactionDto = {
+  body: z.object({
+    amount: z.number({ required_error: "Amount is required" }),
+    transactionType: nativeEnum(WalletTransactionType),
+    transactionStatus: nativeEnum(PaymentStatus),
+    walletId: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Wallet ID must be a positive integer",
+      }),
+    orderId: z
+      .union([z.string(), z.number()])
+      .transform(BigInt)
+      .refine((val) => val > 0n, {
+        message: "Order ID must be a positive integer",
+      })
+      .optional(),
+    description: z.string().min(1, "Description must not be empty").optional(),
+  }),
+};
 
-/**
- * TypeScript type inferred from create schema.
- * Use this type in services or elsewhere.
- */
-export type CreateWalletTransactionDto = z.infer<
-  typeof zCreateWalletTransactionDto
+// TypeScript type inferred from create schema
+type CreateWalletTransactionBodyDto = z.infer<
+  typeof zCreateWalletTransactionDto.body
 >;
+// Combined type for usage / services or elsewhere
+export type CreateWalletTransactionDto = {
+  body: CreateWalletTransactionBodyDto;
+};
 
 /**
  * Zod schema for updating a wallet transaction.
@@ -55,8 +45,8 @@ export type CreateWalletTransactionDto = z.infer<
  */
 export const zUpdateWalletTransactionDto = z.object({
   amount: z.number().optional(),
-  transactionType: transactionTypeEnum.optional(),
-  transactionStatus: paymentStatusEnum.optional(),
+  transactionType: nativeEnum(WalletTransactionType).optional(),
+  transactionStatus: nativeEnum(PaymentStatus).optional(),
   walletId: z
     .union([z.string(), z.number()])
     .transform(BigInt)

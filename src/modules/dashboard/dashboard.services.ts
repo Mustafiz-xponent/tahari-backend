@@ -5,7 +5,7 @@ import {
   DashboardSummary,
   MonthwisePayment,
   RecentOrder,
-} from "./dashboard.interfaces";
+} from "@/modules/dashboard/dashboard.interfaces";
 
 // Service function
 export const getDashboardSummary = async (
@@ -31,16 +31,9 @@ export const getDashboardSummary = async (
         where: {
           status: {
             in: [OrderStatus.CONFIRMED, OrderStatus.DELIVERED],
-          }, // Assuming OrderStatus.COMPLETED exists
+          },
         },
       }),
-
-      // // Count completed payments
-      // prisma.payment.count({
-      //   where: {
-      //     paymentStatus: "COMPLETED", // Adjust based on your payment status enum/string
-      //   },
-      // }),
 
       // Sum of completed payment amounts
       prisma.payment.aggregate({
@@ -152,25 +145,17 @@ const getRecentOrders = async (): Promise<RecentOrder[]> => {
     const recentOrders = await prisma.order.findMany({
       take: 5,
       orderBy: {
-        createdAt: "desc", // Most recent first
+        createdAt: "desc",
       },
       select: {
-        orderId: true, // BigInt field
-        orderDate: true, // DateTime field (already exists, no need to map from createdAt)
-        status: true, // OrderStatus enum
-        totalAmount: true, // Decimal field
-        paymentStatus: true, // PaymentStatus enum
+        orderId: true,
+        orderDate: true,
+        status: true,
+        totalAmount: true,
+        paymentStatus: true,
       },
     });
-
-    // Map to match your interface with proper type conversion
-    return recentOrders.map((order) => ({
-      orderId: order.orderId.toString(), // Convert BigInt to string
-      orderDate: order.orderDate, // Already DateTime
-      status: order.status, // OrderStatus enum
-      totalAmount: order.totalAmount.toNumber(), // Convert Decimal to number
-      paymentStatus: order.paymentStatus.toString(), // Convert PaymentStatus enum to string
-    }));
+    return recentOrders;
   } catch (error) {
     throw new Error(`Failed to fetch recent orders: ${getErrorMessage(error)}`);
   }

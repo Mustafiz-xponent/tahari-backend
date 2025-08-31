@@ -120,13 +120,15 @@ export const handleSSLCommerzIPN = async (
  * Get all payments
  */
 export const getAllPayments = async (
-  _req: Request,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
     // Read optional query param
-    const { paymentStatus } = _req.query;
-    const payments = await paymentService.getAllPayments(paymentStatus as string | undefined);
+    const { paymentStatus } = req.query;
+    const payments = await paymentService.getAllPayments(
+      paymentStatus as string | undefined
+    );
 
     sendResponse<Payment[]>(res, {
       success: true,

@@ -21,7 +21,7 @@ export const zCreateWalletDto = {
 
 // TypeScript type inferred from create schema.
 type CreateWalletBodyDto = z.infer<typeof zCreateWalletDto.body>;
-// Combined type for usage
+// Combined type for usage / services or elsewhere
 export type CreateWalletDto = {
   body: CreateWalletBodyDto;
 };

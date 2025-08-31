@@ -46,7 +46,7 @@ interface OrdersQuery {
   status?: OrderStatus;
   customerId?: string;
   orderId?: string;
-  sort?: "asc" | "desc";
+  sort?: string;
 }
 export const getAllOrders = async (
   req: Request<{}, {}, {}, OrdersQuery>,
@@ -60,7 +60,6 @@ export const getAllOrders = async (
     ); // Max 100 items per page
     const skip = (page - 1) * limit;
     const sort = req.query.sort === "asc" ? "asc" : "desc";
-
     const status = req.query.status as OrderStatus | undefined;
     const customerId = req.query.customerId
       ? BigInt(req.query.customerId as string)
@@ -68,18 +67,10 @@ export const getAllOrders = async (
     const orderId = req.query.orderId
       ? BigInt(req.query.orderId as string)
       : undefined;
-    // TODO: add pagination & filter functionality
 
-    const result = await orderService.getAllOrders({
-      status,
-      customerId,
-      orderId,
-      skip,
-      take: limit,
-      sort,
-      page,
-      limit,
-    });
+    const filters = { status, customerId, orderId };
+    const pagination = { page, limit, skip, sort };
+    const result = await orderService.getAllOrders({ filters, pagination });
     sendResponse<Order[]>(res, {
       success: true,
       statusCode: httpStatus.OK,

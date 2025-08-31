@@ -1,4 +1,5 @@
 import { OrderStatus } from "@/generated/prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 
 // Types
 export interface MonthwisePayment {
@@ -18,10 +19,10 @@ export interface MonthwisePayment {
 
 // Type for recent order
 export interface RecentOrder {
-  orderId: string;
+  orderId: bigint;
   orderDate: Date;
   status: OrderStatus;
-  totalAmount: number;
+  totalAmount: Decimal;
   paymentStatus: string;
 }
 

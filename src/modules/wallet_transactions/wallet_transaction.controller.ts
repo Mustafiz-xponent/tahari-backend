@@ -2,7 +2,6 @@
  * Controller layer for WalletTransaction entity operations.
  * Handles HTTP requests and responses for wallet transaction-related endpoints.
  */
-
 import { Request, Response } from "express";
 import * as walletTransactionService from "@/modules/wallet_transactions/wallet_transaction.service";
 import {
@@ -14,17 +13,12 @@ import { z } from "zod";
 import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
 import { WalletTransaction } from "@/generated/prisma/client";
+import { CustomerTransactionQuery } from "@/modules/wallet_transactions/wallet_transactions.interface";
 
 const transactionIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Transaction ID must be a positive integer",
 });
-interface ICustomerTransactionQuery {
-  page?: string;
-  limit?: string;
-  sort?: "asc" | "desc";
-  transactionStatus?: string;
-  transactionType?: string;
-}
+
 /**
  * Create a new wallet transaction
  */
@@ -33,9 +27,8 @@ export const createWalletTransaction = async (
   res: Response
 ): Promise<void> => {
   try {
-    const data = zCreateWalletTransactionDto.parse(req.body);
     const transaction = await walletTransactionService.createWalletTransaction(
-      data
+      req.body
     );
 
     sendResponse<WalletTransaction>(res, {
@@ -100,7 +93,7 @@ export const getWalletTransactionById = async (
  * Get a customer wallet transactions
  */
 export const getCustomerWalletTransactions = async (
-  req: Request<{}, {}, {}, ICustomerTransactionQuery>,
+  req: Request<{}, {}, {}, CustomerTransactionQuery>,
   res: Response
 ): Promise<void> => {
   try {
