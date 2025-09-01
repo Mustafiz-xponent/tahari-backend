@@ -10,7 +10,6 @@ import {
   UpdateWalletTransactionDto,
 } from "@/modules/wallet_transactions/wallet_transaction.dto";
 import { handleErrorResponse } from "@/utils/errorResponseHandler";
-import { z } from "zod";
 import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
 import { WalletTransaction } from "@/generated/prisma/client";

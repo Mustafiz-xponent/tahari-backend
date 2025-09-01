@@ -57,19 +57,20 @@ export async function getAllCustomers(
     const { page, limit, skip, sort } = paginationParams;
     const { search } = filterParams;
 
-    const customers = await prisma.$queryRaw<
-      Array<{
-        customerId: bigint;
-        userId: bigint;
-        name: string | null;
-        email: string | null;
-        phone: string;
-        lastMessageId: bigint | null;
-        lastMessage: string | null;
-        lastMessageCreatedAt: Date | null;
-        unreadMessageCount: number;
-      }>
-    >`
+    const [customers, totalUnreadMessageResult] = await Promise.all([
+      prisma.$queryRaw<
+        Array<{
+          customerId: bigint;
+          userId: bigint;
+          name: string | null;
+          email: string | null;
+          phone: string;
+          lastMessageId: bigint | null;
+          lastMessage: string | null;
+          lastMessageCreatedAt: Date | null;
+          unreadMessageCount: number;
+        }>
+      >`
         SELECT 
             c."customerId",
             u."userId",
@@ -109,8 +110,16 @@ export async function getAllCustomers(
 
         ORDER BY m."createdAt" DESC NULLS LAST
         LIMIT ${limit} OFFSET ${skip};
-        `;
-
+        `,
+      // Count total unread messages for admin/support
+      prisma.$queryRaw<{ totalUnreadMessageCount: number }[]>`
+      SELECT COUNT(*)::int as "totalUnreadMessageCount"
+      FROM "Message"
+      WHERE "status" = 'UNREAD'
+        AND "receiverId" IS NULL;
+  `,
+    ]);
+    // count total customers
     const totalCount = await prisma.customer.count({
       where: {
         user: {
@@ -124,12 +133,15 @@ export async function getAllCustomers(
       },
     });
     const totalPages = Math.ceil(totalCount / limit);
+    const totalUnreadMessageCount =
+      totalUnreadMessageResult[0]?.totalUnreadMessageCount ?? 0;
 
     return {
       customers,
       totalCount,
       totalPages,
       currentPage: page,
+      totalUnreadMessageCount,
     };
   } catch (error) {
     console.error("Failed to fetch customers:", error);

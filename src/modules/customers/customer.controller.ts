@@ -47,6 +47,9 @@ export const getAllCustomers = asyncHandler(
         hasNextPage: page < result.totalPages,
         hasPreviousPage: page > 1,
       },
+      meta: {
+        totalUnreadMessageCount: result.totalUnreadMessageCount,
+      },
     });
   }
 );

@@ -5,6 +5,7 @@ export interface GetAllCusotmersResult {
   currentPage: number;
   totalPages: number;
   totalCount: number;
+  totalUnreadMessageCount: number;
 }
 export interface GetAllCustomersPaginationParams {
   page: number;
