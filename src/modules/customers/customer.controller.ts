@@ -13,6 +13,7 @@ import { ZodError, z } from "zod";
 import httpStatus from "http-status";
 import sendResponse from "@/utils/sendResponse";
 import { Customer } from "@/generated/prisma/client";
+import asyncHandler from "@/utils/asyncHandler";
 
 const customerIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
   message: "Customer ID must be a positive integer",
@@ -21,31 +22,34 @@ const customerIdSchema = z.coerce.bigint().refine((val) => val > 0n, {
 /**
  * Get all customers
  */
-export const getAllCustomers = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const { page, limit, sort } =
-    req.query as unknown as GetAllCustomersDto["query"];
-  const skip = (page - 1) * limit;
-  const paginationParams = { page, limit, skip, sort };
-  const result = await customerService.getAllCustomers(paginationParams);
+export const getAllCustomers = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { page, limit, sort, search } =
+      req.query as unknown as GetAllCustomersDto["query"];
+    const skip = (page - 1) * limit;
+    const paginationParams = { page, limit, skip, sort };
+    const filterParams = { search };
+    const result = await customerService.getAllCustomers(
+      paginationParams,
+      filterParams
+    );
 
-  sendResponse<Customer[]>(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "Customers retrieved successfully",
-    data: result.customers,
-    pagination: {
-      currentPage: result.currentPage,
-      totalPages: result.totalPages,
-      totalItems: result.totalCount,
-      itemsPerPage: limit,
-      hasNextPage: page < result.totalPages,
-      hasPreviousPage: page > 1,
-    },
-  });
-};
+    sendResponse<Customer[]>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Customers retrieved successfully",
+      data: result.customers,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalCount,
+        itemsPerPage: limit,
+        hasNextPage: page < result.totalPages,
+        hasPreviousPage: page > 1,
+      },
+    });
+  }
+);
 
 /**
  * Get a single customer by ID

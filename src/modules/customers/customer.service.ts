@@ -15,6 +15,7 @@ import {
   GetAllCusotmersResult,
   GetAllCustomersPaginationParams,
 } from "@/modules/customers/customer.interface";
+import { Sql } from "@/generated/prisma/client/runtime/library";
 
 /**
  * Create a new customer
@@ -49,10 +50,12 @@ import {
  * @throws Error if the query fails
  */
 export async function getAllCustomers(
-  paginationParams: GetAllCustomersPaginationParams
+  paginationParams: GetAllCustomersPaginationParams,
+  filterParams: { search?: string }
 ): Promise<GetAllCusotmersResult> {
   try {
     const { page, limit, skip, sort } = paginationParams;
+    const { search } = filterParams;
 
     const customers = await prisma.$queryRaw<
       Array<{
@@ -97,12 +100,29 @@ export async function getAllCustomers(
               AND um."receiverId" IS NULL
               AND um."status" = 'UNREAD'
         ) unread_counts ON TRUE
+       
+       -- Filter by name or phone
+        WHERE 
+          (${search}::text IS NULL OR 
+          u."name" ILIKE '%' || ${search} || '%' OR 
+          u."phone" ILIKE '%' || ${search} || '%')
 
         ORDER BY m."createdAt" DESC NULLS LAST
         LIMIT ${limit} OFFSET ${skip};
         `;
 
-    const totalCount = await prisma.customer.count();
+    const totalCount = await prisma.customer.count({
+      where: {
+        user: {
+          OR: search
+            ? [
+                { name: { contains: search, mode: "insensitive" } },
+                { phone: { contains: search, mode: "insensitive" } },
+              ]
+            : undefined,
+        },
+      },
+    });
     const totalPages = Math.ceil(totalCount / limit);
 
     return {
@@ -112,6 +132,7 @@ export async function getAllCustomers(
       currentPage: page,
     };
   } catch (error) {
+    console.error("Failed to fetch customers:", error);
     throw error;
   }
 }
