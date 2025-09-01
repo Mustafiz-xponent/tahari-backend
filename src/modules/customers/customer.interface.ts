@@ -6,7 +6,7 @@ export interface GetAllCusotmersResult {
   totalPages: number;
   totalCount: number;
 }
-export interface GetAllCustomersQueryParams {
+export interface GetAllCustomersPaginationParams {
   page: number;
   limit: number;
   skip: number;

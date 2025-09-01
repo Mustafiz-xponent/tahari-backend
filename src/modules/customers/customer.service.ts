@@ -13,7 +13,7 @@ import { getErrorMessage } from "@/utils/errorHandler";
 import bcrypt from "bcrypt";
 import {
   GetAllCusotmersResult,
-  GetAllCustomersQueryParams,
+  GetAllCustomersPaginationParams,
 } from "@/modules/customers/customer.interface";
 
 /**
@@ -49,51 +49,64 @@ import {
  * @throws Error if the query fails
  */
 export async function getAllCustomers(
-  paginationParams: GetAllCustomersQueryParams
+  paginationParams: GetAllCustomersPaginationParams
 ): Promise<GetAllCusotmersResult> {
   try {
     const { page, limit, skip, sort } = paginationParams;
-    const customers = await prisma.customer.findMany({
-      include: {
-        user: {
-          select: {
-            userId: true,
-            name: true,
-            email: true,
-            phone: true,
-            // Count unread messages per customer for admin/support.
-            _count: {
-              select: {
-                sentMessages: {
-                  where: {
-                    receiverId: null, // null when receiver is admin/support
-                    status: "UNREAD",
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      take: limit,
-      skip: skip,
-    });
+
+    const customers = await prisma.$queryRaw<
+      Array<{
+        customerId: bigint;
+        userId: bigint;
+        name: string | null;
+        email: string | null;
+        phone: string;
+        lastMessageId: bigint | null;
+        lastMessage: string | null;
+        lastMessageCreatedAt: Date | null;
+        unreadMessageCount: number;
+      }>
+    >`
+        SELECT 
+            c."customerId",
+            u."userId",
+            u."name",
+            u."email",
+            u."phone",
+            m."messageId" as "lastMessageId",
+            m."message"   as "lastMessage",
+            m."createdAt" as "lastMessageCreatedAt",
+            COALESCE(unread_counts."unreadCount", 0) as "unreadMessageCount"
+        FROM "Customer" c
+        JOIN "User" u ON u."userId" = c."userId"
+
+        -- find last message per user (sent or received)
+        LEFT JOIN LATERAL (
+            SELECT msg."messageId", msg."message", msg."createdAt"
+            FROM "Message" msg
+            WHERE msg."senderId" = u."userId" OR msg."receiverId" = u."userId"
+            ORDER BY msg."createdAt" DESC
+            LIMIT 1
+        ) m ON TRUE
+
+        -- count unread messages (for admin/support)
+        LEFT JOIN LATERAL (
+            SELECT COUNT(*) as "unreadCount"
+            FROM "Message" um
+            WHERE um."senderId" = u."userId"
+              AND um."receiverId" IS NULL
+              AND um."status" = 'UNREAD'
+        ) unread_counts ON TRUE
+
+        ORDER BY m."createdAt" DESC NULLS LAST
+        LIMIT ${limit} OFFSET ${skip};
+        `;
 
     const totalCount = await prisma.customer.count();
     const totalPages = Math.ceil(totalCount / limit);
-    const customersWithUnreadMessageCount = customers.map((customer) => ({
-      customerId: customer.customerId,
-      userId: customer.userId,
-      user: {
-        userId: customer.user.userId,
-        name: customer.user.name,
-        email: customer.user.email,
-      },
-      unreadMessageCount: customer.user._count.sentMessages,
-    }));
 
     return {
-      customers: customersWithUnreadMessageCount,
+      customers,
       totalCount,
       totalPages,
       currentPage: page,
