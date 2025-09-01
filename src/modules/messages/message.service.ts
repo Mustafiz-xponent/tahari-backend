@@ -10,7 +10,7 @@ import {
   UpdateMessageDto,
 } from "@/modules/messages/message.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
-import { getOnlineSupportSockets, getSocketId, io } from "@/utils/socket";
+import { getOnlineAdminSupportSockets, getSocketId, io } from "@/utils/socket";
 import { UserRole, Message } from "@/generated/prisma/client";
 
 type GetAllMessagesResult = {
@@ -255,7 +255,7 @@ export async function updateMessage(
       });
     }
 
-    getOnlineSupportSockets().forEach((socketId) => {
+    getOnlineAdminSupportSockets().forEach((socketId) => {
       io.to(socketId).emit("messageUpdated", {
         message: updatedMessage,
       });
@@ -308,7 +308,7 @@ export async function deleteMessage(
         messageId: deletedMessage.messageId,
       });
     }
-    getOnlineSupportSockets().forEach((socketId) => {
+    getOnlineAdminSupportSockets().forEach((socketId) => {
       io.to(socketId).emit("messageDeleted", {
         messageId: deletedMessage.messageId,
       });
@@ -352,7 +352,7 @@ export const sendMessage = async ({
         },
       });
 
-      getOnlineSupportSockets().forEach((socketId) => {
+      getOnlineAdminSupportSockets().forEach((socketId) => {
         io.to(socketId).emit("newMessage", msg);
       });
       const customerSocket = getSocketId(String(senderId));
@@ -411,7 +411,7 @@ export const sendMessage = async ({
         io.to(customerSocket).emit("newMessage", msg);
       }
 
-      getOnlineSupportSockets().forEach((socketId) => {
+      getOnlineAdminSupportSockets().forEach((socketId) => {
         io.to(socketId).emit("newMessage", msg);
       });
 
@@ -488,7 +488,7 @@ export const markMessageAsRead = async ({
       }
     } else if (userRole === UserRole.CUSTOMER) {
       // Notify support/admin that CUSTOMER read their messages
-      getOnlineSupportSockets().forEach((socketId) => {
+      getOnlineAdminSupportSockets().forEach((socketId) => {
         io.to(socketId).emit("messagesRead", {
           read: true,
           readBy: "CUSTOMER",

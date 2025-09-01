@@ -17,7 +17,7 @@ import logger from "@/utils/logger";
 import { Prisma } from "@prisma/client";
 import prisma from "@/prisma-client/prismaClient";
 import { createNotification } from "@/utils/processPayment";
-import { getOnlineSupportSockets, io } from "@/utils/socket";
+import { getOnlineAdminSupportSockets, io } from "@/utils/socket";
 import * as orderService from "@/modules/orders/orders.service";
 
 // Types
@@ -255,7 +255,7 @@ export const createOrderWithItems = async (
   // Emit Support/Admin
   if (order) {
     const orderData = await orderService.getOrderById(order.orderId);
-    const sockets = getOnlineSupportSockets();
+    const sockets = getOnlineAdminSupportSockets();
     sockets.forEach((socketId) => {
       io.to(socketId).emit("newOrder", orderData);
     });

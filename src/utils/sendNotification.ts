@@ -1,12 +1,12 @@
 import { NotificationType } from "@/generated/prisma/client";
 import { Prisma } from "@prisma/client";
-import { getOnlineSupportSockets, getSocketId, io } from "@/utils/socket";
+import { getOnlineAdminSupportSockets, getSocketId, io } from "@/utils/socket";
 import prisma from "@/prisma-client/prismaClient";
 
 export const sendNotification = async (
   message: string,
   type: NotificationType,
-  notify: "CUSTOMER" | "SUPPORT",
+  notify: "CUSTOMER" | "ADMIN_SUPPORT",
   userId?: bigint,
   tx?: Prisma.TransactionClient
 ) => {
@@ -25,10 +25,10 @@ export const sendNotification = async (
       io.to(receiverId).emit("newNotification", notification);
     }
   }
-  if (notify === "SUPPORT") {
-    // 🔥 Emit order notification to Admins/Support
-    //     getOnlineSupportSockets().forEach((socketId) => {
-    //       io.to(socketId).emit("newOrder", order);
-    //     });
+
+  if (notify === "ADMIN_SUPPORT") {
+    getOnlineAdminSupportSockets().forEach((socketId) => {
+      io.to(socketId).emit("newNotification", notification);
+    });
   }
 };

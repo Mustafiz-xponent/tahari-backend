@@ -17,7 +17,7 @@ import {
 } from "@/utils/processPayment";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
 import { createNotification } from "@/utils/processPayment";
-import { getOnlineSupportSockets, io } from "@/utils/socket";
+import { getOnlineAdminSupportSockets, io } from "@/utils/socket";
 import * as orderService from "@/modules/orders/orders.service";
 
 /**
@@ -189,7 +189,7 @@ export async function handleSSLCommerzSuccess(
       // Emit to all connected support/admin sockets
       if (paymentResult.success) {
         const orderData = await orderService.getOrderById(orderId);
-        const sockets = getOnlineSupportSockets();
+        const sockets = getOnlineAdminSupportSockets();
         sockets.forEach((socketId) => {
           io.to(socketId).emit("newOrder", orderData);
         });

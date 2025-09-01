@@ -25,19 +25,19 @@ export function getSocketId(userId: string): string | null {
   return onlineUsers.get(userId)?.socketId || null;
 }
 
-// Helper to get all online support staff socket IDs
-export function getOnlineSupportSockets(): string[] {
-  const supportSockets: string[] = [];
+// Helper to get all online admin/support socket IDs
+export function getOnlineAdminSupportSockets(): string[] {
+  const adminSupportSockets: string[] = [];
   onlineUsers.forEach((userData) => {
     if (
       userData.role === UserRole.SUPPORT ||
       userData.role === UserRole.ADMIN ||
       userData.role === UserRole.SUPER_ADMIN
     ) {
-      supportSockets.push(userData.socketId);
+      adminSupportSockets.push(userData.socketId);
     }
   });
-  return supportSockets;
+  return adminSupportSockets;
 }
 
 // Helper to get all online users

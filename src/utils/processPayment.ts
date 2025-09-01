@@ -4,7 +4,7 @@ import { NotificationType, Payment } from "@/generated/prisma/client";
 import { getErrorMessage } from "@/utils/errorHandler";
 import axios from "axios";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
-import { getOnlineSupportSockets, getSocketId, io } from "@/utils/socket";
+import { getOnlineAdminSupportSockets, getSocketId, io } from "@/utils/socket";
 import { Prisma } from "@prisma/client";
 import * as orderService from "@/modules/orders/orders.service";
 
@@ -147,7 +147,7 @@ export async function processWalletPayment(
   // Emit to all connected support/admin sockets
   if (paymentResult) {
     const orderData = await orderService.getOrderById(order.orderId);
-    const sockets = getOnlineSupportSockets();
+    const sockets = getOnlineAdminSupportSockets();
     sockets.forEach((socketId) => {
       io.to(socketId).emit("newOrder", orderData);
     });
@@ -210,7 +210,7 @@ export async function processCodPayment(
   // Emit to all connected support/admin sockets
   if (paymentResult) {
     const orderData = await orderService.getOrderById(order.orderId);
-    const sockets = getOnlineSupportSockets();
+    const sockets = getOnlineAdminSupportSockets();
     sockets.forEach((socketId) => {
       io.to(socketId).emit("newOrder", orderData);
     });
