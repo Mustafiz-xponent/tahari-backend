@@ -4,7 +4,11 @@
  */
 
 import prisma from "@/prisma-client/prismaClient";
-import { Notification, NotificationStatus } from "@/generated/prisma/client";
+import {
+  Notification,
+  NotificationStatus,
+  UserRole,
+} from "@/generated/prisma/client";
 import {
   CreateNotificationDto,
   UpdateNotificationDto,
@@ -270,12 +274,30 @@ export async function markNotificationAsReadById(
  */
 
 export async function markAllNotificationsAsRead(
-  userId: BigInt
+  userId: bigint
 ): Promise<void> {
   try {
+    // Check if the user exists
+    const user = await prisma.user.findUnique({
+      where: { userId },
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    // If role is customer then receiverId is userId else receiverId is null
+    const receiverId =
+      user.role === UserRole.CUSTOMER
+        ? userId
+        : [UserRole.ADMIN, UserRole.SUPPORT, UserRole.SUPER_ADMIN].includes(
+            user.role
+          )
+        ? null
+        : undefined;
+
+    // update all notifications
     await prisma.notification.updateMany({
       where: {
-        receiverId: Number(userId),
+        receiverId,
         status: NotificationStatus.UNREAD,
       },
       data: {
@@ -294,12 +316,30 @@ export async function markAllNotificationsAsRead(
  */
 
 export async function markAllNotificationsAsSeen(
-  userId: BigInt
+  userId: bigint
 ): Promise<void> {
   try {
+    // Check if the user exists
+    const user = await prisma.user.findUnique({
+      where: { userId },
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    // If role is customer then receiverId is userId else receiverId is null
+    const receiverId =
+      user.role === UserRole.CUSTOMER
+        ? userId
+        : [UserRole.ADMIN, UserRole.SUPPORT, UserRole.SUPER_ADMIN].includes(
+            user.role
+          )
+        ? null
+        : undefined;
+
+    // update all notifications
     await prisma.notification.updateMany({
       where: {
-        receiverId: Number(userId),
+        receiverId,
         isSeen: false,
       },
       data: {
