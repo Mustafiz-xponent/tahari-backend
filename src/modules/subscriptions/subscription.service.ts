@@ -182,7 +182,15 @@ export async function createSubscription(
       } else {
         throw new Error("Invalid payment method. Must be WALLET or COD.");
       }
-
+      // Notify the admin/support
+      const notificationMessage = `A user has subscribed to a plan. Subscription ID: ${subscription.subscriptionId}`;
+      await sendNotification(
+        notificationMessage,
+        "SUBSCRIPTION",
+        "ADMIN_SUPPORT",
+        null,
+        tx
+      );
       return subscription;
     });
   } catch (error) {
