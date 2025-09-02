@@ -1,37 +1,19 @@
-import { CreatePaymentDto } from "@/modules/payments/payment.dto";
-import prisma from "@/prisma-client/prismaClient";
-import { NotificationType, Payment } from "@/generated/prisma/client";
-import { getErrorMessage } from "@/utils/errorHandler";
 import axios from "axios";
-import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
-import { getOnlineAdminSupportSockets, getSocketId, io } from "@/utils/socket";
 import { Prisma } from "@prisma/client";
+import prisma from "@/prisma-client/prismaClient";
+import { getErrorMessage } from "@/utils/errorHandler";
 import * as orderService from "@/modules/orders/orders.service";
+import { CreatePaymentDto } from "@/modules/payments/payment.dto";
+import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
+import { NotificationType, Payment } from "@/generated/prisma/client";
+import { getOnlineAdminSupportSockets, getSocketId, io } from "@/utils/socket";
+import { sendNotification } from "./sendNotification";
 
 export interface PaymentResult {
   payment?: Payment;
   redirectUrl?: string; // For SSLCommerz redirect
 }
 
-// Notify the customer realtime
-export const createNotification = async (
-  message: string,
-  type: NotificationType,
-  userId: bigint,
-  tx: Prisma.TransactionClient
-) => {
-  const notification = await tx.notification.create({
-    data: {
-      message: message.replace(/\s+/g, " ").trim(),
-      receiverId: userId,
-      type,
-    },
-  });
-  const receiverId = getSocketId(String(userId));
-  if (receiverId) {
-    io.to(receiverId).emit("newNotification", notification);
-  }
-};
 /**
  * Process payment through customer wallet
  */
@@ -134,13 +116,22 @@ export async function processWalletPayment(
       updatedOrder.status,
       data.orderId
     );
-    await createNotification(
+    await sendNotification(
       customerMessage,
       "ORDER",
+      "CUSTOMER",
       order.customer.userId,
       tx
     );
-    // TODO: Notify the admin a new order has been placed
+    // Notify the admin/support
+    const adminNotificationMessage = `A new order has been placed. OrderId #${data.orderId}`;
+    await sendNotification(
+      adminNotificationMessage,
+      "ORDER",
+      "ADMIN_SUPPORT",
+      null,
+      tx
+    );
 
     return payment;
   });
@@ -202,8 +193,22 @@ export async function processCodPayment(
     });
     // Notify the customer
     const message = `ধন্যবাদ! আপনার অর্ডারটি নিশ্চিত হয়েছে। দয়া করে পণ্য গ্রহণের সময় পেমেন্ট করুন। (অর্ডার আইডিঃ #${data.orderId})`;
-    await createNotification(message, "ORDER", order.customer.userId, tx);
-    // TODO: Notify the admin
+    await sendNotification(
+      message,
+      "ORDER",
+      "CUSTOMER",
+      order.customer.userId,
+      tx
+    );
+    // Notify the admin/support
+    const adminNotificationMessage = `A new order has been placed. OrderId #${data.orderId}`;
+    await sendNotification(
+      adminNotificationMessage,
+      "ORDER",
+      "ADMIN_SUPPORT",
+      null,
+      tx
+    );
     return payment;
   });
 

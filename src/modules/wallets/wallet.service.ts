@@ -10,13 +10,11 @@ import {
   UpdateWalletDto,
 } from "@/modules/wallets/wallet.dto";
 import { processSSLCommerzWalletDeposite } from "@/utils/processWalletDeposite";
-import {
-  createNotification,
-  validateSSLCommerzPayment,
-} from "@/utils/processPayment";
+import { validateSSLCommerzPayment } from "@/utils/processPayment";
 import { WalletDepositeResult } from "@/modules/wallets/wallet.interface";
 import { AppError } from "@/utils/appError";
 import httpStatus from "http-status";
+import { sendNotification } from "@/utils/sendNotification";
 
 /**
  * Create a new wallet
@@ -132,11 +130,12 @@ export async function handleDepositeSuccess(
             customer: true,
           },
         });
-        // notify the user--
+        // Notify the Customer--
         const message = `অভিনন্দন! আপনার ওয়ালেটে ${walletTransaction.amount} টাকা সফলভাবে জমা হয়েছে। ধন্যবাদ আমাদের সাথে থাকার জন্য। (লেনদেন আইডি: ${tranId})`;
-        await createNotification(
+        await sendNotification(
           message,
           "WALLET",
+          "CUSTOMER",
           updatedWallet.customer.userId,
           tx
         );
@@ -199,9 +198,11 @@ export async function handleDepositeFailure(failureData: any): Promise<void> {
           },
         });
         const message = `দুঃখিত! আপনার ওয়ালেটে টাকা জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন বা সহায়তার জন্য আমাদের সাথে যোগাযোগ করুন।`;
-        await createNotification(
+
+        await sendNotification(
           message,
           "WALLET",
+          "CUSTOMER",
           walletTransaction.wallet.customer.userId,
           tx
         );

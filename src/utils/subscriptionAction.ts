@@ -10,7 +10,7 @@ import {
   hasInsufficientStock,
   updateProductStock,
 } from "@/utils/processSubscription";
-import { createNotification } from "@/utils/processPayment";
+import { sendNotification } from "./sendNotification";
 
 export const canPauseOrCancelSubscription = async (
   subscriptionId: bigint,
@@ -125,7 +125,7 @@ export async function pauseOrCancelSubscription(
     if (action === "CANCELLED") {
       message = `আপনার সাবস্ক্রিপশনটি বাতিল করা হয়েছে।`;
     }
-    await createNotification(message, "SUBSCRIPTION", userId, tx);
+    await sendNotification(message, "SUBSCRIPTION", "CUSTOMER", userId, tx);
     return updatedSubscription;
   });
 }
@@ -228,7 +228,7 @@ export async function processResumeSubscription(
     }
     // Notify the customer realtime
     const message = `আপনার সাবস্ক্রিপশনটি পুনরায় চালু করা হয়েছে।`;
-    await createNotification(message, "SUBSCRIPTION", userId, tx);
+    await sendNotification(message, "SUBSCRIPTION", "CUSTOMER", userId, tx);
     return updatedSubscription;
   });
 }

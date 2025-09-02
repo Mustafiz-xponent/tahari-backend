@@ -16,9 +16,9 @@ import {
 import logger from "@/utils/logger";
 import { Prisma } from "@prisma/client";
 import prisma from "@/prisma-client/prismaClient";
-import { createNotification } from "@/utils/processPayment";
 import { getOnlineAdminSupportSockets, io } from "@/utils/socket";
 import * as orderService from "@/modules/orders/orders.service";
+import { sendNotification } from "./sendNotification";
 
 // Types
 export type SubscriptionWithRelations = {
@@ -147,10 +147,12 @@ const pauseAndNotifyInsufficientStock = async (
   tx: Prisma.TransactionClient
 ) => {
   await pauseSubscription(subscription.subscriptionId, tx);
-  // Notify customer
-  await createNotification(
-    `আপনার সাবস্ক্রিপশন সাময়িকভাবে বন্ধ হয়েছে কারণ পণ্যটি স্টকে নেই।`,
+  // Notify the customer
+  const notificationMessage = `আপনার সাবস্ক্রিপশন সাময়িকভাবে বন্ধ হয়েছে কারণ পণ্যটি স্টকে নেই।`;
+  await sendNotification(
+    notificationMessage,
     "SUBSCRIPTION",
+    "CUSTOMER",
     customer.userId,
     tx
   );
@@ -252,7 +254,7 @@ export const createOrderWithItems = async (
     ],
   });
 
-  // Emit Support/Admin
+  // Emit all connected Support/Admin
   if (order) {
     const orderData = await orderService.getOrderById(order.orderId);
     const sockets = getOnlineAdminSupportSockets();
@@ -281,14 +283,20 @@ export const createSubscriptionDelivery = async (
       orderId: order.orderId,
     },
   });
-  // Notify customer
+  // Notify the customer
   let message = ``;
   if (paymentMethod === "WALLET") {
     message = `আপনার সাবস্ক্রিপশন ডেলিভারি নির্ধারিত হয়েছে।`;
   } else if (paymentMethod === "COD") {
     message = `আপনার সাবস্ক্রিপশন ডেলিভারি নির্ধারিত হয়েছে। দয়া করে পণ্য গ্রহণের সময় পেমেন্ট করুন।`;
   }
-  await createNotification(message, "SUBSCRIPTION", customer.userId, tx);
+  await sendNotification(
+    message,
+    "SUBSCRIPTION",
+    "CUSTOMER",
+    customer.userId,
+    tx
+  );
 };
 const getProduct = async (
   subscription: SubscriptionWithRelations,
@@ -390,19 +398,28 @@ const handleRenewalWalletPayment = async (
       "WALLET",
       tx
     );
-    // Notify customer
+    // Notify the customer
     const message = `আপনার সাবস্ক্রিপশন সফলভাবে রিনিউ হয়েছে।`;
-    await createNotification(message, "SUBSCRIPTION", customer.userId, tx);
+    await sendNotification(
+      message,
+      "SUBSCRIPTION",
+      "CUSTOMER",
+      customer.userId,
+      tx
+    );
 
     logger.info(
       `Renewed subscription ${subscription.subscriptionId} with WALLET.`
     );
   } else {
     await pauseSubscription(subscription.subscriptionId, tx);
-    // Notify customer
-    await createNotification(
-      "পরবর্তী সাবস্ক্রিপশন পরিশোধের জন্য পর্যাপ্ত ব্যালেন্স নেই, অনুগ্রহ করে ওয়ালেট রিচার্জ করুন।",
+    // Notify the customer
+    const notificationMessage =
+      "পরবর্তী সাবস্ক্রিপশন পরিশোধের জন্য পর্যাপ্ত ব্যালেন্স নেই, অনুগ্রহ করে ওয়ালেট রিচার্জ করুন।";
+    await sendNotification(
+      notificationMessage,
       "SUBSCRIPTION",
+      "CUSTOMER",
       customer.userId,
       tx
     );

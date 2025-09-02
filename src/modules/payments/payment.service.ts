@@ -16,9 +16,9 @@ import {
   validateSSLCommerzPayment,
 } from "@/utils/processPayment";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
-import { createNotification } from "@/utils/processPayment";
 import { getOnlineAdminSupportSockets, io } from "@/utils/socket";
 import * as orderService from "@/modules/orders/orders.service";
+import { sendNotification } from "@/utils/sendNotification";
 
 /**
  * create order payment through wallet or SSLCommerz
@@ -179,8 +179,23 @@ export async function handleSSLCommerzSuccess(
           updatedOrder.status,
           updatedOrder.orderId
         );
-        await createNotification(message, "ORDER", order.customer.userId, tx);
-        // TODO: Notify the admin
+
+        await sendNotification(
+          message,
+          "ORDER",
+          "CUSTOMER",
+          order.customer.userId,
+          tx
+        );
+        // Notify the admin/support
+        const adminNotificationMessage = `A new order has been placed. Order ID: ${orderId}`;
+        await sendNotification(
+          adminNotificationMessage,
+          "ORDER",
+          "ADMIN_SUPPORT",
+          null,
+          tx
+        );
         return {
           success: true,
           message: "SSLCommerz payment completed successfully",
@@ -310,8 +325,15 @@ export async function handleSSLCommerzFailure(failureData: any): Promise<void> {
           data: { paymentStatus: "FAILED" },
         });
       }
+      // Notify the customer
       const message = `দুঃখিত! আপনার অর্ডারটি সম্পন্ন করা যায়নি কারণ পেমেন্ট সফল হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।   (অর্ডার আইডিঃ #${order.orderId})`;
-      await createNotification(message, "ORDER", order.customer.userId, tx);
+      await sendNotification(
+        message,
+        "ORDER",
+        "CUSTOMER",
+        order.customer.userId,
+        tx
+      );
     });
   } catch (error) {
     console.error("handleSSLCommerzFailure error:", error);

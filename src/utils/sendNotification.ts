@@ -1,13 +1,13 @@
-import { NotificationType } from "@/generated/prisma/client";
-import { Prisma } from "@prisma/client";
 import { getOnlineAdminSupportSockets, getSocketId, io } from "@/utils/socket";
+import { NotificationType } from "@/generated/prisma/client";
 import prisma from "@/prisma-client/prismaClient";
+import { Prisma } from "@prisma/client";
 
 export const sendNotification = async (
   message: string,
   type: NotificationType,
   notify: "CUSTOMER" | "ADMIN_SUPPORT",
-  userId?: bigint,
+  receiverId?: bigint | null,
   tx?: Prisma.TransactionClient
 ) => {
   // pick transaction client if provided, otherwise use prisma
@@ -15,14 +15,14 @@ export const sendNotification = async (
   const notification = await db.notification.create({
     data: {
       message: message.replace(/\s+/g, " ").trim(),
-      receiverId: userId ? userId : null,
+      receiverId: receiverId ? receiverId : null,
       type,
     },
   });
   if (notify === "CUSTOMER") {
-    const receiverId = getSocketId(String(userId));
-    if (receiverId) {
-      io.to(receiverId).emit("newNotification", notification);
+    const receiverSocketId = getSocketId(String(receiverId));
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newNotification", notification);
     }
   }
 

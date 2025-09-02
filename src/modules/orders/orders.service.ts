@@ -2,18 +2,17 @@
  * Service layer for Order entity operations.
  * Contains business logic and database interactions for orders.
  */
-
-import prisma from "@/prisma-client/prismaClient";
 import { Order, OrderStatus, Prisma } from "@/generated/prisma/client";
 import { CreateOrderDto, UpdateOrderDto } from "@/modules/orders/orders.dto";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { getBatchAccessibleImageUrls } from "@/utils/fileUpload/s3Aws";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
-import { createNotification } from "@/utils/processPayment";
 import {
   hasInsufficientWalletBalance,
   upcomingDelivery,
 } from "@/utils/processSubscription";
+import prisma from "@/prisma-client/prismaClient";
+import { sendNotification } from "@/utils/sendNotification";
 
 interface CustomerOrdersResult {
   orders: Order[];
@@ -316,10 +315,12 @@ export async function updateOrder(
             },
           });
         }
+        // Notify the customer
         const message = getOrderStatusMessage(data.status, orderId);
-        await createNotification(
+        await sendNotification(
           message,
           "ORDER",
+          "CUSTOMER",
           currentOrder.customer.userId,
           tx
         );

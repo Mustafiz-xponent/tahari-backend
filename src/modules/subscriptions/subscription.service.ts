@@ -23,7 +23,7 @@ import {
   processResumeSubscription,
 } from "@/utils/subscriptionAction";
 import { getBatchAccessibleImageUrls } from "@/utils/fileUpload/s3Aws";
-import { createNotification } from "@/utils/processPayment";
+import { sendNotification } from "@/utils/sendNotification";
 
 /**
  * Create a new subscription
@@ -436,7 +436,7 @@ export async function cancelSubscription(
           data: { status: "CANCELLED" },
         });
         const message = `আপনার সাবস্ক্রিপশনটি বাতিল করা হয়েছে।`;
-        await createNotification(message, "SUBSCRIPTION", userId, tx);
+        await sendNotification(message, "SUBSCRIPTION", "CUSTOMER", userId, tx);
         return result;
       });
     } else {
