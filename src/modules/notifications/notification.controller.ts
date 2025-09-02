@@ -70,10 +70,10 @@ export const getAllNotifications = async (
   }
 };
 /**
- * Get a user notification by userId
+ * Get a customer notification by userId
  */
 
-export const getUserNotifications = async (
+export const getCustomerNotifications = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -87,8 +87,54 @@ export const getUserNotifications = async (
     const skip = (page - 1) * limit;
     const sort = req.query.sort === "asc" ? "asc" : "desc";
     const paginationParams = { page, limit, skip, sort };
-    const result = await notificationService.getUserNotifications(
+    const result = await notificationService.getCustomerNotifications(
       BigInt(userId),
+      paginationParams
+    );
+    sendResponse<Notification[]>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Notifications retrieved successfully",
+      data: result.notifications,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalItems: result.totalCount,
+        itemsPerPage: limit,
+        hasNextPage: page < result.totalPages,
+        hasPreviousPage: page > 1,
+      },
+      meta: {
+        unreadNotificationsCount: result.unreadNotificationsCount,
+        unseenNotificationsCount: result.unseenNotificationsCount,
+      },
+    });
+  } catch (error) {
+    sendResponse<null>(res, {
+      success: false,
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: "Failed to fetch notifications",
+      data: null,
+    });
+  }
+};
+/**
+ * Get a admin notification
+ */
+export const getAdminNotifications = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+    const limit = Math.min(
+      Math.max(parseInt(req.query.limit as string) || 10, 1),
+      100
+    ); // Max 100 items per page
+    const skip = (page - 1) * limit;
+    const sort = req.query.sort === "asc" ? "asc" : "desc";
+    const paginationParams = { page, limit, skip, sort };
+    const result = await notificationService.getAdminNotifications(
       paginationParams
     );
     sendResponse<Notification[]>(res, {

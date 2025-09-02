@@ -29,12 +29,20 @@ router.post(
 // Route to get all notifications
 router.get("/", NotificationController.getAllNotifications);
 
-// Route to get user notification
+// Route to get customer notification
 router.get(
-  "/user",
+  "/customer",
   authMiddleware,
   authorizeRoles(UserRole.CUSTOMER),
-  NotificationController.getUserNotifications
+  NotificationController.getCustomerNotifications
+);
+
+// Route to get admin notification
+router.get(
+  "/admin",
+  authMiddleware,
+  authorizeRoles(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  NotificationController.getAdminNotifications
 );
 
 // Route to mark all notifications as read

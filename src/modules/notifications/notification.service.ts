@@ -14,7 +14,7 @@ import { getSocketId, io } from "@/utils/socket";
 import { AppError } from "@/utils/appError";
 import httpStatus from "http-status";
 
-interface GetUserNotificationResult {
+interface GetNotificationsResult {
   notifications: Notification[];
   totalCount: number;
   currentPage: number;
@@ -68,10 +68,10 @@ export async function getAllNotifications(): Promise<Notification[]> {
 /**
  * Retrieve a user's notifications
  */
-export async function getUserNotifications(
+export async function getCustomerNotifications(
   userId: BigInt,
   paginationParams: { page: number; limit: number; skip: number; sort: string }
-): Promise<GetUserNotificationResult> {
+): Promise<GetNotificationsResult> {
   try {
     const user = await prisma.user.findUnique({
       where: { userId: Number(userId) },
@@ -114,7 +114,51 @@ export async function getUserNotifications(
     throw new Error(`Failed to fetch notifications: ${getErrorMessage(error)}`);
   }
 }
-
+/**
+ * Retrieve a admin's notifications
+ */
+export async function getAdminNotifications(paginationParams: {
+  page: number;
+  limit: number;
+  skip: number;
+  sort: string;
+}): Promise<GetNotificationsResult> {
+  try {
+    const notifications = await prisma.notification.findMany({
+      where: { receiverId: null },
+      take: paginationParams.limit,
+      skip: paginationParams.skip,
+      orderBy: {
+        createdAt: paginationParams.sort === "asc" ? "asc" : "desc",
+      },
+    });
+    const totalNotifications = await prisma.notification.count({
+      where: { receiverId: null },
+    });
+    const unreadNotificationsCount = await prisma.notification.count({
+      where: {
+        receiverId: null,
+        status: "UNREAD",
+      },
+    });
+    const unseenNotificationsCount = await prisma.notification.count({
+      where: {
+        receiverId: null,
+        isSeen: false,
+      },
+    });
+    return {
+      notifications,
+      currentPage: paginationParams.page,
+      totalPages: Math.ceil(totalNotifications / paginationParams.limit),
+      totalCount: totalNotifications,
+      unreadNotificationsCount,
+      unseenNotificationsCount,
+    };
+  } catch (error) {
+    throw new Error(`Failed to fetch notifications: ${getErrorMessage(error)}`);
+  }
+}
 /**
  * Retrieve a notification by its ID
  */
