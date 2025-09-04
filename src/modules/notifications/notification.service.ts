@@ -2,7 +2,6 @@
  * Service layer for Notification entity operations.
  * Contains business logic and database interactions for notifications.
  */
-
 import prisma from "@/prisma-client/prismaClient";
 import {
   Notification,

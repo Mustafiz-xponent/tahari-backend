@@ -1,14 +1,12 @@
 import axios from "axios";
-import { Prisma } from "@prisma/client";
 import prisma from "@/prisma-client/prismaClient";
+import { Payment } from "@/generated/prisma/client";
 import { getErrorMessage } from "@/utils/errorHandler";
+import { sendNotification } from "@/utils/sendNotification";
 import * as orderService from "@/modules/orders/orders.service";
+import { getOnlineAdminSupportSockets, io } from "@/utils/socket";
 import { CreatePaymentDto } from "@/modules/payments/payment.dto";
 import { getOrderStatusMessage } from "@/utils/getOrderStatusMessage";
-import { NotificationType, Payment } from "@/generated/prisma/client";
-import { getOnlineAdminSupportSockets, getSocketId, io } from "@/utils/socket";
-import { sendNotification } from "./sendNotification";
-
 export interface PaymentResult {
   payment?: Payment;
   redirectUrl?: string; // For SSLCommerz redirect

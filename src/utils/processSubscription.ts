@@ -262,6 +262,9 @@ export const createOrderWithItems = async (
       io.to(socketId).emit("newOrder", orderData);
     });
   }
+  // Notify the admin/support
+  const message = `নতুন সাবস্ক্রিপশন অর্ডার তৈরি হয়েছে। অর্ডার আইডি: #${order.orderId}`;
+  await sendNotification(message, "ORDER", "ADMIN_SUPPORT", null, tx);
   return order;
 };
 export const createSubscriptionDelivery = async (
