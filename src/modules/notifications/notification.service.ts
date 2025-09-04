@@ -253,9 +253,7 @@ export async function markNotificationAsReadById(
     if (!notification) {
       throw new AppError("Notification not found", httpStatus.NOT_FOUND);
     }
-    if (notification.receiverId !== userId) {
-      throw new AppError("You don't have permission", httpStatus.FORBIDDEN);
-    }
+
     await prisma.notification.update({
       where: {
         notificationId: Number(notificationId),

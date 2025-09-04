@@ -183,7 +183,8 @@ export async function createSubscription(
         throw new Error("Invalid payment method. Must be WALLET or COD.");
       }
       // Notify the admin/support
-      const notificationMessage = `A user has subscribed to a plan. Subscription ID: ${subscription.subscriptionId}`;
+      const notificationMessage = `একজন ব্যবহারকারী সফলভাবে একটি প্ল্যানে সাবস্ক্রাইব সম্পন্ন করেছেন। 
+      সাবস্ক্রিপশন আইডি: #${subscription.subscriptionId} এবং গ্রাহকের আইডি: #${subscription.customer.customerId}`;
       await sendNotification(
         notificationMessage,
         "SUBSCRIPTION",

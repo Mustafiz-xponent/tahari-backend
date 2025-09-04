@@ -188,7 +188,8 @@ export async function handleSSLCommerzSuccess(
           tx
         );
         // Notify the admin/support
-        const adminNotificationMessage = `A new order has been placed. Order ID: ${orderId}`;
+        const adminNotificationMessage = `একজন গ্রাহক একটি নতুন অর্ডার ক্রয় করেছেন। 
+        অর্ডার আইডি: #${orderId} এবং গ্রাহকের আইডি: #${order.customer.customerId}`;
         await sendNotification(
           adminNotificationMessage,
           "ORDER",
@@ -326,7 +327,7 @@ export async function handleSSLCommerzFailure(failureData: any): Promise<void> {
         });
       }
       // Notify the customer
-      const message = `দুঃখিত! আপনার অর্ডারটি সম্পন্ন করা যায়নি কারণ পেমেন্ট সফল হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।   (অর্ডার আইডিঃ #${order.orderId})`;
+      const message = `দুঃখিত! আপনার অর্ডারটি সম্পন্ন করা যায়নি কারণ পেমেন্ট সফল হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন। (অর্ডার আইডিঃ #${order.orderId})`;
       await sendNotification(
         message,
         "ORDER",

@@ -124,7 +124,8 @@ export async function processWalletPayment(
       tx
     );
     // Notify the admin/support
-    const adminNotificationMessage = `A new order has been placed. OrderId #${data.orderId}`;
+    const adminNotificationMessage = `একজন ব্যবহারকারী একটি নতুন অর্ডার ক্রয় করেছেন। 
+    অর্ডার আইডি: #${data.orderId} এবং গ্রাহকের আইডি: #${order.customer.customerId}`;
     await sendNotification(
       adminNotificationMessage,
       "ORDER",
@@ -201,7 +202,8 @@ export async function processCodPayment(
       tx
     );
     // Notify the admin/support
-    const adminNotificationMessage = `A new order has been placed. OrderId #${data.orderId}`;
+    const adminNotificationMessage = `একজন গ্রাহক একটি নতুন অর্ডার ক্রয় করেছেন। 
+    অর্ডার আইডি: #${data.orderId} এবং গ্রাহকের আইডি: #${order.customer.customerId}`;
     await sendNotification(
       adminNotificationMessage,
       "ORDER",
